@@ -1,45 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Productos - AgroMercado</title>
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="CRUD.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <!-- Navbar superior -->
-    <nav class="floating-navbar">
-        <div class="logo-container">
-            <a href="index.html">
-               <img src="img/Logo_Claro.png" alt="Logo" class="logo logo-claro">
-               <img src="img/Logo_Oscuro.png" alt="Logo" class="logo logo-oscuro">
-            </a>
-        </div>
-        
-        <div class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="categorias.html">Productos</a>
-            <a href="contacto.html">Contacto</a>
-            <a href="nosotros.html">Nosotros</a>
-        </div>
+@extends('layouts.app')
 
-        <div class="nav-right">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Buscar productos...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            
-            <button id="themeToggle" class="theme-toggle">
-                <i class="fas fa-sun"></i>
-            </button>
-        </div>
-    </nav>
-
+@section('content')
     <div class="crud-container">
         <div class="crud-header">
             <h2>Gestión de Productos</h2>
@@ -142,27 +103,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Navbar inferior -->
-    <nav class="bottom-navbar">
-        <a href="index.html" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Inicio</span>
-        </a>
-        <a href="pedidos.html" class="nav-item">
-            <i class="fas fa-box"></i>
-            <span>Pedidos</span>
-        </a>
-        <a href="CRUD.html" class="nav-item active">
-            <i class="fas fa-plus-circle"></i>
-            <span>Productos</span>
-        </a>
-        <a href="perfil.html" class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>Perfil</span>
-        </a>
-    </nav>
-
-    <script src="CRUD.js"></script>
-</body>
-</html>
+@endsection

@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroMercado - Iniciar Sesión</title>
-    <link rel="stylesheet" href="login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="container">
+@extends('layouts.app')
+
+@section('content')
+    <div class="container auth-container">
         <div class="forms-container">
             <!-- Formulario de Inicio de Sesión -->
             <form class="login-form active" id="loginForm">
@@ -59,6 +52,4 @@
             </div>
         </div>
     </div>
-    <script src="login.js"></script>
-</body>
-</html>
+@endsection

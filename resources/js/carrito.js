@@ -1,5 +1,15 @@
 let carrito = [];
 let sidebarVisible = false;
+let _productosCache = null;
+
+async function fetchProductos() {
+    if (_productosCache) return _productosCache;
+    const res = await fetch('/api/productos');
+    if (!res.ok) throw new Error('No se pudo cargar productos');
+    const data = await res.json();
+    _productosCache = Array.isArray(data.products) ? data.products : [];
+    return _productosCache;
+}
 
 function updateCartCount() {
     const cartCount = document.querySelector('.cart-count');
@@ -11,7 +21,6 @@ function updateCartCount() {
 
 function addToCart(producto) {
     const existingProduct = carrito.find(item => item.id === producto.id);
-    
     if (existingProduct) {
         existingProduct.cantidad += 1;
     } else {
@@ -20,14 +29,12 @@ function addToCart(producto) {
             cantidad: 1
         });
     }
-    
     updateCartSidebar();
     updateCartCount();
     saveCartToLocalStorage();
-    
     Swal.fire({
         title: '¡Agregado!',
-        text: `${producto.nombre} se agregó al carrito`,
+        text: `${producto.name} se agregó al carrito`,
         icon: 'success',
         timer: 1500,
         showConfirmButton: false,
@@ -41,7 +48,7 @@ function removeFromCart(productId) {
     if (producto) {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: `¿Deseas eliminar ${producto.nombre} del carrito?`,
+            text: `¿Deseas eliminar ${producto.name} del carrito?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
@@ -52,10 +59,9 @@ function removeFromCart(productId) {
                 updateCartSidebar();
                 updateCartCount();
                 saveCartToLocalStorage();
-                
                 Swal.fire({
                     title: 'Eliminado',
-                    text: `${producto.nombre} ha sido eliminado del carrito`,
+                    text: `${producto.name} ha sido eliminado del carrito`,
                     icon: 'success',
                     toast: true,
                     position: 'top-end',
@@ -82,26 +88,23 @@ function updateQuantity(productId, newQuantity) {
 }
 
 function calculateTotal() {
-    return carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+    return carrito.reduce((total, item) => total + (Number(item.price || 0) * item.cantidad), 0);
 }
 
 function updateCartSidebar() {
-    const sidebar = document.querySelector('.cart-sidebar');
     const cartContent = document.querySelector('.cart-content');
-    const totalElement = document.querySelector('.cart-total');
-    
+    const totalElement = document.querySelector('#cartTotal');
     if (!cartContent) return;
-    
     cartContent.innerHTML = '';
-    
     carrito.forEach(item => {
+        const image = item.image_path ? `/storage/${item.image_path}` : '/img/placeholder.png';
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-item';
         itemElement.innerHTML = `
-            <img src="${item.imagen}" alt="${item.nombre}">
+            <img src="${image}" alt="${item.name}">
             <div class="cart-item-details">
-                <h4>${item.nombre}</h4>
-                <p>S/. ${item.precio} /${item.unidad}</p>
+                <h4>${item.name}</h4>
+                <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
                 <div class="quantity-controls">
                     <button onclick="updateQuantity(${item.id}, ${item.cantidad - 1})">-</button>
                     <span>${item.cantidad}</span>
@@ -116,21 +119,14 @@ function updateCartSidebar() {
         `;
         cartContent.appendChild(itemElement);
     });
-    
-    totalElement.textContent = `Total: S/. ${calculateTotal().toFixed(2)}`;
+    if (totalElement) totalElement.textContent = calculateTotal().toFixed(2);
 }
 
 function toggleCartSidebar() {
     const sidebar = document.querySelector('.cart-sidebar');
     sidebarVisible = !sidebarVisible;
-    
-    if (sidebarVisible) {
-        sidebar.style.transform = 'translateX(0)';
-        document.body.style.overflow = 'hidden';
-    } else {
-        sidebar.style.transform = 'translateX(100%)';
-        document.body.style.overflow = 'auto';
-    }
+    if (sidebar) sidebar.style.transform = sidebarVisible ? 'translateX(0)' : 'translateX(100%)';
+    document.body.style.overflow = sidebarVisible ? 'hidden' : 'auto';
 }
 
 function saveCartToLocalStorage() {
@@ -147,68 +143,60 @@ function loadCartFromLocalStorage() {
 
 // Inicializar el carrito
 document.addEventListener('DOMContentLoaded', () => {
-    // Agregar eventos a los botones del carrito
     const cartButton = document.querySelector('#openCart');
     const closeCartButton = document.querySelector('#closeCart');
     const checkoutButton = document.querySelector('#checkoutButton');
-    const cartButtonMobile = document.querySelector('.bottom-nav-mobile a:last-child');
+    const cartButtonMobile = document.querySelector('.cart-button-mobile');
 
-    cartButton.addEventListener('click', toggleCartSidebar);
-    closeCartButton.addEventListener('click', toggleCartSidebar);
-    cartButtonMobile.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleCartSidebar();
-    });
+    if (cartButton) cartButton.addEventListener('click', toggleCartSidebar);
+    if (closeCartButton) closeCartButton.addEventListener('click', toggleCartSidebar);
+    if (cartButtonMobile) cartButtonMobile.addEventListener('click', (e) => { e.preventDefault(); toggleCartSidebar(); });
 
-    // Evento de checkout
-    checkoutButton.addEventListener('click', () => {
-        if (carrito.length === 0) {
+    if (checkoutButton) {
+        checkoutButton.addEventListener('click', () => {
+            if (carrito.length === 0) {
+                Swal.fire({ title: 'Carrito Vacío', text: 'Agrega productos al carrito antes de proceder al pago', icon: 'info' });
+                return;
+            }
             Swal.fire({
-                title: 'Carrito Vacío',
-                text: 'Agrega productos al carrito antes de proceder al pago',
-                icon: 'info'
+                title: 'Procesando Pago',
+                text: `Total a pagar: S/. ${calculateTotal().toFixed(2)}`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Pagar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: '¡Pago Exitoso!', text: 'Gracias por tu compra', icon: 'success' }).then(() => {
+                        carrito = [];
+                        saveCartToLocalStorage();
+                        updateCartSidebar();
+                        updateCartCount();
+                        toggleCartSidebar();
+                    });
+                }
             });
-            return;
-        }
-
-        Swal.fire({
-            title: 'Procesando Pago',
-            text: `Total a pagar: S/. ${calculateTotal().toFixed(2)}`,
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Pagar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Aquí iría la lógica de pago real
-                Swal.fire({
-                    title: '¡Pago Exitoso!',
-                    text: 'Gracias por tu compra',
-                    icon: 'success'
-                }).then(() => {
-                    carrito = [];
-                    saveCartToLocalStorage();
-                    updateCartSidebar();
-                    updateCartCount();
-                    toggleCartSidebar();
-                });
-            }
         });
-    });
+    }
 
-    // Modificar los botones de "Agregar al carrito"
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.add-to-cart')) {
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.add-to-cart');
+        if (btn) {
             const productCard = e.target.closest('.product-card');
-            const productId = parseInt(productCard.dataset.productId);
-            const producto = productos.find(p => p.id === productId);
-            if (producto) {
-                addToCart(producto);
+            const productId = parseInt(productCard?.dataset.productId || btn.dataset.id, 10);
+            try {
+                const productos = await fetchProductos();
+                const producto = productos.find(p => p.id === productId);
+                if (producto) {
+                    addToCart(producto);
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire({ title: 'Error', text: 'No se pudo agregar el producto', icon: 'error' });
             }
         }
     });
 
-    // Cargar el carrito guardado
     loadCartFromLocalStorage();
     updateCartCount();
 });
