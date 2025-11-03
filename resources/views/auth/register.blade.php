@@ -1,60 +1,62 @@
 @extends('layouts.app')
 
+@push('styles')
+    @vite(['resources/css/login.css'])
+@endpush
+
+@push('scripts')
+    @vite(['resources/js/login.js'])
+@endpush
+
 @section('content')
-    <div class="container auth-container">
-        <div class="forms-container">
-            <!-- Formulario de Registro -->
-            <form class="register-form" id="registerForm">
-                <h2>Crear Cuenta</h2>
+    <div class="login-body">
+    <div class="container-auth">
+
+        <div class="toggle-panel">
+            <h1>¡Bienvenido!</h1>
+            <p>Si ya tienes una cuenta, inicia sesión para ver tus pedidos</p>
+            <a href="{{ route('login') }}" class="btn">Iniciar Sesión</a>
+        </div>
+
+        <div class="form-panel">
+            <form method="POST" action="{{ route('register') }}" class="form-container">
+                @csrf
+                <h1>Crear Cuenta</h1>
+                <span>Usa tu correo para registrarte</span>
+
                 <div class="input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" placeholder="Nombre completo" required>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autocomplete="name" />
+                    <label for="name">Nombre</label>
                 </div>
+                @error('name')
+                    <div class="input-error">{{ $message }}</div>
+                @enderror
+
                 <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="Correo electrónico" required>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" />
+                    <label for="email">Correo Electrónico</label>
                 </div>
+                @error('email')
+                    <div class="input-error">{{ $message }}</div>
+                @enderror
+
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Contraseña" required>
+                    <input id="password" type="password" name="password" required autocomplete="new-password" />
+                    <label for="password">Contraseña</label>
                 </div>
+                @error('password')
+                    <div class="input-error">{{ $message }}</div>
+                @enderror
+
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Confirmar contraseña" required>
+                    <input id="password-confirm" type="password" name="password_confirmation" required autocomplete="new-password" />
+                    <label for="password-confirm">Confirmar Contraseña</label>
                 </div>
-                <button type="submit" class="submit-btn">Registrarse</button>
-                
-                <div class="social-login">
-                    <p>O regístrate con</p>
-                    <div class="social-icons">
-                        <button type="button" class="social-btn google">
-                            <i class="fab fa-google"></i>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-btn facebook">
-                            <i class="fab fa-facebook-f"></i>
-                            <span>Facebook</span>
-                        </button>
-                        <button type="button" class="social-btn instagram">
-                            <i class="fab fa-instagram"></i>
-                            <span>Instagram</span>
-                        </button>
-                    </div>
-                </div>
+
+                <button type="submit" class="btn">Registrarse</button>
             </form>
         </div>
 
-        <div class="toggle-container">
-            <div class="toggle-panel">
-                <h3>¿No tienes una cuenta?</h3>
-                <p>Únete a nuestra comunidad y descubre los mejores productos del campo</p>
-                <button type="button" id="showRegisterForm">Registrarse</button>
-            </div>
-            <div class="toggle-panel hidden">
-                <h3>¿Ya tienes una cuenta?</h3>
-                <p>Inicia sesión para acceder a tu cuenta y realizar tus compras</p>
-                <button type="button" id="showLoginForm">Iniciar Sesión</button>
-            </div>
-        </div>
     </div>
+</div>
 @endsection

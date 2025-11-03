@@ -4,9 +4,10 @@ import './bootstrap';
 import './carrito';
 
 // Páginas específicas
-import './login';
-import './contacto';
+// import './login';
+// import './contacto';
 import './nosotros';
 import './categorias';
 import './pedidos';
 import './CRUD';
+import './script';

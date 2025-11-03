@@ -1,53 +1,29 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const showRegisterFormBtn = document.getElementById('showRegisterForm');
-    const showLoginFormBtn = document.getElementById('showLoginForm');
-    const togglePanels = document.querySelectorAll('.toggle-panel');
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecciona todos los inputs dentro de un .input-group
+    const inputs = document.querySelectorAll('.input-group input');
 
-    // Verificar si hay que mostrar el formulario de registro
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('form') === 'register') {
-        toggleForms(true);
+    // Función para activar el label
+    function handleFocus() {
+        // Añade la clase 'active' al div padre (.input-group)
+        this.parentElement.classList.add('active');
     }
 
-    // Función para cambiar entre formularios
-    function toggleForms(showRegister) {
-        if (showRegister) {
-            loginForm.classList.remove('active');
-            registerForm.classList.add('active');
-        } else {
-            registerForm.classList.remove('active');
-            loginForm.classList.add('active');
+    // Función para desactivar el label si el input está vacío
+    function handleBlur() {
+        // Solo quita 'active' si el input está vacío
+        if (this.value === '') {
+            this.parentElement.classList.remove('active');
         }
-
-        // Alternar paneles
-        togglePanels.forEach(panel => panel.classList.toggle('hidden'));
     }
 
-    // Event listeners para los botones de cambio
-    showRegisterFormBtn.addEventListener('click', () => toggleForms(true));
-    showLoginFormBtn.addEventListener('click', () => toggleForms(false));
+    inputs.forEach(input => {
+        // Agrega los listeners
+        input.addEventListener('focus', handleFocus);
+        input.addEventListener('blur', handleBlur);
 
-    // Manejar envío de formularios
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Aquí iría la lógica de inicio de sesión
-        console.log('Iniciando sesión...');
-    });
-
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Aquí iría la lógica de registro
-        console.log('Registrando usuario...');
-    });
-
-    // Manejar clics en botones sociales
-    document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const platform = e.currentTarget.classList[1]; // google, facebook, o instagram
-            console.log(`Iniciando sesión con ${platform}`);
-            // Aquí iría la lógica de inicio de sesión social
-        });
+        // Comprobación inicial por si la página se carga con datos (ej. al fallar la validación)
+        if (input.value !== '') {
+            input.parentElement.classList.add('active');
+        }
     });
 });

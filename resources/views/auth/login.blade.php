@@ -1,55 +1,56 @@
 @extends('layouts.app')
 
+@push('styles')
+    @vite(['resources/css/login.css'])
+@endpush
+
+@push('scripts')
+    @vite(['resources/js/login.js'])
+@endpush
+
 @section('content')
-    <div class="container auth-container">
-        <div class="forms-container">
-            <!-- Formulario de Inicio de Sesión -->
-            <form class="login-form active" id="loginForm">
-                <h2>Iniciar Sesión</h2>
+    <div class="login-body">
+    <div class="container-auth">
+
+        <div class="form-panel">
+            <form method="POST" action="{{ route('login') }}" class="form-container">
+                @csrf
+                <h1>Iniciar Sesión</h1>
+                <span>Usa tu correo y contraseña</span>
+
                 <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" placeholder="Correo electrónico" required>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" />
+                    <label for="email">Correo Electrónico</label>
                 </div>
+                @error('email')
+                    <div class="input-error">{{ $message }}</div>
+                @enderror
+
                 <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" placeholder="Contraseña" required>
+                    <input id="password" type="password" name="password" required autocomplete="current-password" />
+                    <label for="password">Contraseña</label>
                 </div>
-                <div class="forgot-password">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
-                </div>
-                <button type="submit" class="submit-btn">Iniciar Sesión</button>
+                @error('password')
+                    <div class="input-error">{{ $message }}</div>
+                @enderror
                 
-                <div class="social-login">
-                    <p>O inicia sesión con</p>
-                    <div class="social-icons">
-                        <button type="button" class="social-btn google">
-                            <i class="fab fa-google"></i>
-                            <span>Google</span>
-                        </button>
-                        <button type="button" class="social-btn facebook">
-                            <i class="fab fa-facebook-f"></i>
-                            <span>Facebook</span>
-                        </button>
-                        <button type="button" class="social-btn instagram">
-                            <i class="fab fa-instagram"></i>
-                            <span>Instagram</span>
-                        </button>
-                    </div>
+                <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                
+                <div style="margin: 1rem 0; text-align: left; font-size: 0.875rem;">
+                    <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                    <label for="remember" style="color: var(--text-color-light, #777); padding-left: 5px;">Recuérdame</label>
                 </div>
+
+                <button type="submit" class="btn">Iniciar Sesión</button>
             </form>
         </div>
 
-        <div class="toggle-container">
-            <div class="toggle-panel">
-                <h3>¿No tienes una cuenta?</h3>
-                <p>Únete a nuestra comunidad y descubre los mejores productos del campo</p>
-                <button type="button" id="showRegisterForm">Registrarse</button>
-            </div>
-            <div class="toggle-panel hidden">
-                <h3>¿Ya tienes una cuenta?</h3>
-                <p>Inicia sesión para acceder a tu cuenta y realizar tus compras</p>
-                <button type="button" id="showLoginForm">Iniciar Sesión</button>
-            </div>
+        <div class="toggle-panel">
+            <h1>¡Hola, Amigo!</h1>
+            <p>Regístrate con tus datos personales para usar todas las funciones del sitio</p>
+            <a href="{{ route('register') }}" class="btn">Registrarse</a>
         </div>
+
     </div>
+</div>
 @endsection

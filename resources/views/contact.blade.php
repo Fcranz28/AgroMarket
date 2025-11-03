@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite(['resources/css/contacto.css', 'resources/js/contacto.js'])
+@endpush
+
 @section('content')
     <section class="contact-section">
         <div class="contact-container">
@@ -10,7 +14,7 @@
                 <div class="info-items">
                     <div class="info-item">
                         <span class="icon">
-                            <i class="fas fa-map-marker-alt"></i>
+                            <img src="{{ asset('img/location-pin-svgrepo-com.svg') }}" alt="location">
                         </span>
                         <div class="info-content">
                             <span class="info-label">Dirección:</span>
@@ -20,7 +24,7 @@
 
                     <div class="info-item">
                         <span class="icon">
-                            <i class="fas fa-phone"></i>
+                            <img src="{{ asset('img/phone-calling-svgrepo-com.svg') }}" alt="location">                            
                         </span>
                         <div class="info-content">
                             <span class="info-label">Teléfono:</span>
@@ -30,7 +34,7 @@
 
                     <div class="info-item">
                         <span class="icon">
-                            <i class="fas fa-paper-plane"></i>
+                            <img src="{{ asset('img/gmail-old-svgrepo-com.svg') }}" alt="location">                            
                         </span>
                         <div class="info-content">
                             <span class="info-label">Email:</span>
@@ -40,7 +44,7 @@
 
                     <div class="info-item">
                         <span class="icon">
-                            <i class="fas fa-globe"></i>
+                            <img src="{{ asset('img/web-svgrepo-com.svg') }}" alt="location">                            
                         </span>
                         <div class="info-content">
                             <span class="info-label">Sitio Web:</span>
@@ -67,11 +71,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321" required>
+                        <input type="number" id="telefono" name="telefono" placeholder="Ej: 987654321" required>
                     </div>
                     <div class="form-group">
                         <label for="asunto">Asunto</label>
-                        <input type="text" id="asunto" name="asunto" placeholder="Ej: Consulta sobre productos" required>
+                        <select name="asunto" id="asunto">
+                            <option value="" disabled selected>Selecciona un asunto</option>
+                            <option value="consulta">Consulta sobre productos</option>
+                            <option value="soporte">Soporte técnico</option>
+                            <option value="sugerencia">Sugerencias</option>
+                            <option value="otros">Otros</option>
+                        </select>
                     </div>
                 </div>
 
@@ -86,8 +96,7 @@
             </form>
         </div>
         <div class="map-container">
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.964560140294!2d-77.03197642570847!3d-12.046639642354217!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8b5d35662c7%3A0x15f0bda5ccbd31eb!2sPlaza%20Mayor%20de%20Lima!5e0!3m2!1ses!2spe!4v1698990843595!5m2!1ses!2spe" 
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.6662255626034!2d-71.85895702394997!3d-13.556055371837957!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x916e7d4c9db42bf5%3A0xe56b22b37c2e89f9!2sUniversidad%20Continental%20-%20Campus%20Cusco!5e0!3m2!1ses-419!2spe!4v1762201294143!5m2!1ses-419!2spe" 
                 width="100%" 
                 height="450" 
                 style="border:0;" 

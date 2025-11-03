@@ -5,8 +5,8 @@
 @import 'style2.css';
 
 /* Estilos específicos de páginas */
-@import 'login.css';
-@import 'contacto.css';
+@import 'login.css'; 
+@import 'contacto.css'; 
 @import 'nosotros.css';
 @import 'categorias.css';
 @import 'pedidos.css';
