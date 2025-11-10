@@ -55,18 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.querySelector('.products-grid');
     const carouselContainer = document.querySelector('.carousel-content');
 
+
     /**
      * Crea el HTML para una tarjeta de producto.
-     * @param {object} product - El objeto del producto.
-     * @returns {string} - El string HTML de la card.
+     @param {object} product - El objeto del producto.
+     @returns {string} - El string HTML de la card.
      */
     function createProductCard(product) {
-        // NOTA: Ajusta la ruta de la imagen si es necesario.
-        // Si 'image_path' es solo 'productos/imagen.jpg', puede que necesites '/storage/' al inicio.
-        // const imageUrl = product.image_path.startsWith('http') ? product.image_path : `/storage/${product.image_path}`;
-        
-        // Usaremos la ruta tal cual viene de la API por ahora.
-        const imageUrl = product.image_path;
+        // Tu API devuelve rutas como 'img/productos/...'
+        const imageUrl = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
+        const price = Number(product.price || 0).toFixed(2);
 
         return `
             <div class="product-card">
@@ -75,8 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">${product.name}</h3>
-                    <p class="product-price">$${Number(product.price).toFixed(2)} / ${product.unit}</p>
-                    <button class="add-to-cart-btn" data-product-id="${product.id}">
+                    <p class="product-price">S/. ${price} / ${product.unit}</p>
+                    
+                    <button class="add-to-cart-btn" 
+                            data-id="${product.id}"
+                            data-name="${product.name}"
+                            data-price="${price}"
+                            data-image="${imageUrl}"
+                            data-unit="${product.unit}">
                         Agregar al Carrito
                     </button>
                 </div>
@@ -157,36 +161,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- FIN DE LA SOLUCIÓN ---
 });
-// En: resources/js/script.js
-
-    /**
-     * Crea el HTML para una tarjeta de producto.
-     * @param {object} product - El objeto del producto.
-     * @returns {string} - El string HTML de la card.
-     */
-    function createProductCard(product) {
-        // Asumiendo que tus imágenes están en public/img/productos/...
-        const imageUrl = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
-        const price = Number(product.price || 0).toFixed(2);
-
-        return `
-            <div class="product-card">
-                <div class="product-image-container">
-                    <img src="${imageUrl}" alt="${product.name}" class="product-image">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name">${product.name}</h3>
-                    <p class="product-price">S/. ${price} / ${product.unit}</p>
-                    
-                    <button class="add-to-cart-btn" 
-                            data-id="${product.id}"
-                            data-name="${product.name}"
-                            data-price="${price}"
-                            data-image="${imageUrl}"
-                            data-unit="${product.unit}">
-                        Agregar al Carrito
-                    </button>
-                </div>
-            </div>
-        `;
-    }

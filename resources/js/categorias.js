@@ -64,64 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * FUNCIÓN CORREGIDA (para la ruta de imagen)
-     * Dibuja las cards de productos en el grid.
-     */
-    function renderProducts(products) {
-        if (!products || products.length === 0) {
-            productsGrid.innerHTML = `
-                <div class="no-products">
-                    <p>No se encontraron productos en esta categoría.</p>
-                </div>
-            `;
-            return;
-        }
-
-        productsGrid.innerHTML = products.map(product => {
-            // SOLUCIÓN: Tus datos SQL muestran rutas como 'img/productos/...'
-            // No necesitan '/storage/'.
-            const image = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
-            const price = Number(product.price || 0).toFixed(2);
-            return `
-            <article class="product-card" data-product-id="${product.id}">
-                <img src="${image}" alt="${product.name}" loading="lazy">
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <p class="price">S/. ${price}</p>
-                    <button class="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
-                </div>
-            </article>`;
-        }).join('');
-    }
-
-    /**
-     * Marca el botón de categoría como activo
-     */
-    function updateActiveCategory() {
-        categoryButtons.forEach(button => {
-            button.classList.toggle('active', button.dataset.category === currentCategory);
-        });
-    }
-
-    // --- EVENT LISTENERS (Tu código original, que está correcto) ---
-
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            currentCategory = button.dataset.category;
-            updateActiveCategory(); // Actualiza la clase 'active'
-            loadProducts(); // Recarga los productos con el nuevo filtro
-        });
-    });
-
-    sortSelect.addEventListener('change', () => {
-        currentSort = sortSelect.value;
-        loadProducts(); // Recarga los productos con el nuevo orden
-    });
-
-    // Carga inicial de productos
-    loadProducts();
-});
 // En: resources/js/categorias.js
 
     function renderProducts(products) {
@@ -156,3 +98,31 @@ document.addEventListener('DOMContentLoaded', () => {
             </article>`;
         }).join('');
     }
+
+    /**
+     * Marca el botón de categoría como activo
+     */
+    function updateActiveCategory() {
+        categoryButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.category === currentCategory);
+        });
+    }
+
+    // --- EVENT LISTENERS (Tu código original, que está correcto) ---
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            currentCategory = button.dataset.category;
+            updateActiveCategory(); // Actualiza la clase 'active'
+            loadProducts(); // Recarga los productos con el nuevo filtro
+        });
+    });
+
+    sortSelect.addEventListener('change', () => {
+        currentSort = sortSelect.value;
+        loadProducts(); // Recarga los productos con el nuevo orden
+    });
+
+    // Carga inicial de productos
+    loadProducts();
+});
