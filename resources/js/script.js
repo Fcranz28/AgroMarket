@@ -25,10 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTheme();
     }
 
-    themeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-theme');
-        updateTheme();
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            updateTheme();
+        });
+    }
 
     // Manejar la navegación móvil
     bottomNavLinks.forEach(link => {
@@ -48,11 +50,110 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- INICIO DE LA SOLUCIÓN ---
+
+    const gridContainer = document.querySelector('.products-grid');
+    const carouselContainer = document.querySelector('.carousel-content');
+
+    /**
+     * Crea el HTML para una tarjeta de producto.
+     * @param {object} product - El objeto del producto.
+     * @returns {string} - El string HTML de la card.
+     */
+    function createProductCard(product) {
+        // NOTA: Ajusta la ruta de la imagen si es necesario.
+        // Si 'image_path' es solo 'productos/imagen.jpg', puede que necesites '/storage/' al inicio.
+        // const imageUrl = product.image_path.startsWith('http') ? product.image_path : `/storage/${product.image_path}`;
+        
+        // Usaremos la ruta tal cual viene de la API por ahora.
+        const imageUrl = product.image_path;
+
+        return `
+            <div class="product-card">
+                <div class="product-image-container">
+                    <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-price">$${Number(product.price).toFixed(2)} / ${product.unit}</p>
+                    <button class="add-to-cart-btn" data-product-id="${product.id}">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Obtiene todos los productos de la API.
+     * @returns {Promise<Array>} - Una promesa que resuelve a un array de productos.
+     */
+    async function fetchProducts() {
+        try {
+            // Llama a la ruta definida en routes/api.php
+            const response = await fetch('/api/productos'); 
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.products || []; // Devuelve los productos o un array vacío
+        } catch (error) {
+            console.error('No se pudieron cargar los productos:', error);
+            return []; // Devuelve un array vacío en caso de error
+        }
+    }
+
+    /**
+     * Muestra productos aleatorios en el grid.
+     */
+    async function showRandomProducts() {
+        if (!gridContainer) {
+            console.warn('No se encontró el contenedor .products-grid');
+            return;
+        }
+
+        const products = await fetchProducts();
+        
+        // Mezcla los productos y toma 6
+        const randomProducts = products.sort(() => 0.5 - Math.random()).slice(0, 6);
+        
+        gridContainer.innerHTML = ''; // Limpiar el contenedor
+        randomProducts.forEach(product => {
+            gridContainer.innerHTML += createProductCard(product);
+        });
+    }
+
+    /**
+     * Muestra los productos más nuevos en el carrusel.
+     */
+    async function initProductCarousel() {
+        if (!carouselContainer) {
+            console.warn('No se encontró el contenedor .carousel-content');
+            return;
+        }
+
+        const products = await fetchProducts();
+        
+        // La API ya los devuelve por 'latest('id')', así que solo tomamos los primeros 5
+        const carouselProducts = products.slice(0, 5);
+        
+        carouselContainer.innerHTML = ''; // Limpiar el contenedor
+        carouselProducts.forEach(product => {
+            carouselContainer.innerHTML += createProductCard(product);
+        });
+        
+        // Aquí puedes agregar la inicialización de una librería de carrusel (como Swiper o Slick)
+        // si lo deseas. Por ahora, se mostrarán en línea.
+    }
+
     // Inicializar el carrusel y los productos aleatorios
+    // (Estas líneas ya existían en tu script original)
     if (typeof initProductCarousel === 'function') {
         initProductCarousel();
     }
     if (typeof showRandomProducts === 'function') {
         showRandomProducts();
     }
+    
+    // --- FIN DE LA SOLUCIÓN ---
 });

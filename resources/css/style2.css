@@ -231,3 +231,123 @@
         gap: 30px;
     }
 }
+/* ==============================================
+   ESTILOS PARA LAS CARDS DE PRODUCTOS
+   (Añadir en resources/css/app.css o similar)
+   ============================================== */
+
+/* Contenedor del Grid de productos */
+.products-grid {
+    display: grid;
+    /* Crea columnas automáticas de mínimo 250px */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem; /* Espacio entre cards */
+}
+
+/* Contenedor del Carrusel */
+.carousel-content {
+    display: flex;
+    overflow-x: auto; /* Permite scroll horizontal (carrusel simple) */
+    gap: 1.5rem; /* Espacio entre cards */
+    padding-bottom: 1rem; /* Espacio para la barra de scroll */
+}
+
+/* La Card de Producto (base) */
+.product-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #ffffff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Ancho fijo para las cards dentro del carrusel */
+.carousel-content .product-card {
+    flex: 0 0 280px; /* No se encoge, no crece, base de 280px */
+}
+
+/* Contenedor de la imagen (para aspect ratio) */
+.product-image-container {
+    width: 100%;
+    padding-top: 100%; /* Mantiene un aspect ratio 1:1 */
+    position: relative;
+    background-color: #f9f9f9; /* Color de fondo mientras carga */
+}
+
+.product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el contenedor */
+}
+
+/* Información de la card */
+.product-info {
+    padding: 1rem;
+    flex-grow: 1; /* Empuja el botón al fondo */
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.product-price {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1rem;
+    flex-grow: 1; /* Ocupa el espacio disponible */
+}
+
+/* Botón de Añadir al Carrito */
+.add-to-cart-btn {
+    background-color: #28a745; /* Color verde (puedes cambiarlo) */
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #218838; /* Verde más oscuro al pasar el mouse */
+}
+
+/* Títulos de sección */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+/* Estilos para el modo oscuro (Opcional, pero recomendado) */
+.dark-theme .product-card {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-theme .product-name {
+    color: #f5f5f5;
+}
+
+.dark-theme .product-price {
+    color: #ccc;
+}
