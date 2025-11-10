@@ -64,19 +64,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-// En: resources/js/categorias.js
-
+    /**
+     * FUNCIÓN CORREGIDA (para la ruta de imagen)
+     * Dibuja las cards de productos en el grid.
+     */
     function renderProducts(products) {
         if (!products || products.length === 0) {
             productsGrid.innerHTML = `
                 <div class="no-products">
-                    <p>No se encontraron productos.</p>
+                    <p>No se encontraron productos en esta categoría.</p>
                 </div>
             `;
             return;
         }
 
         productsGrid.innerHTML = products.map(product => {
+            // SOLUCIÓN: Tus datos SQL muestran rutas como 'img/productos/...'
+            // No necesitan '/storage/'.
             const image = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
             const price = Number(product.price || 0).toFixed(2);
             return `
@@ -84,16 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${image}" alt="${product.name}" loading="lazy">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <p class="price">S/. ${price} / ${product.unit}</p>
-
-                    <button class="add-to-cart-btn" 
-                            data-id="${product.id}"
-                            data-name="${product.name}"
-                            data-price="${price}"
-                            data-image="${image}"
-                            data-unit="${product.unit}">
-                        Agregar al carrito
-                    </button>
+                    <p class="price">S/. ${price}</p>
+                    <button class="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
                 </div>
             </article>`;
         }).join('');

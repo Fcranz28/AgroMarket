@@ -55,12 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.querySelector('.products-grid');
     const carouselContainer = document.querySelector('.carousel-content');
 
+// En: resources/js/script.js
 
-    /**
-     * Crea el HTML para una tarjeta de producto.
-     @param {object} product - El objeto del producto.
-     @returns {string} - El string HTML de la card.
-     */
+    // /**
+    //  * Crea el HTML para una tarjeta de producto.
+    //  * @param {object} product - El objeto del producto.
+    //  * @returns {string} - El string HTML de la card.
+    //  */
     function createProductCard(product) {
         // Tu API devuelve rutas como 'img/productos/...'
         const imageUrl = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
