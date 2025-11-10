@@ -17,26 +17,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadProducts() {
-        showLoading();
+        showLoading(); // Función que ya tienes
+        
+        // 1. Obtener el texto del botón activo para el título
+        const activeButton = document.querySelector('.category-btn.active');
+        const categoryName = activeButton ? activeButton.textContent.trim() : 'Todos los Productos';
+        categoryTitle.textContent = categoryName;
+
         try {
-            const response = await fetch('/api/productos');
-            if (!response.ok) throw new Error('Error al cargar los productos');
+            // 2. Construir la URL con los parámetros de filtro y orden
+            const url = `/api/productos?category=${currentCategory}&sort=${currentSort}`;
+            
+            const response = await fetch(url); // 3. Llamar a la API con los filtros
+            if (!response.ok) {
+                // Si la API falla, muestra un error
+                throw new Error(`Error HTTP: ${response.status} (${response.statusText})`);
+            }
+            
             const data = await response.json();
             const products = Array.isArray(data.products) ? data.products : [];
-            categoryTitle.textContent = 'Todos los productos';
-            renderProducts(products);
-            paginationContainer.innerHTML = '';
-            updateActiveCategory(currentCategory);
+            
+            renderProducts(products); // Tu función para dibujar las cards
+            updateActiveCategory(currentCategory); // Tu función para marcar el botón
+        
         } catch (error) {
+            console.error('No se pudieron cargar los productos:', error);
             productsGrid.innerHTML = `
                 <div class="error-message">
                     <p>Lo sentimos, ha ocurrido un error al cargar los productos.</p>
+                    <p><i>${error.message}</i></p>
                     <button id="retryLoad">Intentar de nuevo</button>
                 </div>
             `;
             const retry = document.getElementById('retryLoad');
             if (retry) retry.addEventListener('click', loadProducts);
-            console.error('Error:', error);
         }
     }
 
