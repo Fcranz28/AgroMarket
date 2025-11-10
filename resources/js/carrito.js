@@ -141,6 +141,30 @@ function loadCartFromLocalStorage() {
     }
 }
 
+// --- Lógica existente para abrir/cerrar sidebar ---
+const openCart = document.getElementById('openCart');
+const closeCart = document.getElementById('closeCart');
+const cartSidebar = document.querySelector('.cart-sidebar');
+
+if (openCart) {
+    openCart.addEventListener('click', () => {
+        if (cartSidebar) cartSidebar.classList.add('open');
+    });
+}
+
+if (closeCart) {
+    closeCart.addEventListener('click', () => {
+        if (cartSidebar) cartSidebar.classList.remove('open');
+    });
+}
+
+// Cierra el sidebar si se hace clic fuera de él
+document.addEventListener('click', (e) => {
+    if (cartSidebar && !cartSidebar.contains(e.target) && !e.target.closest('#openCart')) {
+        cartSidebar.classList.remove('open');
+    }
+});
+
 // Inicializar el carrito
 document.addEventListener('DOMContentLoaded', () => {
     const cartButton = document.querySelector('#openCart');

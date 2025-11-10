@@ -1,9 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionamos los elementos de la vista
     const productsGrid = document.querySelector('.products-grid');
     const categoryButtons = document.querySelectorAll('.category-btn');
     const sortSelect = document.querySelector('.sort-select');
     const categoryTitle = document.querySelector('.category-title');
     const paginationContainer = document.querySelector('.pagination');
+
+    // Comprobación de seguridad (para evitar errores en otras páginas)
+    if (!productsGrid) {
+        // Si no estamos en la página de categorías, no hacemos nada.
+        return; 
+    }
+
     let currentCategory = 'todos';
     let currentSort = 'featured';
 
@@ -16,8 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    /**
+     * FUNCIÓN CORREGIDA
+     * Carga productos desde la API usando los filtros actuales.
+     */
     async function loadProducts() {
-        showLoading(); // Función que ya tienes
+        showLoading();
         
         // 1. Obtener el texto del botón activo para el título
         const activeButton = document.querySelector('.category-btn.active');
@@ -25,27 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryTitle.textContent = categoryName;
 
         try {
-            // 2. Construir la URL con los parámetros de filtro y orden
+            // 2. SOLUCIÓN: Construir la URL con los parámetros de filtro y orden
             const url = `/api/productos?category=${currentCategory}&sort=${currentSort}`;
             
             const response = await fetch(url); // 3. Llamar a la API con los filtros
             if (!response.ok) {
-                // Si la API falla, muestra un error
-                throw new Error(`Error HTTP: ${response.status} (${response.statusText})`);
+                throw new Error(`Error HTTP: ${response.status}`);
             }
             
             const data = await response.json();
             const products = Array.isArray(data.products) ? data.products : [];
             
-            renderProducts(products); // Tu función para dibujar las cards
-            updateActiveCategory(currentCategory); // Tu función para marcar el botón
-        
+            renderProducts(products); // Renderiza los productos
+            paginationContainer.innerHTML = ''; // Limpiar paginación
+            
         } catch (error) {
-            console.error('No se pudieron cargar los productos:', error);
+            console.error('Error:', error);
             productsGrid.innerHTML = `
                 <div class="error-message">
                     <p>Lo sentimos, ha ocurrido un error al cargar los productos.</p>
-                    <p><i>${error.message}</i></p>
                     <button id="retryLoad">Intentar de nuevo</button>
                 </div>
             `;
@@ -54,18 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * FUNCIÓN CORREGIDA (para la ruta de imagen)
+     * Dibuja las cards de productos en el grid.
+     */
     function renderProducts(products) {
         if (!products || products.length === 0) {
             productsGrid.innerHTML = `
                 <div class="no-products">
-                    <p>No se encontraron productos.</p>
+                    <p>No se encontraron productos en esta categoría.</p>
                 </div>
             `;
             return;
         }
 
         productsGrid.innerHTML = products.map(product => {
-            const image = product.image_path ? `/storage/${product.image_path}` : '/img/placeholder.png';
+            // SOLUCIÓN: Tus datos SQL muestran rutas como 'img/productos/...'
+            // No necesitan '/storage/'.
+            const image = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
             const price = Number(product.price || 0).toFixed(2);
             return `
             <article class="product-card" data-product-id="${product.id}">
@@ -79,23 +95,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function updateActiveCategory(category) {
+    /**
+     * Marca el botón de categoría como activo
+     */
+    function updateActiveCategory() {
         categoryButtons.forEach(button => {
-            button.classList.toggle('active', button.dataset.category === category);
+            button.classList.toggle('active', button.dataset.category === currentCategory);
         });
     }
+
+    // --- EVENT LISTENERS (Tu código original, que está correcto) ---
 
     categoryButtons.forEach(button => {
         button.addEventListener('click', () => {
             currentCategory = button.dataset.category;
-            loadProducts();
+            updateActiveCategory(); // Actualiza la clase 'active'
+            loadProducts(); // Recarga los productos con el nuevo filtro
         });
     });
 
     sortSelect.addEventListener('change', () => {
         currentSort = sortSelect.value;
-        loadProducts();
+        loadProducts(); // Recarga los productos con el nuevo orden
     });
 
+    // Carga inicial de productos
     loadProducts();
 });
+// En: resources/js/categorias.js
+
+    function renderProducts(products) {
+        if (!products || products.length === 0) {
+            productsGrid.innerHTML = `
+                <div class="no-products">
+                    <p>No se encontraron productos.</p>
+                </div>
+            `;
+            return;
+        }
+
+        productsGrid.innerHTML = products.map(product => {
+            const image = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
+            const price = Number(product.price || 0).toFixed(2);
+            return `
+            <article class="product-card" data-product-id="${product.id}">
+                <img src="${image}" alt="${product.name}" loading="lazy">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="price">S/. ${price} / ${product.unit}</p>
+
+                    <button class="add-to-cart-btn" 
+                            data-id="${product.id}"
+                            data-name="${product.name}"
+                            data-price="${price}"
+                            data-image="${image}"
+                            data-unit="${product.unit}">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </article>`;
+        }).join('');
+    }

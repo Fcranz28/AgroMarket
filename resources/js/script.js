@@ -157,3 +157,36 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- FIN DE LA SOLUCIÓN ---
 });
+// En: resources/js/script.js
+
+    /**
+     * Crea el HTML para una tarjeta de producto.
+     * @param {object} product - El objeto del producto.
+     * @returns {string} - El string HTML de la card.
+     */
+    function createProductCard(product) {
+        // Asumiendo que tus imágenes están en public/img/productos/...
+        const imageUrl = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
+        const price = Number(product.price || 0).toFixed(2);
+
+        return `
+            <div class="product-card">
+                <div class="product-image-container">
+                    <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-price">S/. ${price} / ${product.unit}</p>
+                    
+                    <button class="add-to-cart-btn" 
+                            data-id="${product.id}"
+                            data-name="${product.name}"
+                            data-price="${price}"
+                            data-image="${imageUrl}"
+                            data-unit="${product.unit}">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+        `;
+    }
