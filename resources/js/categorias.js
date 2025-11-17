@@ -79,9 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         productsGrid.innerHTML = products.map(product => {
-            // SOLUCIÓN: Tus datos SQL muestran rutas como 'img/productos/...'
-            // No necesitan '/storage/'.
-            const image = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
+            // Usar la URL completa de la imagen
+            const image = product.image_url || product.image_path || '/img/placeholder.png';
             const price = Number(product.price || 0).toFixed(2);
             return `
             <article class="product-card" data-product-id="${product.id}">

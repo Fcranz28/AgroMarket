@@ -54,13 +54,13 @@
                 </div>
             </div>
 
-            <form class="contact-form" id="contactForm">
+            <form class="contact-form" id="contactForm" action="https://formspree.io/f/xyzlyzzd" method="POST">
                 <h2>Envíanos un mensaje</h2>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nombre">Nombre completo</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+                        <input type="text" id="nombre" name="name" placeholder="Ej: Juan Pérez" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Correo electrónico</label>
@@ -71,7 +71,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="number" id="telefono" name="telefono" placeholder="Ej: 987654321" required>
+                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321" required>
                     </div>
                     <div class="form-group">
                         <label for="asunto">Asunto</label>
@@ -87,7 +87,7 @@
 
                 <div class="form-group full-width">
                     <label for="mensaje">Mensaje</label>
-                    <textarea id="mensaje" name="mensaje" rows="7" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    <textarea id="mensaje" name="message" rows="7" placeholder="Escribe tu mensaje aquí..." required></textarea>
                 </div>
 
                 <div class="form-group full-width">

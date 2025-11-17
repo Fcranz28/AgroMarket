@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductCrudController extends Controller
 {
@@ -12,7 +16,8 @@ class ProductCrudController extends Controller
      */
     public function index()
     {
-        return view('admin.products.index');
+        $products = Product::with('category')->get();
+        return view('admin.products.index', compact('products'));
     }
 
     /**
@@ -20,7 +25,8 @@ class ProductCrudController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('admin.products.create', compact('categories'));
     }
 
     /**
@@ -28,7 +34,40 @@ class ProductCrudController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0',
+            'unit' => 'required|string',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Procesar imagen
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            // Guardar en storage/app/public/products
+            $imagePath = $file->store('products', 'public');
+        }
+
+        // Crear slug
+        $slug = Str::slug($request->name) . '-' . Str::random(5);
+
+        Product::create([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'unit' => $validated['unit'],
+            'stock' => $validated['stock'],
+            'image_path' => $imagePath,
+        ]);
+
+        return redirect()->route('admin.productos.index')
+                       ->with('success', 'Producto creado correctamente');
     }
 
     /**
@@ -36,7 +75,8 @@ class ProductCrudController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        return view('admin.products.show', compact('product'));
     }
 
     /**
@@ -44,7 +84,9 @@ class ProductCrudController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -52,7 +94,40 @@ class ProductCrudController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0',
+            'unit' => 'required|string',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Procesar nueva imagen si existe
+        if ($request->hasFile('image')) {
+            // Eliminar imagen anterior
+            if ($product->image_path) {
+                Storage::disk('public')->delete($product->image_path);
+            }
+            $imagePath = $request->file('image')->store('products', 'public');
+            $product->image_path = $imagePath;
+        }
+
+        $product->update([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'unit' => $validated['unit'],
+            'stock' => $validated['stock'],
+            'image_path' => $product->image_path,
+        ]);
+
+        return redirect()->route('admin.productos.index')
+                       ->with('success', 'Producto actualizado correctamente');
     }
 
     /**
@@ -60,6 +135,16 @@ class ProductCrudController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        
+        // Eliminar imagen
+        if ($product->image_path) {
+            Storage::disk('public')->delete($product->image_path);
+        }
+        
+        $product->delete();
+
+        return redirect()->route('admin.productos.index')
+                       ->with('success', 'Producto eliminado correctamente');
     }
 }

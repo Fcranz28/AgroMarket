@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
     //  * @returns {string} - El string HTML de la card.
     //  */
     function createProductCard(product) {
-        // Tu API devuelve rutas como 'img/productos/...'
-        const imageUrl = product.image_path ? `/${product.image_path}` : '/img/placeholder.png';
+        // Usar la URL de imagen del servidor
+        const imageUrl = product.image_url || product.image_path || '/img/placeholder.png';
         const price = Number(product.price || 0).toFixed(2);
 
         return `

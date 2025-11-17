@@ -4,13 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // <-- Asegúrate de importar esto
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
     use HasFactory;
 
-    // ... (El resto de tu modelo aquí) ...
+    protected $fillable = [
+        'category_id',
+        'name',
+        'slug',
+        'description',
+        'price',
+        'unit',
+        'stock',
+        'image_path',
+    ];
 
     /**
      * Define la relación: Un Producto pertenece a una Categoría.
@@ -19,5 +28,16 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Obtiene la URL completa de la imagen
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        return asset('img/placeholder.png');
     }
 }
