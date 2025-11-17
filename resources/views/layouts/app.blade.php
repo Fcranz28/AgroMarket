@@ -60,18 +60,26 @@
                 <a href="{{ route('login') }}" class="btn login-btn">Iniciar sesión</a>
                 <a href="{{ route('register') }}" class="btn register-btn">Registrarse</a>
             @else
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle">
-                        {{ Auth::user()->name }}
-                    </button>
-                    <div class="dropdown-menu">
+                <div class="user-dropdown">
+                
+                    <span class="dropdown-trigger">
+                        Hola, {{ Auth::user()->name }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </span>
+                    
+                    <div class="dropdown-content">
+                        
                         @if(Auth::user()->is_admin)
                             <a href="{{ route('admin.productos.index') }}">Panel Admin</a>
                         @endif
+
                         <a href="{{ route('orders.index') }}">Mis Pedidos</a>
-                        <form method="POST" action="{{ route('logout') }}">
+                        
+                        <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                             @csrf
-                            <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                            <button type="submit" class="logout-button">Cerrar Sesión</button>
                         </form>
                     </div>
                 </div>
@@ -199,6 +207,13 @@
         <div class="footer-bottom">
             <p>&copy; {{ date('Y') }} {{ config('app.name', 'AgroMarket') }}. Todos los derechos reservados.</p>
         </div>
+        @if(auth()->check() && auth()->user()->is_admin)
+
+            <a href="{{ route('admin.productos.create') }}" class="fab-admin" title="Agregar Nuevo Producto">
+                <img src="{{ asset('img/sumicon.png') }}" alt="Agregar">
+            </a>
+
+        @endif
     </footer>
 
     @stack('scripts')

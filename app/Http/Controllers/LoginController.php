@@ -1,59 +1,46 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    protected $maxAttempts = 5;
-    protected $decayMinutes = 15;
-
-    public function showLoginForm()
+    /**
+     * Muestra la vista del formulario de login.
+     */
+    public function create()
     {
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    /**
+     * Procesa la petición de inicio de sesión.
+     */
+    public function store(Request $request)
     {
-        $request->validate([
+        // 1. Validar los datos (email y password)
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
-        // Rate limiting - máximo 5 intentos cada 15 minutos
-        $key = 'login_attempts_' . $request->ip();
-        
-        if (RateLimiter::tooManyAttempts($key, $this->maxAttempts)) {
-            $seconds = RateLimiter::availableIn($key);
-            return back()->withErrors([
-                'email' => "Demasiados intentos. Intenta en {$seconds} segundos.",
-            ])->withInput();
-        }
-
-        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            RateLimiter::clear($key);
-            $request->session()->regenerate();
+        // 2. Intentar iniciar sesión
+        // El 'remember' es para la casilla "Recuérdame"
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             
-            return redirect()->intended('/')->with('success', 'Sesión iniciada correctamente.');
+            // 3. Si tiene éxito, regenera la sesión
+            $request->session()->regenerate();
+
+            // 4. Redirige al home
+            return redirect()->intended(route('home'));
         }
 
-        RateLimiter::hit($key, $this->decayMinutes * 60);
-
-        return back()->withErrors([
-            'email' => 'Las credenciales no son válidas.',
-        ])->withInput();
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
-        return redirect('/')->with('success', 'Sesión cerrada correctamente.');
+        // 5. Si falla, regresa al login con un error
+        throw ValidationException::withMessages([
+            'email' => 'El email o la contraseña son incorrectos.',
+        ]);
     }
 }

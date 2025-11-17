@@ -1,54 +1,48 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers; // <-- Revisa si esta es la carpeta
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException; // Para manejar errores
 
 class RegisterController extends Controller
 {
-    public function showRegisterForm()
+    /**
+     * Muestra la vista del formulario de registro.
+     */
+    public function create()
     {
         return view('auth.register');
     }
 
-    public function register(Request $request)
+    /**
+     * Procesa la petición de registro.
+     */
+    public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|regex:/^[a-záéíóúñ\s]+$/i',
+        // 1. Validar los datos del formulario
+        $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|regex:/^[0-9]{9}$/',
-            'address' => 'required|string|max:500',
-            'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
-        ], [
-            'name.regex' => 'El nombre solo debe contener letras y espacios.',
-            'email.unique' => 'Este email ya está registrado.',
-            'phone.regex' => 'El teléfono debe tener 9 dígitos.',
-            'password.regex' => 'La contraseña debe tener: mayúscula, minúscula, número y símbolo (@$!%*?&).',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password' => 'required|string|min:8|confirmed', // 'confirmed' busca 'password_confirmation'
         ]);
 
-        if ($validator->fails()) {
-            return redirect('register')
-                ->withErrors($validator)
-                ->withInput();
-        }
-
+        // 2. Crear el nuevo usuario
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
             'password' => Hash::make($request->password),
-            'is_admin' => false,
+            // 'is_admin' será 'false' por defecto, gracias a tu migración.
         ]);
 
-        auth()->login($user);
+        // 3. Iniciar sesión con el usuario recién creado
+        Auth::login($user);
 
-        return redirect('/')->with('success', '¡Bienvenido! Tu cuenta ha sido creada.');
+        // 4. Redirigir al usuario al 'home'
+        return redirect()->route('home');
     }
 }

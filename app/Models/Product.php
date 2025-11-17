@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Product extends Model
 {
     use HasFactory;
+    /**
+     * Los atributos que se pueden asignar masivamente.
+     *
+     * @var array
+     */
 
     protected $fillable = [
-        'category_id',
         'name',
         'slug',
         'description',
@@ -19,7 +23,12 @@ class Product extends Model
         'unit',
         'stock',
         'image_path',
+        'category_id',
+        'user_id'
     ];
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Define la relación: Un Producto pertenece a una Categoría.
@@ -40,4 +49,5 @@ class Product extends Model
         }
         return asset('img/placeholder.png');
     }
+        
 }

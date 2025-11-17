@@ -1109,3 +1109,101 @@ p {
         padding: 10px 15px;
     }
 }
+/* --- Estilos para el Dropdown de Usuario --- */
+
+/* El contenedor principal */
+.user-dropdown {
+  position: relative; /* Clave para posicionar el menú */
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* El texto visible (Hola, Franz) */
+.user-dropdown .dropdown-trigger {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Espacio entre el texto y la flecha */
+}
+
+/* El menú desplegable (oculto por defecto) */
+.user-dropdown .dropdown-content {
+  display: none; /* Oculto por defecto */
+  position: absolute;
+  right: 0; /* Alineado a la derecha */
+  background-color: #ffffff;
+  min-width: 180px; /* Ancho del menú */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 4px;
+  overflow: hidden; /* Para que los bordes redondeados se apliquen a los items */
+}
+
+/* --- La Magia: Mostrar el menú al pasar el cursor --- */
+.user-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Estilo para los enlaces y el botón dentro del menú */
+.user-dropdown .dropdown-content a,
+.user-dropdown .dropdown-content .logout-button {
+  color: #333; /* Color de texto oscuro */
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+/* Estilo para el botón de logout (para que parezca un enlace) */
+.user-dropdown .logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit; /* Hereda el tamaño de fuente */
+  font-family: inherit; /* Hereda la fuente */
+}
+
+/* Efecto hover en los items del menú */
+.user-dropdown .dropdown-content a:hover,
+.user-dropdown .dropdown-content .logout-button:hover {
+  background-color: #f1f1f1; /* Un gris claro al pasar el cursor */
+}
+
+/* --- Estilos para el Botón Flotante de Admin --- */
+
+.fab-admin {
+  /* Posicionamiento */
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  z-index: 1000; /* Asegura que esté por encima de todo */
+
+  /* Apariencia */
+  width: 60px;
+  height: 60px;
+  background-color: #4CAF50; /* Un color verde (puedes cambiarlo) */
+  border-radius: 50%; /* Lo hace redondo */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+  /* Centrar el ícono */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Transición suave */
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Estilo para la imagen (tu favicon) */
+.fab-admin img {
+  width: 28px;  /* Ajusta el tamaño de tu ícono */
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Efecto al pasar el cursor */
+.fab-admin:hover {
+  transform: scale(1.05); /* Ligeramente más grande */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
