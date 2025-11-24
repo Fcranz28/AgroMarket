@@ -8,6 +8,7 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        return view('checkout.index');
+        $user = auth()->user();
+        return view('checkout.index', compact('user'));
     }
 }

@@ -15,7 +15,7 @@ class ProductController extends Controller
 
     public function show(string $slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
+        $product = Product::with('units')->where('slug', $slug)->firstOrFail();
         return view('products.show', compact('product'));
     }
 }

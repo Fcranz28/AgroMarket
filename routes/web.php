@@ -20,6 +20,11 @@ Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.su
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
+// Checkout & Payment (Guest Access Allowed)
+Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
+Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process');
+
 // Firebase Authentication (without CSRF)
 Route::post('/auth/firebase', [App\Http\Controllers\FirebaseAuthController::class, 'authenticate'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
@@ -47,11 +52,11 @@ Route::post('/logout', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/pedidos/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
     
-    // Stripe Payment Routes
-    Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
-    Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process');
+    // Invoice Routes
+    Route::get('/factura/{invoice}/descargar', [App\Http\Controllers\InvoiceController::class, 'download'])->name('invoice.download');
+    Route::get('/factura/{invoice}/ver', [App\Http\Controllers\InvoiceController::class, 'view'])->name('invoice.view');
+    Route::get('/factura/{invoice}', [App\Http\Controllers\InvoiceController::class, 'show'])->name('invoice.show');
     
     // Profile Routes
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');

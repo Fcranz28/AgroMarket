@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\EnsureOnboarding::class,
         ]);
+        
+        // Exclude payment routes from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'payment/*'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

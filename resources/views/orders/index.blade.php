@@ -52,7 +52,7 @@
                         <div class="order-card">
                             <div class="order-header">
                                 <div>
-                                    <span class="order-id">#{{ $order->id }}</span>
+                                    <span class="order-id">ID de Seguimiento: #{{ $order->id }}</span>
                                     <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
                                 </div>
                                 <span class="status-badge status-{{ $order->status }}">
@@ -86,9 +86,10 @@
                                     <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline">
                                         Ver Detalles
                                     </a>
-                                    @if($order->status === 'pending')
-                                        <a href="{{ route('checkout.index') }}" class="btn btn-primary">
-                                            Pagar Ahora
+                                    
+                                    @if($order->invoice)
+                                        <a href="{{ route('invoice.download', $order->invoice->id) }}" class="btn btn-outline">
+                                            <i class="fas fa-file-invoice"></i> Descargar Factura
                                         </a>
                                     @endif
                                 </div>

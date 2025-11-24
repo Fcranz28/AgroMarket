@@ -30,8 +30,10 @@ export async function initializeStripeCheckout() {
          return;
       }
 
-      // Calculate total
-      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      // Calculate subtotal and tax (18% IGV)
+      const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.cantidad), 0);
+      const tax = subtotal * 0.18;
+      const total = subtotal + tax;
 
       // Create payment intent
       const response = await fetch('/payment/create-intent', {
@@ -42,7 +44,8 @@ export async function initializeStripeCheckout() {
          },
          body: JSON.stringify({
             amount: total,
-            cart: cart
+            cart: cart,
+            tax: tax
          })
       });
 
@@ -98,12 +101,27 @@ async function handleSubmit(e) {
       // Get form data
       const shippingAddress = document.getElementById('shipping_address').value;
       const phone = document.getElementById('phone').value;
+      const guestName = document.getElementById('guest_name').value;
+      const guestLastname = document.getElementById('guest_lastname').value;
+      const guestEmail = document.getElementById('guest_email').value;
+      const documentType = document.getElementById('document_type').value;
+      const documentNumber = document.getElementById('document_number').value;
 
       // Confirm payment
       const { error, paymentIntent } = await stripe.confirmPayment({
          elements,
          confirmParams: {
             return_url: window.location.origin + '/checkout',
+            payment_method_data: {
+               billing_details: {
+                  name: `${guestName} ${guestLastname}`,
+                  email: guestEmail,
+                  phone: phone,
+                  address: {
+                     line1: shippingAddress
+                  }
+               }
+            }
          },
          redirect: 'if_required'
       });
@@ -125,7 +143,12 @@ async function handleSubmit(e) {
                payment_intent_id: paymentIntent.id,
                cart: cart,
                shipping_address: shippingAddress,
-               phone: phone
+               phone: phone,
+               guest_name: guestName,
+               guest_lastname: guestLastname,
+               guest_email: guestEmail,
+               document_type: documentType,
+               document_number: documentNumber
             })
          });
 
@@ -136,7 +159,7 @@ async function handleSubmit(e) {
          }
 
          // Clear cart
-         localStorage.removeItem('cart');
+         localStorage.removeItem('carrito');
 
          // Redirect to order confirmation
          window.location.href = data.redirect;
@@ -158,7 +181,7 @@ async function handleSubmit(e) {
  */
 function getCartFromStorage() {
    try {
-      const cart = localStorage.getItem('cart');
+      const cart = localStorage.getItem('carrito');
       return cart ? JSON.parse(cart) : [];
    } catch (e) {
       console.error('Error reading cart:', e);
@@ -167,4 +190,8 @@ function getCartFromStorage() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', initializeStripeCheckout);
+if (document.readyState === 'loading') {
+   document.addEventListener('DOMContentLoaded', initializeStripeCheckout);
+} else {
+   initializeStripeCheckout();
+}

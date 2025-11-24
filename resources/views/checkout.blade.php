@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<meta name="stripe-key" content="{{ env('STRIPE_KEY') }}">
+@endpush
+
 @section('content')
 <div class="checkout-container">
     <h1>Finalizar Compra</h1>
@@ -20,6 +24,44 @@
             <form id="checkoutForm">
                 @csrf
                 
+                <h2>Información del Cliente</h2>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="guest_name">Nombres</label>
+                        <input type="text" id="guest_name" name="guest_name" required 
+                            value="{{ $user?->firstname ?? '' }}" placeholder="Tus nombres">
+                    </div>
+                    <div class="form-group half">
+                        <label for="guest_lastname">Apellidos</label>
+                        <input type="text" id="guest_lastname" name="guest_lastname" required 
+                            value="{{ $user?->lastname ?? '' }}" placeholder="Tus apellidos">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="guest_email">Correo Electrónico</label>
+                    <input type="email" id="guest_email" name="guest_email" required 
+                        value="{{ $user?->email ?? '' }}" placeholder="tu@email.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="document_type">Tipo de Documento</label>
+                        <select id="document_type" name="document_type" required>
+                            <option value="DNI">DNI</option>
+                            <option value="RUC">RUC</option>
+                            <option value="Pasaporte">Pasaporte</option>
+                            <option value="Carnet de Extranjeria">Carnet de Extranjería</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label for="document_number">Nro de Documento</label>
+                        <input type="text" id="document_number" name="document_number" required 
+                            placeholder="Número de documento">
+                    </div>
+                </div>
+
                 <h2>Información de Envío</h2>
                 
                 <div class="form-group">
@@ -130,8 +172,17 @@
         margin-top: 0;
     }
 
+    .form-row {
+        display: flex;
+        gap: 20px;
+    }
+
     .form-group {
         margin-bottom: 20px;
+    }
+
+    .form-group.half {
+        flex: 1;
     }
 
     .form-group label {
@@ -226,7 +277,7 @@
 <script>
     // Display cart summary
     document.addEventListener('DOMContentLoaded', () => {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const cart = JSON.parse(localStorage.getItem('carrito') || '[]');
         const cartSummary = document.getElementById('cart-summary');
         const totalAmount = document.getElementById('total-amount');
         
@@ -255,7 +306,4 @@
         totalAmount.textContent = `S/. ${total.toFixed(2)}`;
     });
 </script>
-
-<!-- Add Stripe publishable key meta tag -->
-<meta name="stripe-key" content="{{ env('STRIPE_KEY') }}">
 @endsection

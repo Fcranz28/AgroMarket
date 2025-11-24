@@ -46,11 +46,31 @@
             <div class="product-options">
                 <!-- Selección de Unidad -->
                 <div class="form-group">
-                    <label>Unidad de Medida:</label>
+                    <label class="option-label">Unidad de Medida:</label>
                     <div id="unitButtonsContainer" class="unit-buttons-container">
-                        <!-- Se llenará con JS -->
+                        @if($product->units->count() > 0)
+                            @foreach($product->units as $unit)
+                                <button type="button" 
+                                        class="unit-btn {{ $loop->first ? 'active' : '' }}" 
+                                        data-unit="{{ $unit->unit }}" 
+                                        data-price="{{ $unit->price }}" 
+                                        data-stock="{{ $unit->stock }}">
+                                    {{ $unit->unit }}
+                                </button>
+                            @endforeach
+                        @else
+                            <!-- Fallback for legacy products -->
+                            <button type="button" 
+                                    class="unit-btn active" 
+                                    data-unit="{{ $product->unit }}" 
+                                    data-price="{{ $product->price }}" 
+                                    data-stock="{{ $product->stock }}">
+                                {{ $product->unit }}
+                            </button>
+                        @endif
                     </div>
                     <input type="hidden" id="selectedUnit" value="">
+                    <input type="hidden" id="selectedPrice" value="">
                 </div>
 
                 <!-- Stock Disponible -->
@@ -165,36 +185,14 @@
         object-fit: cover;
     }
     
-    /* ... (rest of styles) */
-
     .product-title {
         font-size: 2rem;
         color: #2d3748;
         margin-bottom: 1rem;
     }
-    
-    /* ... */
-</style>
-@endpush
-
-@push('scripts')
-<script>
-    // Gallery Logic
-    function changeImage(thumbnail, src) {
-        // Update main image
-        document.getElementById('mainImage').src = src;
-        
-        // Update active class
-        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-        thumbnail.classList.add('active');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const product = @json($product);
-        // ... (rest of existing script)
 
     .product-price {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         color: #48bb78;
         font-weight: bold;
         margin-bottom: 1.5rem;
@@ -212,16 +210,11 @@
         border-radius: 8px;
     }
 
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        background: white;
+    .option-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        display: block;
     }
 
     .stock-info {
@@ -233,24 +226,30 @@
     .unit-buttons-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
     }
 
     .unit-btn {
-        padding: 0.5rem 1rem;
-        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #e2e8f0;
         background: white;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
-        font-size: 0.9rem;
+        font-size: 1rem;
         color: #4a5568;
+        font-weight: 500;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
     }
 
     .unit-btn:hover {
         border-color: #cbd5e0;
         background: #f7fafc;
+        transform: translateY(-1px);
     }
 
     .unit-btn.active {
@@ -258,7 +257,7 @@
         background: #f0fff4;
         color: #2f855a;
         font-weight: 600;
-        box-shadow: 0 0 0 1px #48bb78;
+        box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
     }
 
     .quantity-selector {
@@ -279,6 +278,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .qty-btn:hover {
+        background: #f7fafc;
     }
 
     .qty-input {
@@ -287,6 +291,7 @@
         text-align: center;
         border: 1px solid #e2e8f0;
         border-radius: 5px;
+        font-weight: 600;
     }
 
     .btn-block {
@@ -299,13 +304,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const product = @json($product);
-        const unitContainer = document.getElementById('unitButtonsContainer');
+        const unitBtns = document.querySelectorAll('.unit-btn');
         const selectedUnitInput = document.getElementById('selectedUnit');
+        const selectedPriceInput = document.getElementById('selectedPrice');
         const stockDisplay = document.getElementById('stockDisplay');
         const quantityInput = document.getElementById('quantityInput');
         const decreaseBtn = document.getElementById('decreaseQty');
         const increaseBtn = document.getElementById('increaseQty');
         const addToCartBtn = document.getElementById('addToCartBtn');
+        const priceDisplay = document.querySelector('.product-price');
 
         // --- Gallery Logic ---
         const mainImage = document.getElementById('mainImage');
@@ -321,36 +328,32 @@
         });
 
         // --- Unit Logic ---
-        const units = product.unit ? product.unit.split(',') : [];
-        const stocks = product.stock ? product.stock.toString().split(',') : [];
-
-        // Create Buttons
-        units.forEach((unit, index) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'unit-btn';
-            btn.textContent = unit.trim();
-            btn.dataset.stock = stocks[index] ? stocks[index].trim() : 0;
-            btn.dataset.unit = unit.trim();
-            
+        unitBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 // Remove active class from all
-                document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+                unitBtns.forEach(b => b.classList.remove('active'));
                 // Add active to clicked
                 this.classList.add('active');
                 
                 // Update state
-                selectedUnitInput.value = this.dataset.unit;
-                updateStock(parseInt(this.dataset.stock));
+                const unit = this.dataset.unit;
+                const price = parseFloat(this.dataset.price);
+                const stock = parseInt(this.dataset.stock);
+
+                selectedUnitInput.value = unit;
+                selectedPriceInput.value = price;
+                
+                // Update UI
+                updateStock(stock);
+                updatePrice(price);
             });
-
-            unitContainer.appendChild(btn);
-
-            // Select first by default
-            if (index === 0) {
-                btn.click();
-            }
         });
+
+        // Initialize with active button
+        const activeBtn = document.querySelector('.unit-btn.active');
+        if (activeBtn) {
+            activeBtn.click();
+        }
 
         function updateStock(stock) {
             stockDisplay.textContent = stock;
@@ -360,10 +363,18 @@
             if (stock === 0) {
                 addToCartBtn.disabled = true;
                 addToCartBtn.textContent = 'Sin Stock';
+                addToCartBtn.classList.add('btn-secondary');
+                addToCartBtn.classList.remove('btn-primary');
             } else {
                 addToCartBtn.disabled = false;
                 addToCartBtn.textContent = 'Agregar al Carrito';
+                addToCartBtn.classList.add('btn-primary');
+                addToCartBtn.classList.remove('btn-secondary');
             }
+        }
+
+        function updatePrice(price) {
+            priceDisplay.textContent = 'S/. ' + price.toFixed(2);
         }
 
         // --- Quantity Logic ---
@@ -381,6 +392,7 @@
         // --- Add to Cart Logic ---
         addToCartBtn.addEventListener('click', () => {
             const selectedUnit = selectedUnitInput.value;
+            const selectedPrice = parseFloat(selectedPriceInput.value);
             const quantity = parseInt(quantityInput.value);
             
             if (!selectedUnit) {
@@ -391,6 +403,7 @@
             const productToAdd = {
                 ...product,
                 unit: selectedUnit,
+                price: selectedPrice, // Use the selected unit price
                 cantidad: quantity
             };
 

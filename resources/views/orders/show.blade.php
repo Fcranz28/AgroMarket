@@ -88,12 +88,7 @@
                 @endif
             </div>
 
-            @if($order->status === 'pending')
-                <a href="{{ route('checkout.index') }}" class="btn btn-primary btn-block">
-                    <i class="fas fa-credit-card"></i>
-                    Pagar Ahora
-                </a>
-            @endif
+
         </aside>
     </div>
 </div>

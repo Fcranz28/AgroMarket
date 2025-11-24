@@ -95,4 +95,17 @@ class User extends Authenticatable
     {
         return $query->where('verification_status', self::STATUS_PENDING);
     }
+
+    // Accessors
+    public function getFirstnameAttribute(): string
+    {
+        $parts = explode(' ', $this->name);
+        return $parts[0];
+    }
+
+    public function getLastnameAttribute(): string
+    {
+        $parts = explode(' ', $this->name);
+        return count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+    }
 }

@@ -15,7 +15,12 @@ class Order extends Model
         'shipping_address',
         'phone',
         'stripe_payment_intent_id',
-        'payment_status'
+        'payment_status',
+        'guest_name',
+        'guest_lastname',
+        'guest_email',
+        'document_type',
+        'document_number'
     ];
 
     /**
@@ -32,5 +37,13 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get the invoice for the order
+     */
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
     }
 }

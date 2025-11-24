@@ -13,7 +13,7 @@ class PaymentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // NOTE: No auth middleware to allow guest checkout
         Stripe::setApiKey(env('STRIPE_SECRET'));
     }
 
@@ -66,7 +66,13 @@ class PaymentController extends Controller
                 'payment_intent_id' => 'required|string',
                 'cart' => 'required|array',
                 'shipping_address' => 'required|string',
-                'phone' => 'required|string'
+                'phone' => 'required|string',
+                // Guest/Customer Info Validation
+                'guest_name' => 'required|string',
+                'guest_lastname' => 'required|string',
+                'guest_email' => 'required|email',
+                'document_type' => 'required|string',
+                'document_number' => 'required|string',
             ]);
 
             // Verify payment intent
@@ -81,18 +87,24 @@ class PaymentController extends Controller
             // Calculate total
             $total = 0;
             foreach ($request->cart as $item) {
-                $total += $item['price'] * $item['quantity'];
+                $total += $item['price'] * $item['cantidad'];
             }
 
             // Create order
             $order = Order::create([
-                'user_id' => Auth::id(),
+                'user_id' => Auth::id(), // Nullable now
                 'total' => $total,
                 'status' => 'pending',
                 'shipping_address' => $request->shipping_address,
                 'phone' => $request->phone,
                 'stripe_payment_intent_id' => $request->payment_intent_id,
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                // Guest fields
+                'guest_name' => $request->guest_name,
+                'guest_lastname' => $request->guest_lastname,
+                'guest_email' => $request->guest_email,
+                'document_type' => $request->document_type,
+                'document_number' => $request->document_number,
             ]);
 
             // Create order items
@@ -100,15 +112,42 @@ class PaymentController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['id'],
-                    'quantity' => $item['quantity'],
+                    'quantity' => $item['cantidad'],
                     'price' => $item['price']
                 ]);
             }
 
+            // Generate electronic invoice
+            try {
+                $invoiceService = new \App\Services\InvoiceService();
+                $invoice = $invoiceService->generateInvoice($order);
+                \Log::info('Invoice generated successfully', [
+                    'order_id' => $order->id,
+                    'invoice_id' => $invoice->id,
+                    'invoice_number' => $invoice->numero_completo
+                ]);
+            } catch (\Exception $e) {
+                // Don't fail the order if invoice generation fails
+                \Log::error('Invoice generation failed', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Continue with order processing
+            }
+
+            // Determine redirect URL
+            // If user is logged in, go to order details. If guest, maybe show a success page or the same order details (if public access allowed)
+            // For now, we'll redirect to home with success message if not logged in, or order details if logged in.
+            // Actually, we can allow guests to see their order via a signed URL or just show it once.
+            // Let's redirect to order show page but we need to ensure it's accessible.
+            // For now, let's redirect to a generic success page or home.
+            
+            $redirectUrl = Auth::check() ? route('orders.show', $order->id) : route('home'); // Simplified for now
+
             return response()->json([
                 'success' => true,
                 'order_id' => $order->id,
-                'redirect' => route('orders.show', $order->id)
+                'redirect' => $redirectUrl
             ]);
 
         } catch (\Exception $e) {
