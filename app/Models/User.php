@@ -12,6 +12,15 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    const ROLE_USER = 'user';
+    const ROLE_FARMER = 'farmer';
+    const ROLE_ADMIN = 'admin';
+
+    const STATUS_NONE = 'none';
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +30,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'verification_status',
+        'verification_document',
+        'is_banned',
+        'onboarding_completed',
+        'dni_front',
+        'dni_back',
+        'face_photo',
     ];
 
     /**
@@ -43,9 +60,39 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_banned' => 'boolean',
         ];
     }
-        public function products(){
+
+    public function products()
+    {
         return $this->hasMany(Product::class);
+    }
+
+    // Helpers
+    public function isFarmer(): bool
+    {
+        return $this->role === self::ROLE_FARMER;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->verification_status === self::STATUS_APPROVED;
+    }
+
+    // Scopes
+    public function scopeFarmers($query)
+    {
+        return $query->where('role', self::ROLE_FARMER);
+    }
+
+    public function scopePendingVerification($query)
+    {
+        return $query->where('verification_status', self::STATUS_PENDING);
     }
 }

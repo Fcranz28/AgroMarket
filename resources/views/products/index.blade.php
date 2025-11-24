@@ -7,65 +7,17 @@
             <h2>Categorías</h2>
             <ul class="category-list">
                 <li>
-                    <button class="category-btn active" data-category="todos">
+                    <button class="category-btn active" data-category="all">
                         Todos los Productos
                     </button>
                 </li>
-                <li>
-                    <button class="category-btn" data-category="frutas">
-                        Frutas
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="verduras">
-                        Verduras y Hortalizas
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="tuberculos">
-                        Tubérculos y Raíces
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="granos">
-                        Granos y Legumbres
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="hierbas">
-                        Hierbas y Aromáticas
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="semillas">
-                        Semillas y Plantones
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="insumos">
-                        Insumos Agrícolas
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="herramientas">
-                        Herramientas Manuales
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="maquinaria">
-                        Maquinaria Agrícola
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="riego">
-                        Sistemas de Riego
-                    </button>
-                </li>
-                <li>
-                    <button class="category-btn" data-category="tecnologia">
-                        Tecnología Agrícola
-                    </button>
-                </li>
+                @foreach($categories as $category)
+                    <li>
+                        <button class="category-btn" data-category="{{ $category->slug }}">
+                            {{ $category->name }}
+                        </button>
+                    </li>
+                @endforeach
             </ul>
         </aside>
 
@@ -100,3 +52,7 @@
         </main>
     </div>
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/categorias.js'])
+@endpush

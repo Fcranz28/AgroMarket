@@ -34,6 +34,14 @@ class LoginController extends Controller
             // 3. Si tiene éxito, regenera la sesión
             $request->session()->regenerate();
 
+            $user = Auth::user();
+
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->isFarmer()) {
+                return redirect()->route('farmer.dashboard');
+            }
+
             // 4. Redirige al home
             return redirect()->intended(route('home'));
         }

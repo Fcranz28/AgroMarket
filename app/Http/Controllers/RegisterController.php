@@ -28,21 +28,22 @@ class RegisterController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed', // 'confirmed' busca 'password_confirmation'
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // 2. Crear el nuevo usuario
+        // 2. Crear el nuevo usuario (Rol por defecto: user, pero se cambiará en onboarding)
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            // 'is_admin' será 'false' por defecto, gracias a tu migración.
+            'role' => User::ROLE_USER, // Default
+            'onboarding_completed' => false,
         ]);
 
-        // 3. Iniciar sesión con el usuario recién creado
+        // 3. Iniciar sesión
         Auth::login($user);
 
-        // 4. Redirigir al usuario al 'home'
-        return redirect()->route('home');
+        // 4. Redirigir al onboarding
+        return redirect()->route('onboarding.welcome');
     }
 }

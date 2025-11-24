@@ -27,26 +27,28 @@
 
         <div class="nav-right">
             <div class="search-container">
-                <select class="category-select">
-                     <option value="todos">Todas las Categorias</option>
-                     <option value="frutas">Frutas</option>
-                     <option value="verduras">Verduras y Hortalizas</option>
-                     <option value="tuberculos">Tubérculos y Raíces</option>
-                     <option value="granos">Granos y Legumbres</option>
-                     <option value="hierbas">Hierbas y Aromáticas</option>
-                     <option value="semillas">Semillas y Plantones</option>
-                     <option value="insumos">Insumos Agrícolas</option>
-                     <option value="herramientas">Herramientas Manuales</option>
-                     <option value="maquinaria">Maquinaria Agrícola</option>
-                     <option value="riego">Sistemas de Riego</option>
-                     <option value="tecnologia">Tecnología Agrícola</option>
-                </select>
-                <input type="text" class="search-input" placeholder="Buscar...">
-                <button class="search-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
-                </button>
+                <form action="{{ route('search') }}" method="GET" id="searchForm">
+                    <select class="category-select" name="category">
+                        <option value="all">Todas las Categorías</option>
+                        @php
+                            $categories = \App\Models\Category::all();
+                        @endphp
+                        @foreach($categories as $category)
+                            <option value="{{ $category->slug }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="text" name="q" class="search-input" placeholder="Buscar productos..." autocomplete="off" id="searchInput">
+                    <button type="submit" class="search-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                    </button>
+                </form>
+                
+                <!-- Autocomplete Dropdown -->
+                <div class="search-suggestions" id="searchSuggestions" style="display: none;">
+                    <div class="suggestions-list"></div>
+                </div>
             </div>
             
             <button class="btn cart-btn" id="openCart">
@@ -71,8 +73,10 @@
                     
                     <div class="dropdown-content">
                         
-                        @if(Auth::user()->is_admin)
-                            <a href="{{ route('admin.productos.index') }}">Panel Admin</a>
+                        @if(Auth::user()->isAdmin())
+                            <a href="{{ route('admin.dashboard') }}">Panel Admin</a>
+                        @elseif(Auth::user()->isFarmer())
+                            <a href="{{ route('farmer.dashboard') }}">Panel Agricultor</a>
                         @endif
 
                         <a href="{{ route('orders.index') }}">Mis Pedidos</a>
@@ -207,14 +211,72 @@
         <div class="footer-bottom">
             <p>&copy; {{ date('Y') }} {{ config('app.name', 'AgroMarket') }}. Todos los derechos reservados.</p>
         </div>
-        @if(auth()->check() && auth()->user()->is_admin)
-
-            <a href="{{ route('admin.productos.create') }}" class="fab-admin" title="Agregar Nuevo Producto">
-                <img src="{{ asset('img/sumicon.png') }}" alt="Agregar">
-            </a>
-
-        @endif
+        @auth
+            @if(auth()->user()->isAdmin() || (auth()->user()->isFarmer() && auth()->user()->isVerified()))
+                <a href="{{ route('dashboard.productos.create') }}" class="fab-admin" title="Agregar Nuevo Producto">
+                    <img src="{{ asset('img/sumicon.png') }}" alt="Agregar">
+                </a>
+            @endif
+        @endauth
     </footer>
+
+
+    <style>
+        /* Autocomplete Suggestions */
+        .search-suggestions {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .suggestions-list {
+            padding: 8px 0;
+        }
+        
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s;
+            gap: 12px;
+        }
+        
+        .suggestion-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .suggestion-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .suggestion-info {
+            flex: 1;
+        }
+        
+        .suggestion-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-price {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
 
     @stack('scripts')
 </body>

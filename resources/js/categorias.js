@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Comprobación de seguridad (para evitar errores en otras páginas)
     if (!productsGrid) {
         // Si no estamos en la página de categorías, no hacemos nada.
-        return; 
+        return;
     }
 
-    let currentCategory = 'todos';
+    let currentCategory = 'all';
     let currentSort = 'featured';
 
     function showLoading() {
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function loadProducts() {
         showLoading();
-        
+
         // 1. Obtener el texto del botón activo para el título
         const activeButton = document.querySelector('.category-btn.active');
         const categoryName = activeButton ? activeButton.textContent.trim() : 'Todos los Productos';
@@ -39,18 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // 2. SOLUCIÓN: Construir la URL con los parámetros de filtro y orden
             const url = `/api/productos?category=${currentCategory}&sort=${currentSort}`;
-            
+
             const response = await fetch(url); // 3. Llamar a la API con los filtros
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
-            
+
             const data = await response.json();
             const products = Array.isArray(data.products) ? data.products : [];
-            
+
             renderProducts(products); // Renderiza los productos
             paginationContainer.innerHTML = ''; // Limpiar paginación
-            
+
         } catch (error) {
             console.error('Error:', error);
             productsGrid.innerHTML = `
@@ -80,13 +80,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         productsGrid.innerHTML = products.map(product => {
             // Usar la URL completa de la imagen
-            const image = product.image_url || product.image_path || '/img/placeholder.png';
+            let image = '/img/placeholder.png';
+            if (product.image_path) {
+                image = `/storage/${product.image_path}`;
+            } else if (product.image_url) {
+                image = product.image_url;
+            }
             const price = Number(product.price || 0).toFixed(2);
             return `
             <article class="product-card" data-product-id="${product.id}">
-                <img src="${image}" alt="${product.name}" loading="lazy">
+                <a href="/producto/${product.slug}">
+                    <img src="${image}" alt="${product.name}" loading="lazy">
+                </a>
                 <div class="product-info">
-                    <h3>${product.name}</h3>
+                    <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
+                        <h3>${product.name}</h3>
+                    </a>
                     <p class="price">S/. ${price}</p>
                     <button class="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
                 </div>

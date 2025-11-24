@@ -19,7 +19,7 @@
         </div>
 
         <div class="form-panel">
-            <form method="POST" action="{{ route('register') }}" class="form-container">
+            <form method="POST" action="{{ route('register') }}" class="form-container" enctype="multipart/form-data">
                 @csrf
                 <h1>Crear Cuenta</h1>
                 <span>Usa tu correo para registrarte</span>
@@ -53,7 +53,7 @@
                     <label for="password-confirm">Confirmar Contraseña</label>
                 </div>
 
-                <button type="submit" class="btn">Registrarse</button>
+                <button type="submit" class="btn" style="margin-top: 20px;">Registrarse</button>
             </form>
         </div>
 

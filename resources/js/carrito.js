@@ -102,28 +102,35 @@ function updateCartSidebar() {
     if (!cartContent) return;
     cartContent.innerHTML = '';
     carrito.forEach(item => {
-        // Usar directamente la imagen_url que ya es una URL completa
-        const image = item.image || '/img/placeholder.png';
+        // Fix: Use image_path with storage prefix or fallback
+        let image = '/img/placeholder.png';
+        if (item.image_path) {
+            image = `/storage/${item.image_path}`;
+        } else if (item.image_url) {
+            image = item.image_url;
+        } else if (item.image) { // Fallback for existing items in local storage that might have the old format
+            image = item.image;
+        }
 
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-item';
         itemElement.dataset.productId = item.id;
         itemElement.innerHTML = `
-            <img src="${image}" alt="${item.name}">
-            <div class="cart-item-details">
-                <h4>${item.name}</h4>
-                <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
-                <div class="quantity-controls">
-                    <button class="qty-btn qty-decrease" data-action="decrease">-</button>
-                    <span class="qty-display">${item.cantidad}</span>
-                    <button class="qty-btn qty-increase" data-action="increase">+</button>
+                <img src="${image}" alt="${item.name}">
+                <div class="cart-item-details">
+                    <h4>${item.name}</h4>
+                    <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
+                    <div class="quantity-controls">
+                        <button class="qty-btn qty-decrease" data-action="decrease">-</button>
+                        <span class="qty-display">${item.cantidad}</span>
+                        <button class="qty-btn qty-increase" data-action="increase">+</button>
+                    </div>
+                    <button class="remove-btn" data-action="remove">Eliminar</button>
                 </div>
-                <button class="remove-btn" data-action="remove">Eliminar</button>
-            </div>
-        `;
+            `;
         cartContent.appendChild(itemElement);
     });
-    
+
     // Actualizar total
     const total = carrito.reduce((sum, item) => sum + (item.price * item.cantidad), 0);
     if (totalElement) {
@@ -192,24 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 Swal.fire({ title: 'Carrito Vacío', text: 'Agrega productos al carrito antes de proceder al pago', icon: 'info' });
                 return;
             }
-            Swal.fire({
-                title: 'Procesando Pago',
-                text: `Total a pagar: S/. ${calculateTotal().toFixed(2)}`,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Pagar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({ title: '¡Pago Exitoso!', text: 'Gracias por tu compra', icon: 'success' }).then(() => {
-                        carrito = [];
-                        saveCartToLocalStorage();
-                        updateCartSidebar();
-                        updateCartCount();
-                        toggleCartSidebar();
-                    });
-                }
-            });
+            // Redirect to checkout page
+            window.location.href = '/checkout';
         });
     }
 
@@ -260,4 +251,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadCartFromLocalStorage();
     updateCartCount();
+
+    // Listen for custom event from product detail page
+    document.addEventListener('add-to-cart-detail', (e) => {
+        const { product, quantity } = e.detail;
+        const existingProduct = carrito.find(item => item.id === product.id && item.unit === product.unit);
+
+        if (existingProduct) {
+            existingProduct.cantidad += quantity;
+        } else {
+            carrito.push({
+                ...product,
+                cantidad: quantity
+            });
+        }
+
+        updateCartSidebar();
+        updateCartCount();
+        saveCartToLocalStorage();
+
+        Swal.fire({
+            title: '¡Agregado!',
+            text: `${product.name} (${quantity} ${product.unit}) se agregó al carrito`,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            position: 'top-end',
+            toast: true
+        });
+    });
 });

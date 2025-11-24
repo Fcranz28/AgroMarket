@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateTheme() {
         const isDarkTheme = body.classList.contains('dark-theme');
         const themeIcon = themeToggle.querySelector('.theme-icon');
-        
+
         if (isDarkTheme) {
             themeIcon.innerHTML = '<path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/>';
             localStorage.setItem('theme', 'dark');
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.querySelector('.products-grid');
     const carouselContainer = document.querySelector('.carousel-content');
 
-// En: resources/js/script.js
+    // En: resources/js/script.js
 
     // /**
     //  * Crea el HTML para una tarjeta de producto.
@@ -64,16 +64,25 @@ document.addEventListener('DOMContentLoaded', () => {
     //  */
     function createProductCard(product) {
         // Usar la URL de imagen del servidor
-        const imageUrl = product.image_url || product.image_path || '/img/placeholder.png';
+        let imageUrl = '/img/placeholder.png';
+        if (product.image_path) {
+            imageUrl = `/storage/${product.image_path}`;
+        } else if (product.image_url) {
+            imageUrl = product.image_url;
+        }
         const price = Number(product.price || 0).toFixed(2);
 
         return `
             <div class="product-card">
                 <div class="product-image-container">
-                    <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                    <a href="/producto/${product.slug}">
+                        <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                    </a>
                 </div>
                 <div class="product-info">
-                    <h3 class="product-name">${product.name}</h3>
+                    <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
+                        <h3 class="product-name">${product.name}</h3>
+                    </a>
                     <p class="product-price">S/. ${price} / ${product.unit}</p>
                     
                     <button class="add-to-cart-btn" 
@@ -96,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchProducts() {
         try {
             // Llama a la ruta definida en routes/api.php
-            const response = await fetch('/api/productos'); 
+            const response = await fetch('/api/productos');
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
             }
@@ -118,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const products = await fetchProducts();
-        
+
         // Mezcla los productos y toma 6
         const randomProducts = products.sort(() => 0.5 - Math.random()).slice(0, 6);
-        
+
         gridContainer.innerHTML = ''; // Limpiar el contenedor
         randomProducts.forEach(product => {
             gridContainer.innerHTML += createProductCard(product);
@@ -138,15 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const products = await fetchProducts();
-        
+
         // La API ya los devuelve por 'latest('id')', así que solo tomamos los primeros 5
         const carouselProducts = products.slice(0, 5);
-        
+
         carouselContainer.innerHTML = ''; // Limpiar el contenedor
         carouselProducts.forEach(product => {
             carouselContainer.innerHTML += createProductCard(product);
         });
-        
+
         // Aquí puedes agregar la inicialización de una librería de carrusel (como Swiper o Slick)
         // si lo deseas. Por ahora, se mostrarán en línea.
     }
@@ -159,6 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof showRandomProducts === 'function') {
         showRandomProducts();
     }
-    
+
     // --- FIN DE LA SOLUCIÓN ---
 });
