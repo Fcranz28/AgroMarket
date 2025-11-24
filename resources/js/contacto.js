@@ -1,61 +1,53 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formStatus = document.getElementById('formStatus');
 
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+    if (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        // Obtener los valores del formulario
-        const nombre = document.getElementById('nombre').value;
-        const email = document.getElementById('email').value;
-        const telefono = document.getElementById('telefono').value;
-        const asunto = document.getElementById('asunto').value;
-        const mensaje = document.getElementById('mensaje').value;
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
 
-        // Validar que todos los campos estén llenos
-        if (!nombre || !email || !telefono || !asunto || !mensaje) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Por favor, complete todos los campos',
-                icon: 'error',
-                confirmButtonColor: 'var(--color-primary)'
-            });
-            return;
-        }
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
-        // Validar formato de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Por favor, ingrese un email válido',
-                icon: 'error',
-                confirmButtonColor: 'var(--color-primary)'
-            });
-            return;
-        }
+                if (response.ok) {
+                    // Show success message
+                    formStatus.style.display = 'block';
+                    formStatus.style.background = '#d4edda';
+                    formStatus.style.color = '#155724';
+                    formStatus.textContent = '¡Mensaje enviado exitosamente! Nos pondremos en contacto contigo pronto.';
 
-        // Validar formato de teléfono (permite números y algunos caracteres especiales)
-        const telefonoRegex = /^[0-9+\-\s()]+$/;
-        if (!telefonoRegex.test(telefono)) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Por favor, ingrese un número de teléfono válido',
-                icon: 'error',
-                confirmButtonColor: 'var(--color-primary)'
-            });
-            return;
-        }
+                    // Reset form
+                    form.reset();
 
-        // Aquí normalmente enviarías los datos al servidor
-        // Por ahora solo mostraremos un mensaje de éxito
-        Swal.fire({
-            title: '¡Mensaje Enviado!',
-            text: 'Gracias por contactarnos. Te responderemos pronto.',
-            icon: 'success',
-            confirmButtonColor: 'var(--color-primary)'
-        }).then(() => {
-            // Limpiar el formulario
-            contactForm.reset();
+                    // Scroll to message
+                    formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Error al enviar el mensaje');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                formStatus.style.display = 'block';
+                formStatus.style.background = '#f8d7da';
+                formStatus.style.color = '#721c24';
+                formStatus.textContent = 'Hubo un problema al enviar el mensaje. Por favor, intenta de nuevo.';
+                formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Mensaje';
+            }
         });
-    });
+    }
 });

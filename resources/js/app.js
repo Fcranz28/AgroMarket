@@ -15,3 +15,9 @@ import './categorias';
 
 // Search autocomplete
 import './autocomplete';
+
+// Firebase authentication
+import './firebase-auth';
+
+// Stripe checkout
+import './stripe-checkout';

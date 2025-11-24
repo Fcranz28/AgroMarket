@@ -20,6 +20,10 @@ Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.su
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
+// Firebase Authentication (without CSRF)
+Route::post('/auth/firebase', [App\Http\Controllers\FirebaseAuthController::class, 'authenticate'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 // --- RUTAS DE AUTENTICACIÓN ARREGLADAS ---
 
 // Registro
@@ -42,7 +46,16 @@ Route::post('/logout', function () {
 // RUTAS PARA USUARIOS LOGUEADOS
 Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/pedidos/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+    
+    // Stripe Payment Routes
+    Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
+    Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process');
+    
+    // Profile Routes
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update');
 
     // Onboarding Routes
     Route::prefix('onboarding')->name('onboarding.')->group(function () {
@@ -77,6 +90,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('productos', ProductCrudController::class);
     });
 });
+
+// Stripe Webhook (outside auth middleware)
+Route::post('/stripe/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('products.show');
 

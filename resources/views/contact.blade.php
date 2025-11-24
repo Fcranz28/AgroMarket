@@ -5,6 +5,12 @@
 @endpush
 
 @section('content')
+    @if(request()->has('success'))
+        <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; margin: 20px; border-radius: 5px; text-align: center;">
+            ¡Mensaje enviado exitosamente! Nos pondremos en contacto contigo pronto.
+        </div>
+    @endif
+    
     <section class="contact-section">
         <div class="contact-container">
             <div class="contact-info">
@@ -57,6 +63,9 @@
             <form class="contact-form" id="contactForm" action="https://formspree.io/f/xyzlyzzd" method="POST">
                 <h2>Envíanos un mensaje</h2>
                 
+                <!-- Status message -->
+                <div id="formStatus" style="display: none; padding: 15px; border-radius: 5px; margin-bottom: 20px;"></div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nombre">Nombre completo</label>
@@ -64,7 +73,7 @@
                     </div>
                     <div class="form-group">
                         <label for="email">Correo electrónico</label>
-                        <input type="email" id="email" name="email" placeholder="Ej: juan@email.com" required>
+                        <input type="email" id="email" name="_replyto" placeholder="Ej: juan@email.com" required>
                     </div>
                 </div>
 
@@ -75,12 +84,12 @@
                     </div>
                     <div class="form-group">
                         <label for="asunto">Asunto</label>
-                        <select name="asunto" id="asunto">
+                        <select name="_subject" id="asunto" required>
                             <option value="" disabled selected>Selecciona un asunto</option>
-                            <option value="consulta">Consulta sobre productos</option>
-                            <option value="soporte">Soporte técnico</option>
-                            <option value="sugerencia">Sugerencias</option>
-                            <option value="otros">Otros</option>
+                            <option value="Consulta sobre productos">Consulta sobre productos</option>
+                            <option value="Soporte técnico">Soporte técnico</option>
+                            <option value="Sugerencias">Sugerencias</option>
+                            <option value="Otros">Otros</option>
                         </select>
                     </div>
                 </div>
@@ -90,8 +99,11 @@
                     <textarea id="mensaje" name="message" rows="7" placeholder="Escribe tu mensaje aquí..." required></textarea>
                 </div>
 
+                <!-- Hidden field to redirect after submission -->
+                <input type="hidden" name="_next" value="{{ url('/contacto') }}?success=true">
+                
                 <div class="form-group full-width">
-                    <button type="submit" class="submit-btn">Enviar Mensaje</button>
+                    <button type="submit" class="submit-btn" id="submitBtn">Enviar Mensaje</button>
                 </div>
             </form>
         </div>

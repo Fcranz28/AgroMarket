@@ -156,7 +156,8 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: transform 0.1s ease-in;
-    text-decoration: none; /* Para los enlaces <a> */
+    text-decoration: none;
+    /* Para los enlaces <a> */
 }
 
 .toggle-panel .btn:active {
@@ -178,10 +179,12 @@
 
 /* Estilos para errores de validación de Laravel */
 .input-error {
-    color: #e53e3e; /* Rojo */
+    color: #e53e3e;
+    /* Rojo */
     font-size: 0.75rem;
     text-align: left;
-    margin-top: -0.75rem; /* Sube un poco */
+    margin-top: -0.75rem;
+    /* Sube un poco */
     margin-bottom: 1rem;
     padding-left: 5px;
 }
@@ -190,12 +193,77 @@ html.dark .login-body {
     /* Usamos las variables globales si existen, o un fallback */
     background-color: var(--background-color, #1a202c);
 }
- html.dark .form-panel {
+
+html.dark .form-panel {
     background-color: #333537;
     color: var(--text-color, #e2e8f0);
- }
+}
 
+/* Social Login Styles */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: var(--text-color-light, #999);
+    font-size: 0.875rem;
+}
 
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color, #ddd);
+}
 
+.divider span {
+    padding: 0 10px;
+}
 
+.social-login {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 1rem;
+}
 
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    background: var(--card-background-color, #fff);
+    color: var(--text-color, #333);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+    border-color: var(--primary-color, #4a90e2);
+    background: var(--hover-background, #f5f5f5);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.social-btn:active {
+    transform: translateY(0);
+}
+
+.social-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.social-btn svg {
+    flex-shrink: 0;
+}
+
+.social-btn span {
+    margin: 0;
+}

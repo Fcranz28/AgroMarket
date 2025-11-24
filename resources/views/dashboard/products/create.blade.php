@@ -29,20 +29,19 @@
             </div>
 
             <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="price">Precio (S/.)</label>
-                    <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ old('price') }}" required>
-                </div>
-
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-12">
                     <label for="category_id">Categoría</label>
                     <select class="form-control" id="category_id" name="category_id" required>
                         <option value="">Seleccione una categoría</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
+                        @if(isset($categories) && count($categories) > 0)
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        @else
+                            <option value="" disabled>No hay categorías disponibles</option>
+                        @endif
                     </select>
                 </div>
             </div>
@@ -67,9 +66,9 @@
                 </div>
 
                 <div class="form-group col-md-6">
-                    <label>Stock Disponible por Unidad</label>
+                    <label>Stock y Precio por Unidad</label>
                     <div id="stock-container" class="stock-container">
-                        <p class="text-muted text-center" style="padding: 2rem; border: 1px dashed #cbd5e0; border-radius: 0.5rem;">Seleccione unidades para asignar stock</p>
+                        <p class="text-muted text-center" style="padding: 2rem; border: 1px dashed #cbd5e0; border-radius: 0.5rem;">Seleccione unidades para asignar stock y precio</p>
                     </div>
                 </div>
             </div>
@@ -261,30 +260,42 @@
         function updateStockInputs() {
             const selectedOptions = Array.from(unitSelect.selectedOptions);
             const currentInputs = {};
+            const currentPrices = {};
             
             // Save current values
-            stockContainer.querySelectorAll('input').forEach(input => {
+            stockContainer.querySelectorAll('input[name="stock[]"]').forEach(input => {
                 currentInputs[input.dataset.unit] = input.value;
+            });
+            stockContainer.querySelectorAll('input[name="price[]"]').forEach(input => {
+                currentPrices[input.dataset.unit] = input.value;
             });
 
             stockContainer.innerHTML = '';
 
             if (selectedOptions.length === 0) {
-                stockContainer.innerHTML = '<p class="text-muted text-center" style="padding: 2rem; border: 1px dashed #cbd5e0; border-radius: 0.5rem;">Seleccione unidades para asignar stock</p>';
+                stockContainer.innerHTML = '<p class="text-muted text-center" style="padding: 2rem; border: 1px dashed #cbd5e0; border-radius: 0.5rem;">Seleccione unidades para asignar stock y precio</p>';
                 return;
             }
 
             selectedOptions.forEach(option => {
                 const unit = option.value;
                 const unitName = option.text;
-                const value = currentInputs[unit] || '';
+                const stockValue = currentInputs[unit] || '';
+                const priceValue = currentPrices[unit] || '';
 
                 const div = document.createElement('div');
                 div.className = 'stock-item';
                 div.innerHTML = `
                     <div class="stock-label">${unitName}</div>
                     <div class="stock-input-group">
-                        <input type="number" class="form-control" name="stock[]" placeholder="Cantidad" value="${value}" required data-unit="${unit}">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.75rem; color: #718096; margin-bottom: 0.25rem; display: block">Stock</label>
+                            <input type="number" class="form-control" name="stock[]" placeholder="Cantidad" value="${stockValue}" required data-unit="${unit}">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.75rem; color: #718096; margin-bottom: 0.25rem; display: block;">Precio (S/.)</label>
+                            <input type="number" step="0.01" class="form-control" name="price[]" placeholder="0.00" value="${priceValue}" required data-unit="${unit}">
+                        </div>
                     </div>
                 `;
                 stockContainer.appendChild(div);

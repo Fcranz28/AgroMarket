@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Category;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
@@ -16,16 +15,19 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             'Frutas',
-            'Verduras y Hortalizas',
-            'Tubérculos y Raíces',
-            'Granos y Legumbres',
-            'Hierbas y Aromáticas',
-            'Semillas y Plantones',
-            'Insumos Agrícolas',
-            'Herramientas Manuales',
-            'Maquinaria Agrícola',
-            'Sistemas de Riego',
-            'Tecnología Agrícola',
+            'Verduras',
+            'Tubérculos',
+            'Granos y Cereales',
+            'Legumbres',
+            'Hierbas y Especias',
+            'Lácteos y Derivados',
+            'Carnes y Aves',
+            'Huevos',
+            'Miel y Derivados',
+            'Frutos Secos',
+            'Semillas',
+            'Flores y Plantas',
+            'Procesados Artesanales'
         ];
 
         foreach ($categories as $category) {
@@ -34,5 +36,7 @@ class CategorySeeder extends Seeder
                 ['slug' => Str::slug($category)]
             );
         }
+
+        $this->command->info('Categorías insertadas correctamente.');
     }
 }

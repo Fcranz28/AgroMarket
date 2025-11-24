@@ -44,17 +44,13 @@ class UserProductController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
             'unit' => 'required|array|min:1',
             'stock' => 'required|array|min:1',
+            'price' => 'required|array|min:1', // Now an array
             'image' => 'required',
             'image.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
-
-        // Convert unit and stock arrays to comma-separated strings
-        $validatedData['unit'] = implode(', ', $request->unit);
-        $validatedData['stock'] = implode(', ', $request->stock);
 
         // Handle Image Upload
         if ($request->hasFile('image')) {
@@ -73,8 +69,25 @@ class UserProductController extends Controller
         }
 
         $validatedData['slug'] = Str::slug($request->name) . '-' . uniqid();
+        
+        // Set base price/stock/unit from the first entry for backward compatibility/display
+        // Or calculate min price
+        $validatedData['price'] = min($request->price); 
+        $validatedData['unit'] = $request->unit[0]; 
+        $validatedData['stock'] = array_sum($request->stock);
 
         $product = Auth::user()->products()->create($validatedData);
+
+        // Save product units
+        foreach ($request->unit as $key => $unit) {
+            if (isset($request->stock[$key]) && isset($request->price[$key])) {
+                $product->units()->create([
+                    'unit' => $unit,
+                    'stock' => $request->stock[$key],
+                    'price' => $request->price[$key]
+                ]);
+            }
+        }
 
         // Save all images to product_images table
         if ($request->hasFile('image')) {

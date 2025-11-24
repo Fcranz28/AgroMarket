@@ -36,6 +36,11 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    public function units(): HasMany
+    {
+        return $this->hasMany(ProductUnit::class);
+    }
+
     /**
      * Define la relación: Un Producto pertenece a una Categoría.
      * Esto le permite a Eloquent usar la 'category_id' que definiste.
