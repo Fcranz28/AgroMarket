@@ -1,106 +1,855 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* Hero Section Mejorado */
+    .about-hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(42, 62, 31, 0.7)),
+                    url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2574&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        padding: 6rem 2rem 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        margin-top: -100px;
+        width: 100vw;
+    }
+
+    .about-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z" fill="none"/><path d="M50 10 L90 90 L10 90 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+        opacity: 0.1;
+    }
+
+    .about-hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .about-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        background: linear-gradient(135deg, 
+            #ffeb3b 0%,    /* Amarillo brillante */
+            #76ff03 20%,   /* Verde lima */
+            #00e676 40%,   /* Verde esmeralda */
+            #00bcd4 60%,   /* Cyan */
+            #2979ff 80%,   /* Azul */
+            #d500f9 100%   /* Púrpura */
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+        animation: gradientShift 8s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .about-hero p {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        line-height: 1.6;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 3rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 3rem;
+    }
+
+    .hero-stat {
+        text-align: center;
+    }
+
+    .hero-stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    /* Sección Principal */
+    .about-section {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 5rem 2rem;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        max-width: 700px;
+        margin: 2rem auto 0;
+        line-height: 1.6;
+    }
+
+    /* Mission & Vision con íconos */
+    .mission-vision-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .mission-card-new {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mission-card-new::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+    }
+
+    .mission-card-new:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-color);
+    }
+
+    .mission-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, rgba(122, 165, 55, 0.1), rgba(216, 239, 192, 0.1));
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .mission-icon i {
+        font-size: 2rem;
+        color: var(--accent-color);
+    }
+
+    .mission-card-new h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+    }
+
+    .mission-card-new p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.8;
+    }
+
+    /* Values Grid */
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .value-item {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .value-item:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-color);
+    }
+
+    .value-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+    }
+
+    .value-item h4 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.75rem;
+    }
+
+    .value-item p {
+        font-size: 1rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* Team Section Mejorado */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
+        margin-top: 3rem;
+    }
+
+    .team-member {
+        background: var(--card-bg);
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .team-member:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-color);
+    }
+
+    .team-photo {
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-secondary) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5rem;
+        color: white;
+    }
+
+    .team-info {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .team-info h4 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .team-role {
+        color: var(--accent-color);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .team-description {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .team-social {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .team-social a {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--primary-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+    }
+
+    .team-social a:hover {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+        transform: translateY(-3px);
+    }
+
+    /* Impact Stats */
+    .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .impact-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        border: none;
+        transition: all 0.3s ease;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .impact-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        transform: rotate(45deg);
+    }
+
+    .impact-card:nth-child(1) {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .impact-card:nth-child(2) {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .impact-card:nth-child(3) {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .impact-card:nth-child(4) {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .impact-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .impact-number {
+        font-size: 4rem;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 0.5rem;
+        display: block;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .impact-label {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Dark mode adjustments for impact cards */
+    [data-theme="dark"] .impact-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="dark"] .impact-card:nth-child(1) {
+        background: linear-gradient(135deg, #6b5b8e 0%, #4a5f7a 100%);
+    }
+
+    [data-theme="dark"] .impact-card:nth-child(2) {
+        background: linear-gradient(135deg, #4a7c7e 0%, #5a8f7a 100%);
+    }
+
+    [data-theme="dark"] .impact-card:nth-child(3) {
+        background: linear-gradient(135deg, #5f8575 0%, #6b9d7a 100%);
+    }
+
+    [data-theme="dark"] .impact-card:nth-child(4) {
+        background: linear-gradient(135deg, #8a6b7a 0%, #9d7a6b 100%);
+    }
+
+    [data-theme="dark"] .impact-card:hover {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .impact-card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        :root:not([data-theme="light"]) .impact-card:nth-child(1) {
+            background: linear-gradient(135deg, #6b5b8e 0%, #4a5f7a 100%);
+        }
+
+        :root:not([data-theme="light"]) .impact-card:nth-child(2) {
+            background: linear-gradient(135deg, #4a7c7e 0%, #5a8f7a 100%);
+        }
+
+        :root:not([data-theme="light"]) .impact-card:nth-child(3) {
+            background: linear-gradient(135deg, #5f8575 0%, #6b9d7a 100%);
+        }
+
+        :root:not([data-theme="light"]) .impact-card:nth-child(4) {
+            background: linear-gradient(135deg, #8a6b7a 0%, #9d7a6b 100%);
+        }
+
+        :root:not([data-theme="light"]) .impact-card:hover {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+    }
+
+
+
+    /* CTA Final */
+    .cta-section-new {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 6rem 2rem;
+        margin-top: 5rem;
+        position: relative;
+        overflow: hidden;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        width: 100vw;
+    }
+
+    .cta-section-new::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        opacity: 0.3;
+    }
+
+    /* Dark mode CTA */
+    [data-theme="dark"] .cta-section-new {
+        background: linear-gradient(135deg, #4a5f7a 0%, #5f8575 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .cta-section-new {
+            background: linear-gradient(135deg, #4a5f7a 0%, #5f8575 100%);
+        }
+    }
+
+
+    .cta-content {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .cta-content h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-content p {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.95;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cta-btn-new {
+        padding: 1.2rem 3rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .cta-btn-primary {
+        background: white;
+        color: var(--accent-color);
+        border: 2px solid white;
+    }
+
+    .cta-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+    }
+
+    .cta-btn-secondary:hover {
+        background: white;
+        color: var(--accent-color);
+        transform: translateY(-3px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .about-hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .about-hero p {
+            font-size: 1.1rem;
+        }
+
+        .hero-stats {
+            gap: 2rem;
+        }
+
+        .hero-stat-number {
+            font-size: 2.2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .mission-vision-grid,
+        .values-grid,
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-content h2 {
+            font-size: 2rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-    <section class="hero-section">
-        <div class="hero-content" data-aos="fade-up">
+<div style="margin: 0; padding: 0; width: 100%;">
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="about-hero-content" data-aos="fade-up">
             <h1>Conectando el Campo con el Futuro</h1>
-            <p>Transformando la agricultura peruana a través de la innovación y el comercio justo</p>
+            <p>Transformando la agricultura peruana a través de la innovación tecnológica y el comercio justo</p>
+            
+            <div class="hero-stats">
+                <div class="hero-stat" data-aos="zoom-in" data-aos-delay="100">
+                    <span class="hero-stat-number" data-count="1500">0</span>
+                    <span class="hero-stat-label">Agricultores</span>
+                </div>
+                <div class="hero-stat" data-aos="zoom-in" data-aos-delay="200">
+                    <span class="hero-stat-number" data-count="25">0</span>
+                    <span class="hero-stat-label">Comunidades</span>
+                </div>
+                <div class="hero-stat" data-aos="zoom-in" data-aos-delay="300">
+                    <span class="hero-stat-number" data-count="10000">0</span>
+                    <span class="hero-stat-label">Clientes</span>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="mission-section">
-        <div class="mission-container">
-            <div class="mission-card" data-aos="fade-right">
-                <h2>Nuestra Misión</h2>
-                <p>Empoderar a los agricultores peruanos conectándolos directamente con los consumidores, promoviendo el comercio justo y sostenible mientras facilitamos el acceso a tecnología y recursos que mejoren su productividad.</p>
+    <!-- Mission & Vision -->
+    <section class="about-section">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Nuestra Razón de Ser</h2>
+            <p class="section-subtitle">Comprometidos con el desarrollo sostenible del sector agrícola peruano</p>
+        </div>
+
+        <div class="mission-vision-grid">
+            <div class="mission-card-new" data-aos="fade-right">
+                <div class="mission-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Misión</h3>
+                <p>Empoderar a los agricultores peruanos conectándolos directamente con los consumidores, promoviendo el comercio justo y sostenible mientras facilitamos el acceso a tecnología y recursos que mejoren su productividad y calidad de vida.</p>
             </div>
-            <div class="mission-card" data-aos="fade-left">
-                <h2>Nuestra Visión</h2>
+
+            <div class="mission-card-new" data-aos="fade-left">
+                <div class="mission-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3>Visión</h3>
                 <p>Ser la plataforma líder en la transformación digital del sector agrícola peruano, creando un ecosistema donde la tecnología y la tradición se unen para construir un futuro más próspero para nuestras comunidades agrícolas.</p>
             </div>
         </div>
     </section>
 
-    <section class="impact-section">
-        <h2 class="section-title" data-aos="fade-up">Nuestro Impacto</h2>
-        <div class="impact-stats">
-            <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
-                <div class="stat-number" data-target="1500">0</div>
-                <p>Agricultores Beneficiados</p>
+    <!-- Nuestros Valores -->
+    <section class="about-section" style="background: var(--primary-bg);">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Nuestros Valores</h2>
+            <p class="section-subtitle">Los principios que guían nuestro trabajo diario</p>
+        </div>
+
+        <div class="values-grid">
+            <div class="value-item" data-aos="flip-up" data-aos-delay="100">
+                <div class="value-icon-wrapper">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h4>Compromiso Social</h4>
+                <p>Trabajamos por el desarrollo sostenible de las comunidades agrícolas</p>
             </div>
-            <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
-                <div class="stat-number" data-target="25">0</div>
-                <p>Comunidades Alcanzadas</p>
+
+            <div class="value-item" data-aos="flip-up" data-aos-delay="200">
+                <div class="value-icon-wrapper">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h4>Sostenibilidad</h4>
+                <p>Promovemos prácticas agrícolas responsables con el medio ambiente</p>
             </div>
-            <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
-                <div class="stat-number" data-target="40">0</div>
-                <p>% Incremento en Ingresos</p>
+
+            <div class="value-item" data-aos="flip-up" data-aos-delay="300">
+                <div class="value-icon-wrapper">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h4>Innovación</h4>
+                <p>Integramos tecnología para mejorar la eficiencia y productividad</p>
             </div>
-            <div class="stat-card" data-aos="zoom-in" data-aos-delay="400">
-                <div class="stat-number" data-target="10000">0</div>
-                <p>Clientes Satisfechos</p>
+
+            <div class="value-item" data-aos="flip-up" data-aos-delay="400">
+                <div class="value-icon-wrapper">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h4>Comercio Justo</h4>
+                <p>Garantizamos precios justos y condiciones equitativas</p>
             </div>
         </div>
     </section>
 
-    <section class="values-section">
-        <h2 class="section-title" data-aos="fade-up">Nuestros Valores</h2>
-        <div class="values-container">
-            <div class="value-card" data-aos="flip-left" data-aos-delay="100">
-                <div class="value-icon">🤝</div>
-                <h3>Compromiso Social</h3>
-                <p>Trabajamos por el desarrollo sostenible de las comunidades agrícolas.</p>
+    <!-- Impacto -->
+    <section class="about-section">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Nuestro Impacto</h2>
+            <p class="section-subtitle">Resultados que transforman vidas</p>
+        </div>
+
+        <div class="impact-grid">
+            <div class="impact-card" data-aos="zoom-in" data-aos-delay="100">
+                <span class="impact-number" data-count="1500">0</span>
+                <p class="impact-label">Agricultores Beneficiados</p>
             </div>
-            <div class="value-card" data-aos="flip-left" data-aos-delay="200">
-                <div class="value-icon">🌱</div>
-                <h3>Sostenibilidad</h3>
-                <p>Promovemos prácticas agrícolas responsables con el medio ambiente.</p>
+
+            <div class="impact-card" data-aos="zoom-in" data-aos-delay="200">
+                <span class="impact-number" data-count="25">0</span>
+                <p class="impact-label">Comunidades Alcanzadas</p>
             </div>
-            <div class="value-card" data-aos="flip-left" data-aos-delay="300">
-                <div class="value-icon">💡</div>
-                <h3>Innovación</h3>
-                <p>Integramos tecnología para mejorar la eficiencia y productividad.</p>
+
+            <div class="impact-card" data-aos="zoom-in" data-aos-delay="300">
+                <span class="impact-number" data-count="40">0</span>
+                <span style="font-size: 2rem; margin-left: 0.25rem;">%</span>
+                <p class="impact-label">Incremento en Ingresos</p>
             </div>
-            <div class="value-card" data-aos="flip-left" data-aos-delay="400">
-                <div class="value-icon">⚖️</div>
-                <h3>Comercio Justo</h3>
-                <p>Garantizamos precios justos y condiciones equitativas.</p>
+
+            <div class="impact-card" data-aos="zoom-in" data-aos-delay="400">
+                <span class="impact-number" data-count="10000">0</span>
+                <p class="impact-label">Clientes Satisfechos</p>
             </div>
         </div>
     </section>
 
-    <section class="team-section">
-        <h2 class="section-title" data-aos="fade-up">Nuestro Equipo</h2>
-        <div class="team-container">
-            <div class="team-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="team-photo-placeholder"></div>
-                <h3>María Rodriguez</h3>
-                <p class="team-role">Directora Ejecutiva</p>
-                <p class="team-desc">Experta en desarrollo agrícola sostenible con 15 años de experiencia.</p>
+    <!-- Team Section -->
+    <section class="about-section" style="background: var(--primary-bg);">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Nuestro Equipo</h2>
+            <p class="section-subtitle">Las personas detrás de la transformación agrícola</p>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+                <div class="team-photo">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>María Rodríguez</h4>
+                    <span class="team-role">Directora Ejecutiva</span>
+                    <p class="team-description">Experta en desarrollo agrícola sostenible con 15 años de experiencia trabajando con comunidades rurales.</p>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="team-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="team-photo-placeholder"></div>
-                <h3>Carlos Mendoza</h3>
-                <p class="team-role">Director de Tecnología</p>
-                <p class="team-desc">Especialista en soluciones tecnológicas para el sector agrícola.</p>
+
+            <div class="team-member" data-aos="fade-up" data-aos-delay="200">
+                <div class="team-photo">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>Carlos Mendoza</h4>
+                    <span class="team-role">Director de Tecnología</span>
+                    <p class="team-description">Especialista en soluciones tecnológicas para el sector agrícola, con enfoque en innovación digital.</p>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="team-card" data-aos="fade-up" data-aos-delay="300">
-                <div class="team-photo-placeholder"></div>
-                <h3>Ana Torres</h3>
-                <p class="team-role">Gerente de Desarrollo Comunitario</p>
-                <p class="team-desc">Dedicada a fortalecer vínculos con comunidades agrícolas.</p>
+
+            <div class="team-member" data-aos="fade-up" data-aos-delay="300">
+                <div class="team-photo">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="team-info">
+                    <h4>Ana Torres</h4>
+                    <span class="team-role">Gerente de Desarrollo Comunitario</span>
+                    <p class="team-description">Dedicada a fortalecer vínculos con comunidades agrícolas y promover el desarrollo sostenible.</p>
+                    <div class="team-social">
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="cta-section">
-        <div class="cta-container" data-aos="fade-up">
+    <!-- CTA Final -->
+    <section class="cta-section-new">
+        <div class="cta-content" data-aos="fade-up">
             <h2>Sé Parte del Cambio</h2>
             <p>Únete a nuestra comunidad y ayuda a transformar el sector agrícola peruano</p>
             <div class="cta-buttons">
-                <a href="#" class="cta-btn primary">Únete como Agricultor</a>
-                <a href="#" class="cta-btn secondary">Conoce Más</a>
+                <a href="{{ route('register') }}" class="cta-btn-new cta-btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    Únete como Agricultor
+                </a>
+                <a href="{{ route('products.index') }}" class="cta-btn-new cta-btn-secondary">
+                    <i class="fas fa-shopping-bag"></i>
+                    Explora Productos
+                </a>
             </div>
         </div>
     </section>
+</div>
 @endsection
+
+@push('scripts')
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100
+    });
+
+    // Counter Animation
+    function animateCounters() {
+        const counters = document.querySelectorAll('[data-count]');
+        
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    counter.textContent = Math.floor(current).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = target.toLocaleString();
+                }
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        updateCounter();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            observer.observe(counter);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', animateCounters);
+</script>
+@endpush

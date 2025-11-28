@@ -256,7 +256,7 @@
             top: calc(100% + 5px);
             left: 0;
             right: 0;
-            background: white;
+            background: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             max-height: 400px;
@@ -273,13 +273,13 @@
             align-items: center;
             padding: 10px 15px;
             text-decoration: none;
-            color: #333;
+            color: var(--text-main);
             transition: background 0.2s;
             gap: 12px;
         }
         
         .suggestion-item:hover {
-            background: #f5f5f5;
+            background: var(--primary-bg);
         }
         
         .suggestion-item img {
@@ -301,7 +301,7 @@
         
         .suggestion-price {
             font-size: 0.85rem;
-            color: var(--primary-color);
+            color: var(--accent-color);
             font-weight: 600;
         }
     </style>

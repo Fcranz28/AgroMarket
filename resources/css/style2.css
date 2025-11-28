@@ -1,15 +1,38 @@
 /* Carrusel de productos */
 .products-section {
-    padding: 40px 20px;
-    background-color: var(--primary-color);
-    margin-top: 20px;
+    width: 100%;
+    background: linear-gradient(135deg, #7AA537 0%, #8ab854 50%, #76A233 100%);
+    padding: 60px 0;
+    margin: 40px 0 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.products-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.products-section .section-title {
+    color: #2a3e1f;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .products-carousel {
     position: relative;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 0 20px;
     overflow: hidden;
+    z-index: 1;
 }
 
 .section-title {
@@ -225,12 +248,13 @@
     .products-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .footer-content {
         grid-template-columns: 1fr;
         gap: 30px;
     }
 }
+
 /* ==============================================
    ESTILOS PARA LAS CARDS DE PRODUCTOS
    (Añadir en resources/css/app.css o similar)
@@ -241,22 +265,26 @@
     display: grid;
     /* Crea columnas automáticas de mínimo 250px */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem; /* Espacio entre cards */
+    gap: 1.5rem;
+    /* Espacio entre cards */
 }
 
 /* Contenedor del Carrusel */
 .carousel-content {
     display: flex;
-    overflow-x: auto; /* Permite scroll horizontal (carrusel simple) */
-    gap: 1.5rem; /* Espacio entre cards */
-    padding-bottom: 1rem; /* Espacio para la barra de scroll */
+    overflow-x: auto;
+    /* Permite scroll horizontal (carrusel simple) */
+    gap: 1.5rem;
+    /* Espacio entre cards */
+    padding-bottom: 1rem;
+    /* Espacio para la barra de scroll */
 }
 
 /* La Card de Producto (base) */
 .product-card {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     background: #ffffff;
     overflow: hidden;
     display: flex;
@@ -265,20 +293,23 @@
 }
 
 .product-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Ancho fijo para las cards dentro del carrusel */
 .carousel-content .product-card {
-    flex: 0 0 280px; /* No se encoge, no crece, base de 280px */
+    flex: 0 0 280px;
+    /* No se encoge, no crece, base de 280px */
 }
 
 /* Contenedor de la imagen (para aspect ratio) */
 .product-image-container {
     width: 100%;
-    padding-top: 100%; /* Mantiene un aspect ratio 1:1 */
+    padding-top: 100%;
+    /* Mantiene un aspect ratio 1:1 */
     position: relative;
-    background-color: #f9f9f9; /* Color de fondo mientras carga */
+    background-color: #f9f9f9;
+    /* Color de fondo mientras carga */
 }
 
 .product-image {
@@ -287,13 +318,15 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Asegura que la imagen cubra el contenedor */
+    object-fit: cover;
+    /* Asegura que la imagen cubra el contenedor */
 }
 
 /* Información de la card */
 .product-info {
     padding: 1rem;
-    flex-grow: 1; /* Empuja el botón al fondo */
+    flex-grow: 1;
+    /* Empuja el botón al fondo */
     display: flex;
     flex-direction: column;
 }
@@ -309,12 +342,14 @@
     font-size: 1rem;
     color: #555;
     margin-bottom: 1rem;
-    flex-grow: 1; /* Ocupa el espacio disponible */
+    flex-grow: 1;
+    /* Ocupa el espacio disponible */
 }
 
 /* Botón de Añadir al Carrito */
 .add-to-cart-btn {
-    background-color: #28a745; /* Color verde (puedes cambiarlo) */
+    background-color: #28a745;
+    /* Color verde (puedes cambiarlo) */
     color: white;
     border: none;
     padding: 0.75rem 1rem;
@@ -326,7 +361,8 @@
 }
 
 .add-to-cart-btn:hover {
-    background-color: #218838; /* Verde más oscuro al pasar el mouse */
+    background-color: #218838;
+    /* Verde más oscuro al pasar el mouse */
 }
 
 /* Títulos de sección */

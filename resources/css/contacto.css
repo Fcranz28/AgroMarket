@@ -10,7 +10,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0;
-    background: rgb(28, 173, 30);
+    background: var(--accent-color);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
@@ -82,7 +82,7 @@
 }
 
 .contact-form {
-    background: whitesmoke;
+    background: var(--primary-bg);
     padding: 4rem 3rem;
 }
 
@@ -142,8 +142,8 @@
 }
 
 .submit-btn {
-    background: green;
-    color: black;
+    background: var(--accent-color);
+    color: white;
     padding: 1.2rem 2rem;
     border: none;
     border-radius: 5px;
@@ -198,6 +198,7 @@
 }
 
 @media (max-width: 480px) {
+
     .contact-info,
     .contact-form {
         padding: 2rem 1.5rem;

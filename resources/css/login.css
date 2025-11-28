@@ -3,7 +3,7 @@
 
 /* Estilo para el body, para centrar el contenido */
 .login-body {
-    background-color: whitesmoke;
+    background-color: #f0f4e8;
     font-family: 'Montserrat', sans-serif;
     display: flex;
     align-items: center;
@@ -48,7 +48,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: linear-gradient(to right, #00b074a6, #25b562);
+    background: linear-gradient(to right, #7AA537, #8ab854);
     color: #fff;
 }
 
@@ -189,14 +189,96 @@
     padding-left: 5px;
 }
 
-html.dark .login-body {
-    /* Usamos las variables globales si existen, o un fallback */
-    background-color: var(--background-color, #1a202c);
+/* Dark Mode Styles */
+:root[data-theme="dark"] .login-body {
+    background-color: #1a1e16;
 }
 
-html.dark .form-panel {
-    background-color: #333537;
-    color: var(--text-color, #e2e8f0);
+:root[data-theme="dark"] .container-auth {
+    background-color: #2e3228;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .form-panel {
+    background-color: #2e3228;
+    color: #f1edd4;
+}
+
+:root[data-theme="dark"] .form-container h1 {
+    color: #f1edd4;
+}
+
+:root[data-theme="dark"] .form-container span {
+    color: #c8c4ab;
+}
+
+:root[data-theme="dark"] .form-panel h2 {
+    color: #f1edd4;
+}
+
+:root[data-theme="dark"] .input-group input {
+    background-color: #24281f;
+    color: #f1edd4;
+    border: 1px solid #4a4e42;
+}
+
+:root[data-theme="dark"] .input-group input::placeholder {
+    color: #8a9d7a;
+}
+
+:root[data-theme="dark"] .input-group input:focus {
+    border-color: #76A233;
+    background-color: #2e3228;
+}
+
+:root[data-theme="dark"] .input-group label {
+    color: #c8c4ab;
+}
+
+:root[data-theme="dark"] .input-group.active label {
+    color: #76A233;
+    background-color: #2e3228;
+}
+
+:root[data-theme="dark"] .form-container a.forgot-password {
+    color: #76A233;
+}
+
+:root[data-theme="dark"] .form-container a.forgot-password:hover {
+    color: #8ab854;
+}
+
+:root[data-theme="dark"] .form-container .btn {
+    background-color: #76A233;
+    color: #fff;
+}
+
+:root[data-theme="dark"] .form-container .btn:hover {
+    background-color: #8ab854;
+}
+
+:root[data-theme="dark"] .divider {
+    color: #8a9d7a;
+}
+
+:root[data-theme="dark"] .divider::before,
+:root[data-theme="dark"] .divider::after {
+    background-color: #4a4e42;
+}
+
+:root[data-theme="dark"] .social-btn {
+    background-color: #24281f;
+    border-color: #4a4e42;
+    color: #f1edd4;
+}
+
+:root[data-theme="dark"] .social-btn:hover {
+    border-color: #76A233;
+    background-color: #2e3228;
+}
+
+:root[data-theme="dark"] label[for="remember"] {
+    color: #c8c4ab !important;
 }
 
 /* Social Login Styles */

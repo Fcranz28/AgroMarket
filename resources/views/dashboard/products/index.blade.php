@@ -1,25 +1,48 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('title', 'Mis Productos')
+@section('header', 'Mis Productos')
 
 @section('content')
-<div class="container">
-    <div class="header-actions">
-        <h2>Mis Productos</h2>
-        <a href="{{ route('dashboard.productos.create') }}" class="btn btn-primary">
+    <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div></div>
+        <a href="{{ route('dashboard.productos.create') }}" class="btn btn-primary" style="background: #48bb78; border: none; padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <line x1="5" y1="12" x2="19" y12="12"></line>
             </svg>
             Agregar Producto
         </a>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#48bb78',
+                    timer: 3000
+                });
+            });
+        </script>
     @endif
 
-    <div class="products-grid">
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '{{ session('error') }}',
+                    confirmButtonColor: '#48bb78'
+                });
+            });
+        </script>
+    @endif
+
+    <div class="dashboard-products-grid">
         @forelse($products as $product)
             <div class="product-card">
                 <div class="product-image">
@@ -35,10 +58,10 @@
                     <p class="stock">Stock: {{ $product->stock }}</p>
                     <div class="actions">
                         <a href="{{ route('dashboard.productos.edit', $product) }}" class="btn btn-sm btn-secondary">Editar</a>
-                        <form action="{{ route('dashboard.productos.destroy', $product) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de querer eliminar este producto?');">
+                        <form action="{{ route('dashboard.productos.destroy', $product) }}" method="POST" class="d-inline delete-form">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-product-name="{{ $product->name }}">Eliminar</button>
                         </form>
                     </div>
                 </div>
@@ -50,7 +73,6 @@
             </div>
         @endforelse
     </div>
-</div>
 
 @push('styles')
 <style>
@@ -67,7 +89,7 @@
         margin-bottom: 2rem;
     }
 
-    .products-grid {
+    .dashboard-products-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 2rem;
@@ -151,21 +173,23 @@
     }
 
     .btn-secondary {
-        background-color: #edf2f7;
-        color: #4a5568;
+        background-color: #4299e1;
+        color: white;
+        border: 1px solid #4299e1;
     }
 
     .btn-secondary:hover {
-        background-color: #e2e8f0;
+        background-color: #3182ce;
     }
 
     .btn-danger {
-        background-color: #fff5f5;
-        color: #c53030;
+        background-color: #e53e3e;
+        color: white;
+        border: 1px solid #e53e3e;
     }
 
     .btn-danger:hover {
-        background-color: #fed7d7;
+        background-color: #c53030;
     }
 
     .alert-success {
@@ -188,5 +212,35 @@
         display: inline-block;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete confirmations with SweetAlert
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = this.closest('.delete-form');
+                const productName = this.dataset.productName;
+                
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: `¿Deseas eliminar "${productName}"? Esta acción no se puede deshacer.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e53e3e',
+                    cancelButtonColor: '#718096',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endpush
 @endsection

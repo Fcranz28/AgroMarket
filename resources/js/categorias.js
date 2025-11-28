@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // NO ejecutar en el dashboard de agricultores
+    if (window.location.pathname.startsWith('/agricultor/')) {
+        return;
+    }
+
     let currentCategory = 'all';
     let currentSort = 'featured';
 

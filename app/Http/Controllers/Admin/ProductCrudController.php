@@ -116,31 +116,52 @@ class ProductCrudController extends Controller
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'price' => 'required|numeric|min:0',
-            'unit' => 'required|string',
-            'stock' => 'required|integer|min:0',
+            'unit' => 'required|array|min:1',
+            'stock' => 'required|array|min:1',
+            'price' => 'required|array|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Procesar nueva imagen si existe
-        if ($request->hasFile('image')) {
-            // Eliminar imagen anterior
-            if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+        // Use database transaction for data integrity
+        \DB::transaction(function () use ($request, $validated, $product) {
+            // Process new image if exists
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($product->image_path) {
+                    Storage::disk('public')->delete($product->image_path);
+                }
+                $imagePath = $request->file('image')->store('products', 'public');
+                $product->image_path = $imagePath;
             }
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image_path = $imagePath;
-        }
 
-        $product->update([
-            'category_id' => $validated['category_id'],
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'unit' => $validated['unit'],
-            'stock' => $validated['stock'],
-            'image_path' => $product->image_path,
-        ]);
+            // Recalculate base values from new units
+            $basePrice = min($request->price);
+            $baseUnit = $request->unit[0];
+            $baseStock = array_sum($request->stock);
+
+            $product->update([
+                'category_id' => $validated['category_id'],
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'price' => $basePrice,
+                'unit' => $baseUnit,
+                'stock' => $baseStock,
+                'image_path' => $product->image_path,
+            ]);
+
+            // Sync product units: delete old units and create new ones
+            $product->units()->delete();
+            
+            foreach ($request->unit as $key => $unit) {
+                if (isset($request->stock[$key]) && isset($request->price[$key])) {
+                    $product->units()->create([
+                        'unit' => $unit,
+                        'stock' => $request->stock[$key],
+                        'price' => $request->price[$key]
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('admin.productos.index')
                        ->with('success', 'Producto actualizado correctamente');

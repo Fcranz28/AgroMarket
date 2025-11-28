@@ -62,7 +62,6 @@
                         <option value="litro">Litro</option>
                         <option value="ml">Mililitro (ml)</option>
                     </select>
-                    <small class="text-muted">Mantenga presionado Ctrl (Windows) o Cmd (Mac) para seleccionar múltiples opciones.</small>
                 </div>
 
                 <div class="form-group col-md-6">

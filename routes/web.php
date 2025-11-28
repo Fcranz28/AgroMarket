@@ -78,6 +78,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:farmer'])->prefix('agricultor')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\FarmerController::class, 'index'])->name('farmer.dashboard');
         
+        // Farmer Orders (as seller)
+        Route::get('/pedidos', [OrderController::class, 'farmerOrders'])->name('farmer.orders');
+        
         // Product Management (Reusing UserProductController but scoped to farmers)
         Route::name('dashboard.')->group(function () {
             Route::resource('productos', UserProductController::class);
