@@ -92,6 +92,10 @@
                                             <i class="fas fa-file-invoice"></i> Descargar Factura
                                         </a>
                                     @endif
+                                    
+                                    <button class="btn btn-outline" onclick="openTrackingModal('{{ $order->id }}', '{{ $order->status }}')">
+                                        <i class="fas fa-map-marker-alt"></i> Rastrear Pedido
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -243,6 +247,32 @@
             </form>
         </section>
     </main>
+</div>
+
+<!-- Tracking Modal -->
+<div id="trackingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeTrackingModal()">&times;</span>
+        <h2>Rastreo de Pedido</h2>
+        <div class="stepper-wrapper">
+            <div class="stepper-item" id="step-pending">
+                <div class="step-counter">1</div>
+                <div class="step-name">Pendiente</div>
+            </div>
+            <div class="stepper-item" id="step-processing">
+                <div class="step-counter">2</div>
+                <div class="step-name">En Proceso</div>
+            </div>
+            <div class="stepper-item" id="step-shipped">
+                <div class="step-counter">3</div>
+                <div class="step-name">Enviado</div>
+            </div>
+            <div class="stepper-item" id="step-delivered">
+                <div class="step-counter">4</div>
+                <div class="step-name">Entregado</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -705,7 +735,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 4px solid white;
+        border: 4px solid var(--card-bg);
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
@@ -750,6 +780,129 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: var(--card-background-color, #fff);
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--text-color-light, #aaa);
+        cursor: pointer;
+    }
+
+    .close-modal:hover {
+        color: var(--text-color, #333);
+    }
+
+    /* Stepper Styles */
+    .stepper-wrapper {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .stepper-wrapper::before {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--border-color, #e0e0e0);
+        z-index: 0;
+    }
+
+    .stepper-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        z-index: 1;
+    }
+
+    .step-counter {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: var(--card-background-color, #fff);
+        border: 2px solid var(--border-color, #e0e0e0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: var(--text-color-light, #999);
+        transition: all 0.3s;
+    }
+
+    .step-name {
+        font-size: 0.85rem;
+        color: var(--text-color-light, #999);
+        font-weight: 500;
+    }
+
+    /* Active/Completed States */
+    .stepper-item.active .step-counter {
+        border-color: var(--primary-color, #4caf50);
+        background-color: var(--primary-color, #4caf50);
+        color: white;
+    }
+
+    .stepper-item.completed .step-counter {
+        border-color: var(--primary-color, #4caf50);
+        background-color: var(--primary-color, #4caf50);
+        color: white;
+    }
+
+    .stepper-item.active .step-name,
+    .stepper-item.completed .step-name {
+        color: var(--text-color, #333);
+        font-weight: 600;
+    }
+
+    /* Progress Bar Line */
+    .stepper-item.completed::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background-color: var(--primary-color, #4caf50);
+        z-index: -1;
+    }
+
+    .stepper-item:last-child::after {
+        display: none;
+    }
 </style>
 
 <script>
@@ -792,6 +945,44 @@
                 avatarContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
             };
             reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function openTrackingModal(orderId, status) {
+        const modal = document.getElementById('trackingModal');
+        modal.style.display = 'flex';
+        
+        // Reset steps
+        const steps = ['pending', 'processing', 'shipped', 'delivered'];
+        steps.forEach(step => {
+            const el = document.getElementById('step-' + step);
+            if(el) el.classList.remove('active', 'completed');
+        });
+
+        // Activate steps based on status
+        let active = true;
+        steps.forEach(step => {
+            const el = document.getElementById('step-' + step);
+            if (el && active) {
+                if (step === status) {
+                    el.classList.add('active');
+                    active = false; 
+                } else {
+                    el.classList.add('completed');
+                }
+            }
+        });
+    }
+
+    function closeTrackingModal() {
+        document.getElementById('trackingModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('trackingModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
         }
     }
 </script>

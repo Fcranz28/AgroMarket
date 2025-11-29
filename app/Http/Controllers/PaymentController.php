@@ -29,6 +29,14 @@ class PaymentController extends Controller
             ]);
 
             $amount = $request->amount;
+
+            // Enforce minimum amount for Stripe (approx $0.50 USD)
+            // S/. 2.00 is safely above the limit
+            if ($amount < 2.00) {
+                return response()->json([
+                    'error' => 'El monto mínimo de compra para pagos con tarjeta es de S/. 2.00. Por favor, agregue más productos a su carrito.'
+                ], 400);
+            }
             
             // Create Stripe Payment Intent
             $paymentIntent = PaymentIntent::create([
@@ -48,10 +56,15 @@ class PaymentController extends Controller
                 'paymentIntentId' => $paymentIntent->id
             ]);
 
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            \Log::error('Stripe Invalid Request: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error en la solicitud de pago: ' . $e->getMessage()
+            ], 400);
         } catch (\Exception $e) {
             \Log::error('Payment Intent creation failed: ' . $e->getMessage());
             return response()->json([
-                'error' => 'Error al crear la intención de pago: ' . $e->getMessage()
+                'error' => 'Error al iniciar el sistema de pagos. Por favor intente nuevamente.'
             ], 500);
         }
     }

@@ -92,17 +92,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 image = product.image_url;
             }
             const price = Number(product.price || 0).toFixed(2);
+            const categoryName = product.category_name || product.category || 'Productos';
+
             return `
             <article class="product-card" data-product-id="${product.id}">
                 <a href="/producto/${product.slug}">
-                    <img src="${image}" alt="${product.name}" loading="lazy">
+                    <div class="product-image-container">
+                        <img src="${image}" alt="${product.name}" class="product-image" loading="lazy">
+                    </div>
                 </a>
                 <div class="product-info">
+                    <p class="product-category">${categoryName}</p>
                     <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
-                        <h3>${product.name}</h3>
+                        <h3 class="product-title">${product.name}</h3>
                     </a>
-                    <p class="price">S/. ${price}</p>
-                    <button class="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
+                    <div class="product-footer">
+                        <p class="product-price">S/. ${price}</p>
+                        <button class="btn-add-cart" data-id="${product.id}"></button>
+                    </div>
                 </div>
             </article>`;
         }).join('');
@@ -134,4 +141,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carga inicial de productos
     loadProducts();
+
+    // --- MOBILE SIDEBAR LOGIC ---
+    const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    function openSidebar() {
+        if (mobileSidebar) mobileSidebar.classList.add('open');
+        if (mobileSidebarOverlay) mobileSidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeSidebar() {
+        if (mobileSidebar) mobileSidebar.classList.remove('open');
+        if (mobileSidebarOverlay) mobileSidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (mobileFilterBtn) {
+        mobileFilterBtn.addEventListener('click', openSidebar);
+    }
+
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+    }
+
+    if (mobileSidebarOverlay) {
+        mobileSidebarOverlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close sidebar when a category is selected (on mobile)
+    const mobileCategoryButtons = document.querySelectorAll('.mobile-category-list .category-btn');
+    mobileCategoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            closeSidebar();
+            // The existing logic will handle the category selection and product loading
+            // because we are using the same class .category-btn
+        });
+    });
 });

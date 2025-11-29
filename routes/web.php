@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Farmer Orders (as seller)
         Route::get('/pedidos', [OrderController::class, 'farmerOrders'])->name('farmer.orders');
+        Route::patch('/pedidos/{order}/status', [OrderController::class, 'updateStatus'])->name('farmer.orders.status');
         
         // Product Management (Reusing UserProductController but scoped to farmers)
         Route::name('dashboard.')->group(function () {

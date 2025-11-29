@@ -297,6 +297,89 @@
     .btn-block {
         width: 100%;
     }
+
+    /* =========================================
+       DARK MODE STYLES
+       ========================================= */
+    :root[data-theme="dark"] .product-detail-grid {
+        background: var(--card-bg);
+        box-shadow: var(--shadow-lg);
+    }
+
+    :root[data-theme="dark"] .main-image-container {
+        background: var(--primary-bg);
+        border-color: var(--border-color);
+    }
+
+    :root[data-theme="dark"] .thumbnail {
+        border-color: var(--border-color);
+    }
+
+    :root[data-theme="dark"] .thumbnail.active {
+        border-color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .thumbnail:hover {
+        border-color: var(--accent-hover);
+    }
+
+    :root[data-theme="dark"] .product-title {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .product-price {
+        color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .product-description {
+        color: var(--text-muted);
+    }
+
+    :root[data-theme="dark"] .product-options {
+        background: var(--primary-bg);
+    }
+
+    :root[data-theme="dark"] .option-label {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .stock-info {
+        color: var(--text-muted);
+    }
+
+    :root[data-theme="dark"] .unit-btn {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .unit-btn:hover {
+        background: var(--primary-bg);
+        border-color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .unit-btn.active {
+        background: rgba(122, 165, 55, 0.15);
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .qty-btn {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .qty-btn:hover {
+        background: var(--primary-bg);
+    }
+
+    :root[data-theme="dark"] .qty-input {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
+
 </style>
 @endpush
 

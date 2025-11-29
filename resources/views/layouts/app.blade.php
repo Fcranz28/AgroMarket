@@ -98,53 +98,85 @@
         </div>
     </nav>
 
+    {{-- Sub-barra de navegación con pestañas Chrome invertidas --}}
+    @include('partials.sub-navbar')
+
+
+
     <nav class="bottom-nav-mobile">
-        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">
+        {{-- Inicio --}}
+        <a href="{{ route('home') }}" class="mobile-nav-item {{ request()->routeIs('home') ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
             </svg>
             <span>Inicio</span>
         </a>
-        <a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/>
-            </svg>
-            <span>Categorías</span>
-        </a>
         
-        @auth
-            @if(Auth::user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-                    </svg>
-                    <span>Panel</span>
-                </a>
-            @elseif(Auth::user()->isFarmer())
-                <a href="{{ route('farmer.dashboard') }}" class="{{ request()->routeIs('farmer.*') || request()->routeIs('dashboard.*') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-                    </svg>
-                    <span>Panel</span>
-                </a>
-            @else
-                <a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                    </svg>
-                    <span>Pedidos</span>
-                </a>
-            @endif
-        @else
-            <a href="{{ route('contact.show') }}" class="{{ request()->routeIs('contact.*') ? 'active' : '' }}">
+        {{-- Yo (Dropdown para login/register o menú usuario) --}}
+        <div class="mobile-nav-item mobile-user-dropdown">
+            <button class="mobile-dropdown-trigger">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
-                <span>Contacto</span>
-            </a>
-        @endauth
+                <span>Yo</span>
+                <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+                    <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                </svg>
+            </button>
+            
+            <div class="mobile-dropdown-menu">
+                @guest
+                    <a href="{{ route('login') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/>
+                        </svg>
+                        Iniciar Sesión
+                    </a>
+                    <a href="{{ route('register') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Registrarse
+                    </a>
+                @else
+                    @if(Auth::user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                            </svg>
+                            Panel Admin
+                        </a>
+                    @elseif(Auth::user()->isFarmer())
+                        <a href="{{ route('farmer.dashboard') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                            </svg>
+                            Panel Agricultor
+                        </a>
+                    @endif
+                    
+                    <a href="{{ route('orders.index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        Mis Pedidos
+                    </a>
+                    
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                            </svg>
+                            Cerrar Sesión
+                        </button>
+                    </form>
+                @endguest
+            </div>
+        </div>
         
-        <button class="cart-button-mobile" id="openCartMobile">
+        {{-- Carrito --}}
+        <button class="mobile-nav-item cart-button-mobile" id="openCartMobile">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
             </svg>
@@ -152,6 +184,7 @@
             <span class="cart-count-mobile">0</span>
         </button>
     </nav>
+
 
     <main class="content">
         @yield('content')
@@ -242,7 +275,10 @@
         @auth
             @if(auth()->user()->isAdmin() || (auth()->user()->isFarmer() && auth()->user()->isVerified()))
                 <a href="{{ route('dashboard.productos.create') }}" class="fab-admin" title="Agregar Nuevo Producto">
-                    <img src="{{ asset('img/sumicon.png') }}" alt="Agregar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y12="12"></line>
+                    </svg>
                 </a>
             @endif
         @endauth
@@ -307,5 +343,31 @@
     </style>
 
     @stack('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.querySelector('.floating-navbar');
+            const subNavbar = document.querySelector('.sub-navbar');
+            
+            function adjustSubNavbar() {
+                if (navbar && subNavbar) {
+                    const navHeight = navbar.offsetHeight;
+                    const navTop = navbar.offsetTop;
+                    // Posicionar justo debajo del navbar, restando unos pixeles para que "cuelgue" visualmente
+                    // y se vea la conexión (overlap)
+                    subNavbar.style.top = (navTop + navHeight - 2) + 'px';
+                }
+            }
+
+            // Ajustar al cargar y al redimensionar
+            adjustSubNavbar();
+            window.addEventListener('resize', adjustSubNavbar);
+            
+            // Observer para cambios en el tamaño del navbar (ej. si carga algo dinámico)
+            const resizeObserver = new ResizeObserver(() => {
+                adjustSubNavbar();
+            });
+            resizeObserver.observe(navbar);
+        });
+    </script>
 </body>
 </html>

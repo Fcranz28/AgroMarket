@@ -349,3 +349,91 @@
 .social-btn span {
     margin: 0;
 }
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 768px) {
+    .login-body {
+        padding: 1rem;
+        align-items: flex-start;
+        /* Better scrolling on small screens */
+        padding-top: 80px;
+        /* Space for navbar */
+    }
+
+    .container-auth {
+        flex-direction: column;
+        max-width: 100%;
+        min-height: auto;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+    }
+
+    .form-panel {
+        padding: 2rem 1.5rem;
+        order: 2;
+        /* Form below toggle on mobile if we want, or above. Let's keep it standard. */
+    }
+
+    .toggle-panel {
+        padding: 2rem 1.5rem;
+        min-height: 200px;
+        order: 1;
+        /* Toggle on top */
+        border-radius: 20px 20px 0 0;
+        /* Rounded top only if it was separate, but here it's inside container */
+    }
+
+    /* Adjust border radius for stacked layout */
+    .toggle-panel {
+        border-radius: 0;
+        /* Reset */
+    }
+
+    .form-container h1 {
+        font-size: 1.75rem;
+    }
+
+    .toggle-panel h1 {
+        font-size: 1.75rem;
+    }
+
+    .input-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-container .btn,
+    .toggle-panel .btn {
+        padding: 12px 30px;
+        width: 100%;
+        /* Full width buttons on mobile */
+    }
+
+    /* Specific adjustments for Register page where order might be different */
+    /* If we want the form to be always first or second, we can control it with flex order */
+}
+
+@media (max-width: 480px) {
+    .container-auth {
+        border-radius: 15px;
+    }
+
+    .form-panel,
+    .toggle-panel {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-container h1 {
+        font-size: 1.5rem;
+    }
+
+    .social-login {
+        flex-direction: column;
+    }
+
+    .social-btn {
+        width: 100%;
+    }
+}

@@ -117,22 +117,24 @@
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     padding: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    background-color: white;
-    color: var(--color-text-primary);
+    border: 2px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    background-color: var(--card-bg, white);
+    color: var(--text-main, #2d3748);
     font-size: 1rem;
     transition: all 0.3s ease;
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 5px rgba(var(--color-primary-rgb), 0.2);
+    border-color: var(--accent-color, #7AA537);
+    box-shadow: 0 0 0 3px rgba(122, 165, 55, 0.1);
 }
 
 .form-group input::placeholder,
@@ -195,6 +197,11 @@
     .contact-form h2 {
         font-size: 1.75rem;
     }
+
+    /* Map adjustment for tablet/mobile */
+    .map-container iframe {
+        height: 350px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -204,12 +211,79 @@
         padding: 2rem 1.5rem;
     }
 
+    /* Reverting to left alignment for better readability on mobile, 
+       but keeping the stack layout */
     .info-item {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        /* Keep icon next to text if possible */
+        align-items: flex-start;
+        text-align: left;
     }
 
     .info-item .icon {
-        margin: 0 auto 1rem;
+        margin-right: 1rem;
+        margin-bottom: 0;
+        width: 40px;
+        /* Slightly smaller icon */
+        height: 40px;
+        flex-shrink: 0;
     }
+
+    .info-item i {
+        font-size: 1rem;
+    }
+
+    .map-container iframe {
+        height: 300px;
+        /* Even smaller map on mobile */
+    }
+
+    .contact-section {
+        padding: 2rem 1rem;
+        padding-top: 80px;
+        /* Ensure space for fixed navbar */
+    }
+}
+
+/* =========================================
+   DARK MODE STYLES
+   ========================================= */
+:root[data-theme="dark"] .contact-form {
+    background: var(--card-bg);
+}
+
+:root[data-theme="dark"] .contact-form h2 {
+    color: var(--text-main);
+}
+
+:root[data-theme="dark"] .form-group label {
+    color: var(--text-main);
+}
+
+:root[data-theme="dark"] .form-group input,
+:root[data-theme="dark"] .form-group textarea,
+:root[data-theme="dark"] .form-group select {
+    background-color: var(--primary-bg);
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+:root[data-theme="dark"] .form-group input:focus,
+:root[data-theme="dark"] .form-group textarea:focus,
+:root[data-theme="dark"] .form-group select:focus {
+    border-color: var(--accent-color);
+    background-color: var(--card-bg);
+}
+
+:root[data-theme="dark"] .form-group input::placeholder,
+:root[data-theme="dark"] .form-group textarea::placeholder {
+    color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .submit-btn {
+    background: var(--accent-color);
+}
+
+:root[data-theme="dark"] .submit-btn:hover {
+    background: var(--accent-hover);
 }

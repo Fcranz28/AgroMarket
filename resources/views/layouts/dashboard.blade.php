@@ -14,7 +14,10 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ route('home') }}" class="sidebar-logo">AgroMarket</a>
+                <a href="{{ route('home') }}" class="sidebar-logo">
+                    <img src="{{ asset('img/Logo_Claro.png') }}" alt="AgroMarket" class="logo-claro">
+                    <img src="{{ asset('img/Logo_Oscuro.png') }}" alt="AgroMarket" class="logo-oscuro">
+                </a>
             </div>
             
             <ul class="sidebar-menu">

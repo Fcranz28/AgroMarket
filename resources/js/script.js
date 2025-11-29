@@ -46,14 +46,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Agregar evento al botón del carrito en la barra superior
+    // Agregar evento al botón del carrito en la barra superior
     if (cartBtn) {
         cartBtn.addEventListener('click', () => {
             const cartSidebar = document.getElementById('cartSidebar');
             if (cartSidebar) {
-                cartSidebar.style.transform = 'translateX(0)';
+                cartSidebar.classList.add('open');
             }
         });
     }
+
+    // Agregar evento al botón de cerrar carrito
+    const closeCartBtn = document.getElementById('closeCart');
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', () => {
+            const cartSidebar = document.getElementById('cartSidebar');
+            if (cartSidebar) {
+                cartSidebar.classList.remove('open');
+            }
+        });
+    }
+
+    // Cerrar carrito al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        const cartSidebar = document.getElementById('cartSidebar');
+        if (cartSidebar && cartSidebar.classList.contains('open') && !cartSidebar.contains(e.target) && !cartBtn.contains(e.target)) {
+            cartSidebar.classList.remove('open');
+        }
+    });
 
     // --- INICIO DE LA SOLUCIÓN ---
 
@@ -175,4 +195,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FIN DE LA SOLUCIÓN ---
+
+    // Mobile User Dropdown
+    const mobileDropdownTrigger = document.querySelector('.mobile-dropdown-trigger');
+    const mobileDropdownMenu = document.querySelector('.mobile-dropdown-menu');
+
+    if (mobileDropdownTrigger && mobileDropdownMenu) {
+        mobileDropdownTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileDropdownMenu.classList.toggle('show');
+
+            // Rotar la flecha
+            const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
+            if (arrow) {
+                arrow.style.transform = mobileDropdownMenu.classList.contains('show')
+                    ? 'rotate(180deg)'
+                    : 'rotate(0deg)';
+            }
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!mobileDropdownTrigger.contains(e.target) && !mobileDropdownMenu.contains(e.target)) {
+                mobileDropdownMenu.classList.remove('show');
+                const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Cerrar dropdown al seleccionar una opción
+        const dropdownLinks = mobileDropdownMenu.querySelectorAll('a, button[type="submit"]');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileDropdownMenu.classList.remove('show');
+                const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+    }
 });

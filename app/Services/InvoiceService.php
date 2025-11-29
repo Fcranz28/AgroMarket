@@ -134,23 +134,25 @@ class InvoiceService
         // Build details array
         $details = [];
         foreach ($order->items as $item) {
-            $precioSinIgv = floatval($item->price) / 1.18;
-            $subtotal = $precioSinIgv * $item->quantity;
+            $precioBase = floatval($item->price); // El precio es la base (Op. Gravada)
+            $subtotal = $precioBase * $item->quantity;
             $igv = $subtotal * 0.18;
+            $totalItem = $subtotal + $igv;
+            $precioConIgv = $precioBase * 1.18;
 
             $details[] = [
                 'codProducto' => 'PROD' . $item->product_id,
                 'unidad' => 'NIU', // Unidad de medida
                 'descripcion' => $item->product->name ?? 'Producto',
                 'cantidad' => floatval($item->quantity),
-                'mtoValorUnitario' => round($precioSinIgv, 2),
+                'mtoValorUnitario' => round($precioBase, 2),
                 'mtoValorVenta' => round($subtotal, 2),
                 'mtoBaseIgv' => round($subtotal, 2),
                 'porcentajeIgv' => 18,
                 'igv' => round($igv, 2),
                 'tipAfeIgv' => '10', // Gravado - Operación Onerosa
                 'totalImpuestos' => round($igv, 2),
-                'mtoPrecioUnitario' => round(floatval($item->price), 2)
+                'mtoPrecioUnitario' => round($precioConIgv, 2)
             ];
         }
 
@@ -170,8 +172,19 @@ class InvoiceService
             default => '1',
         };
 
+        // Calculate totals from details to ensure consistency
+        $totalOperGravadas = 0;
+        $totalIgv = 0;
+        $totalImpVenta = 0;
+
+        foreach ($details as $detail) {
+            $totalOperGravadas += $detail['mtoValorVenta'];
+            $totalIgv += $detail['igv'];
+            $totalImpVenta += ($detail['mtoValorVenta'] + $detail['igv']);
+        }
+
         // Convert total to words (simplified version)
-        $totalWords = $this->numberToWords($invoice->total);
+        $totalWords = $this->numberToWords($totalImpVenta);
 
         $payload = [
             'ublVersion' => '2.1',
@@ -197,12 +210,12 @@ class InvoiceService
                 'ruc' => $this->companyRuc,
                 'razonSocial' => $this->companyRazonSocial
             ],
-            'mtoOperGravadas' => round(floatval($invoice->subtotal), 2),
-            'mtoIGV' => round(floatval($invoice->igv), 2),
-            'totalImpuestos' => round(floatval($invoice->igv), 2),
-            'valorVenta' => round(floatval($invoice->subtotal), 2),
-            'subTotal' => round(floatval($invoice->total), 2),
-            'mtoImpVenta' => round(floatval($invoice->total), 2),
+            'mtoOperGravadas' => round($totalOperGravadas, 2),
+            'mtoIGV' => round($totalIgv, 2),
+            'totalImpuestos' => round($totalIgv, 2),
+            'valorVenta' => round($totalOperGravadas, 2),
+            'subTotal' => round($totalImpVenta, 2),
+            'mtoImpVenta' => round($totalImpVenta, 2),
             'details' => $details,
             'legends' => [
                 [

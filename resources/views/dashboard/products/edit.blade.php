@@ -8,22 +8,7 @@
     <div class="form-container">
         <div class="form-header">
             <h2>Editar Producto: {{ $producto->name }}</h2>
-            <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
-                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
+
         </div>
         
         @if ($errors->any())
@@ -186,91 +171,7 @@
 
 @push('styles')
 <style>
-    :root {
-        /* Light Mode - Pastel Colors */
-        --bg-primary: #fef6f9;
-        --bg-secondary: #ffffff;
-        --bg-card: #ffffff;
-        --bg-input: #f8f9fa;
-        --bg-input-focus: #ffffff;
-        
-        --text-primary: #2d3748;
-        --text-secondary: #718096;
-        --text-muted: #a0aec0;
-        
-        --border-color: #e9d5e0;
-        --border-focus: #f0abdd;
-        
-        --accent-primary: #f0abdd;
-        --accent-secondary: #b8e0d2;
-        --accent-tertiary: #d4a5a5;
-        
-        --shadow-sm: 0 2px 4px rgba(240, 171, 221, 0.1);
-        --shadow-md: 0 4px 12px rgba(240, 171, 221, 0.15);
-        --shadow-lg: 0 8px 24px rgba(240, 171, 221, 0.2);
-        
-        --success: #b8e0d2;
-        --warning: #ffd5a5;
-        --danger: #ffb3c1;
-    }
 
-    @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) {
-            /* Dark Mode - Muted Pastels */
-            --bg-primary: #1a1a2e;
-            --bg-secondary: #25274d;
-            --bg-card: #2e3047;
-            --bg-input: #363853;
-            --bg-input-focus: #3d405f;
-            
-            --text-primary: #e8e9f3;
-            --text-secondary: #b4b5c5;
-            --text-muted: #8486a0;
-            
-            --border-color: #464866;
-            --border-focus: #8b7fa8;
-            
-            --accent-primary: #9d8ba8;
-            --accent-secondary: #7fa89d;
-            --accent-tertiary: #a88b8b;
-            
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-            
-            --success: #7fa89d;
-            --warning: #c4a57b;
-            --danger: #c47b8d;
-        }
-    }
-
-    :root[data-theme="dark"] {
-        /* Dark Mode - Muted Pastels (Manual override) */
-        --bg-primary: #1a1a2e;
-        --bg-secondary: #25274d;
-        --bg-card: #2e3047;
-        --bg-input: #363853;
-        --bg-input-focus: #3d405f;
-        
-        --text-primary: #e8e9f3;
-        --text-secondary: #b4b5c5;
-        --text-muted: #8486a0;
-        
-        --border-color: #464866;
-        --border-focus: #8b7fa8;
-        
-        --accent-primary: #9d8ba8;
-        --accent-secondary: #7fa89d;
-        --accent-tertiary: #a88b8b;
-        
-        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-        
-        --success: #7fa89d;
-        --warning: #c4a57b;
-        --danger: #c47b8d;
-    }
 
     .container {
         max-width: 900px;
@@ -736,37 +637,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Theme Toggle Functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const rootElement = document.documentElement;
-        
-        // Check for saved theme preference or default to system preference
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        // Set initial theme
-        if (savedTheme) {
-            rootElement.setAttribute('data-theme', savedTheme);
-        } else if (systemPrefersDark) {
-            rootElement.setAttribute('data-theme', 'dark');
-        } else {
-            rootElement.setAttribute('data-theme', 'light');
-        }
-        
-        // Toggle theme on button click
-        themeToggle.addEventListener('click', function() {
-            const currentTheme = rootElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            rootElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Add a subtle animation
-            this.style.transform = 'rotate(360deg)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 300);
-        });
+
         
         // Dynamic Stock Logic
         const unitSelect = document.getElementById('unit');

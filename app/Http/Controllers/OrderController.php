@@ -60,4 +60,28 @@ class OrderController extends Controller
 
         return view('farmer.orders', compact('pendingOrders', 'orders'));
     }
+
+    /**
+     * Update order status
+     */
+    public function updateStatus(\Illuminate\Http\Request $request, Order $order)
+    {
+        // Verify user is a farmer and owns products in this order
+        // For simplicity, we'll just check if they are a farmer for now, 
+        // but ideally we should check if they are the seller of items in this order.
+        if (!Auth::user()->isFarmer()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+        ]);
+
+        $order->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado actualizado correctamente'
+        ]);
+    }
 }

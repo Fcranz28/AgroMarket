@@ -531,6 +531,44 @@
             justify-content: center;
         }
     }
+
+    @media (max-width: 480px) {
+        .orders-section {
+            padding: 1rem;
+        }
+
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            width: 100%;
+            text-align: center;
+        }
+
+        .customer-info {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .order-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .item-total {
+            margin-top: 0.5rem;
+        }
+    }
 </style>
 @endpush
 
@@ -585,8 +623,31 @@
             cancelButtonColor: '#718096'
         }).then((result) => {
             if (result.isConfirmed) {
-                // TODO: Implement AJAX call to update status
-                Swal.fire('¡Actualizado!', 'El estado del pedido ha sido actualizado', 'success');
+                const newStatus = result.value;
+                
+                fetch(`/agricultor/pedidos/${orderId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('¡Actualizado!', 'El estado del pedido ha sido actualizado', 'success')
+                        .then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', 'No se pudo actualizar el estado', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Ocurrió un error al procesar la solicitud', 'error');
+                });
             }
         });
     }

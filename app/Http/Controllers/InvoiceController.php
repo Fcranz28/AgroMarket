@@ -11,6 +11,9 @@ class InvoiceController extends Controller
     /**
      * Download invoice PDF
      */
+    /**
+     * Download invoice PDF
+     */
     public function download(Invoice $invoice)
     {
         $this->authorize('view', $invoice);
@@ -18,10 +21,15 @@ class InvoiceController extends Controller
         // If we have a local JSON file (stored in pdf_url for now)
         if ($invoice->pdf_url && str_contains($invoice->pdf_url, '.json')) {
             // Convert storage URL to path
-            $path = str_replace('/storage', 'public', parse_url($invoice->pdf_url, PHP_URL_PATH));
+            $path = str_replace('/storage', '', parse_url($invoice->pdf_url, PHP_URL_PATH));
             
-            if (Storage::exists($path)) {
-                return Storage::download($path, "{$invoice->serie}-{$invoice->correlativo}.json");
+            if (Storage::disk('public')->exists($path)) {
+                $jsonContent = Storage::disk('public')->get($path);
+                $data = json_decode($jsonContent, true);
+
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.pdf', compact('data'));
+                
+                return $pdf->download("{$invoice->serie}-{$invoice->correlativo}.pdf");
             }
         }
 

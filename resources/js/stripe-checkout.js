@@ -78,7 +78,19 @@ export async function initializeStripeCheckout() {
 
    } catch (error) {
       console.error('Error initializing Stripe:', error);
-      alert('Error al cargar el sistema de pagos: ' + error.message);
+
+      // Use SweetAlert for better error presentation
+      if (typeof Swal !== 'undefined') {
+         Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: error.message,
+            confirmButtonColor: '#4caf50',
+            confirmButtonText: 'Entendido'
+         });
+      } else {
+         alert('Error: ' + error.message);
+      }
    }
 }
 

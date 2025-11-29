@@ -26,6 +26,7 @@
     --text-color-light: var(--text-muted);
     --card-background-color: var(--card-bg);
     --primary-color: var(--accent-color);
+    --hover-background: #f5f5f5;
 }
 
 :root[data-theme="dark"] {
@@ -48,6 +49,7 @@
     --text-color-light: var(--text-muted);
     --card-background-color: var(--card-bg);
     --primary-color: var(--accent-color);
+    --hover-background: rgba(255, 255, 255, 0.05);
 }
 
 /* =========================================
@@ -66,6 +68,8 @@ body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 a {
@@ -86,8 +90,8 @@ ul {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 95%;
-    max-width: 1400px;
+    width: 90%;
+    max-width: 1600px;
     background-color: var(--navbar-bg);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
@@ -168,6 +172,7 @@ ul {
 
 #searchForm {
     display: flex;
+    align-items: center;
     background: var(--primary-bg);
     border-radius: 50px;
     border: 1px solid var(--border-color);
@@ -194,7 +199,11 @@ ul {
     border: none;
     background: transparent;
     padding: 8px 12px;
-    width: 200px;
+    /* width: 200px; REMOVED fixed width */
+    flex: 1;
+    /* Allow input to fill available space and shrink */
+    min-width: 0;
+    /* Allow shrinking below content size */
     color: var(--text-main);
     outline: none;
     font-size: 0.9rem;
@@ -205,6 +214,8 @@ ul {
     border: none;
     width: 32px;
     height: 32px;
+    padding: 0;
+    /* Ensure no padding affects centering */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -377,15 +388,133 @@ ul {
 }
 
 /* =========================================
+   SUB-NAVBAR (Bloque Unificado Invertido)
+   ========================================= */
+.sub-navbar {
+    position: fixed;
+    top: 75px;
+    /* Ajustado para pegar justo debajo del navbar */
+    width: 100%;
+    z-index: 998;
+    display: none;
+    padding: 0;
+    pointer-events: none;
+    transition: top 0.3s ease;
+}
+
+.sub-navbar-container {
+    /* Contenedor unificado con forma de pestaña invertida */
+    width: fit-content;
+    max-width: 95%;
+    /* Siempre respetar el ancho de pantalla */
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Centrado por defecto */
+    background: var(--navbar-bg);
+    backdrop-filter: blur(10px);
+
+    /* Bordes redondeados inferiores */
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+
+    padding: 0 5px;
+    pointer-events: auto;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    /* Scroll horizontal suave si no cabe */
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE */
+}
+
+.sub-navbar-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+/* Curvas laterales */
+.sub-navbar-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-top-right-radius: 20px;
+    box-shadow: 5px -5px 0 var(--navbar-bg);
+    z-index: 1;
+    pointer-events: none;
+    /* Evitar clicks fantasma */
+}
+
+.sub-navbar-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -20px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-top-left-radius: 20px;
+    box-shadow: -5px -5px 0 var(--navbar-bg);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sub-nav-tab {
+    position: relative;
+    padding: 10px 15px;
+    /* Padding reducido para ahorrar espacio */
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    /* Indispensable para el scroll */
+    border-radius: 10px;
+    margin: 5px 2px;
+    flex-shrink: 0;
+    /* No encoger los textos */
+}
+
+.sub-nav-tab:hover {
+    color: var(--accent-color);
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+.sub-nav-tab.active {
+    color: var(--accent-color);
+    font-weight: 600;
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+/* Ajuste específico para cuando el contenido desborda (alineación izquierda) */
+@media (max-width: 600px) {
+    .sub-navbar-container {
+        justify-content: flex-start;
+        /* Alinear al inicio para permitir scroll correcto */
+    }
+}
+
+/* =========================================
    MAIN CONTENT & PRODUCTS
    ========================================= */
 .content {
-    padding-top: 100px;
-    /* Espacio para el navbar flotante */
+    flex: 1;
+    width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 80px 20px 0 20px;
+    /* Padding top for navbar */
 }
 
 .section-title {
@@ -617,8 +746,7 @@ ul {
     padding-bottom: env(safe-area-inset-bottom);
 }
 
-.bottom-nav-mobile a,
-.cart-button-mobile {
+.mobile-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -631,23 +759,108 @@ ul {
     background: none;
     border: none;
     cursor: pointer;
+    position: relative;
 }
 
-.bottom-nav-mobile svg {
+.mobile-nav-item svg {
     width: 22px;
     height: 22px;
     fill: currentColor;
     transition: transform 0.2s;
 }
 
-.bottom-nav-mobile a.active,
-.bottom-nav-mobile a:hover,
-.cart-button-mobile:hover {
+.mobile-nav-item.active,
+.mobile-nav-item:hover {
     color: var(--accent-color);
 }
 
-.bottom-nav-mobile a.active svg {
+.mobile-nav-item.active svg {
     transform: translateY(-2px);
+}
+
+/* Mobile User Dropdown */
+.mobile-user-dropdown {
+    position: relative;
+}
+
+.mobile-dropdown-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+    width: 100%;
+    padding: 8px 0;
+}
+
+.mobile-dropdown-trigger svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.mobile-dropdown-trigger .dropdown-arrow {
+    width: 10px;
+    height: 10px;
+    margin-top: -2px;
+}
+
+.mobile-dropdown-menu {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    z-index: 2100;
+    overflow: hidden;
+}
+
+.mobile-dropdown-menu.show {
+    display: block;
+    animation: slideUpFade 0.2s ease;
+}
+
+.mobile-dropdown-menu a,
+.mobile-dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.9rem;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.mobile-dropdown-menu a:hover,
+.mobile-dropdown-menu button:hover {
+    background: var(--primary-bg);
+    color: var(--accent-color);
+}
+
+.mobile-dropdown-menu svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.mobile-dropdown-menu form {
+    margin: 0;
 }
 
 .cart-count-mobile {
@@ -660,6 +873,19 @@ ul {
     padding: 2px 5px;
     border-radius: 10px;
 }
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 
 /* =========================================
    CART SIDEBAR
@@ -695,6 +921,31 @@ ul {
 .cart-header h3 {
     color: var(--text-main);
     font-weight: 600;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.close-cart:hover {
+    background-color: var(--primary-bg);
+    color: var(--accent-color);
+    transform: rotate(90deg);
+}
+
+.close-cart svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
 }
 
 .cart-content {
@@ -763,6 +1014,8 @@ ul {
     /* Empuja el footer al fondo si hay poco contenido */
     position: relative;
     z-index: 10;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .footer-content {
@@ -873,15 +1126,15 @@ ul {
 /* Ajustes Responsive */
 @media (max-width: 768px) {
     .footer {
-        padding: 50px 20px 100px;
+        padding: 30px 20px 80px;
         /* Padding extra abajo para el menú móvil */
         text-align: center;
     }
 
     .footer-content {
-        gap: 40px;
-        /* En móvil forzamos 1 columna para mejor lectura o 2 si el móvil es grande */
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        /* En móvil forzamos 1 columna para mejor lectura */
+        grid-template-columns: 1fr;
     }
 
     .footer-column h4::after {
@@ -1024,8 +1277,61 @@ ul {
    RESPONSIVE MEDIA QUERIES
    ========================================= */
 
-/* Tablets y menores (ocultar elementos del nav desktop) */
+/* Desktop completo - Sin sub-navbar */
+@media (min-width: 1600px) {
+    .sub-navbar {
+        display: none;
+    }
+}
+
+/* Tablet Grande - Sub-navbar visible con algunos links */
+@media (max-width: 1599px) {
+
+    /* Mostrar sub-navbar */
+    .sub-navbar {
+        display: block;
+    }
+
+    /* Ocultar algunos links del navbar principal */
+    .nav-links a:nth-child(2),
+    /* Categorías */
+    .nav-links a:nth-child(3),
+    /* Contacto */
+    .nav-links a:nth-child(4)
+
+    /* Nosotros */
+        {
+        display: none;
+    }
+
+    /* Ocultar "Inicio" de la sub-navbar en este breakpoint */
+    .sub-nav-tab:first-child {
+        display: none;
+    }
+}
+
+/* Tablet - Sub-navbar con todos los links */
+@media (max-width: 1199px) {
+    .sub-navbar {
+        display: block;
+    }
+
+    /* Ocultar todos los nav-links del navbar principal */
+    .nav-links {
+        display: none;
+    }
+
+    /* Mostrar todos los tabs en sub-navbar */
+    .sub-nav-tab:first-child {
+        display: block;
+    }
+}
+
+/* Tablets y menores (992px) */
 @media (max-width: 992px) {
+    .sub-navbar {
+        display: block;
+    }
 
     .nav-links,
     .btn.login-btn,
@@ -1034,16 +1340,39 @@ ul {
     }
 
     .floating-navbar {
-        width: 95%;
-        padding: 10px 15px;
+        width: 90%;
+        padding: 12px 20px;
+        gap: 12px;
+    }
+
+    .search-container {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    #searchForm {
+        width: 100%;
     }
 
     .search-input {
-        width: 120px;
+        width: 100%;
+        min-width: 140px;
     }
 
-    .category-select {
-        display: none;
+    /* .category-select removed to keep it visible until 350px */
+
+    .nav-right {
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .user-dropdown .dropdown-trigger {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .theme-toggle {
+        padding: 8px;
     }
 }
 
@@ -1051,6 +1380,10 @@ ul {
 @media (max-width: 768px) {
     body {
         padding-bottom: calc(var(--mobile-nav-height) + 20px);
+    }
+
+    .sub-navbar {
+        display: block;
     }
 
     .bottom-nav-mobile {
@@ -1066,8 +1399,9 @@ ul {
 
     .floating-navbar {
         top: 10px;
+        width: 92%;
         padding: 8px 12px;
-        border-radius: 12px;
+        border-radius: 16px;
         flex-wrap: wrap;
         gap: 10px;
     }
@@ -1127,21 +1461,71 @@ ul {
     }
 }
 
+/* Ajuste específico para móviles muy pequeños (< 480px) para evitar desborde del buscador */
+@media (max-width: 480px) {
+    .floating-navbar {
+        width: 95%;
+        /* Aprovechar más ancho */
+        padding: 8px 8px;
+        /* Reducir padding lateral */
+    }
+
+    .search-container {
+        max-width: 100%;
+        /* Asegurar que no exceda el padre */
+    }
+
+    .search-input {
+        min-width: 0;
+        /* Permitir que se encoja tanto como sea necesario */
+        width: 100%;
+        font-size: 0.9rem;
+        /* Reducir fuente ligeramente */
+        padding: 8px 8px;
+        /* Reducir padding interno */
+    }
+
+    .nav-right {
+        gap: 4px;
+    }
+
+    .logo-container img {
+        height: 24px;
+        /* Reducir logo ligeramente */
+    }
+}
+
 /* Utilidad Admin FAB */
 .fab-admin {
     position: fixed;
     bottom: 90px;
     right: 20px;
     left: auto;
-    width: 56px;
-    height: 56px;
-    background: var(--accent-color);
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 15px rgba(122, 165, 55, 0.4);
     z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.fab-admin:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 8px 25px rgba(122, 165, 55, 0.5);
+    background: linear-gradient(135deg, var(--accent-hover), var(--accent-color));
+}
+
+.fab-admin svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
 }
 
 @keyframes fadeIn {
@@ -1153,5 +1537,79 @@ ul {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Hide category select on very small screens */
+@media (max-width: 350px) {
+    .category-select {
+        display: none;
+    }
+
+    .search-input {
+        border-radius: 50px;
+        /* Full rounded when alone */
+        padding-left: 15px;
+    }
+}
+
+/* Adjustments for tight spaces in search bar */
+@media (max-width: 550px) {
+    .category-select {
+        padding: 8px 4px;
+        font-size: 0.75rem;
+        /* Smaller font */
+        max-width: 90px;
+        /* Aggressive width limit */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /* Truncate text with ... */
+    }
+
+    .search-input {
+        padding: 8px 6px;
+        font-size: 0.85rem;
+    }
+
+    /* Ensure search button doesn't shrink */
+    .search-btn {
+        flex-shrink: 0;
+    }
+
+    /* Hide redundant top navbar elements on mobile to save space */
+    .cart-btn,
+    .user-dropdown {
+        display: none !important;
+    }
+
+    .nav-right {
+        gap: 8px;
+    }
+
+    /* Reduce Logo size to save space */
+    .logo-container img {
+        height: 30px;
+    }
+
+    /* Reduce Navbar padding */
+    .floating-navbar {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    /* Ensure search container takes available space */
+    .search-container {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+    }
+
+    .search-input {
+        padding: 8px 6px;
+        font-size: 0.85rem;
+        min-width: 0 !important;
+        /* Override 140px from tablet query */
+        width: 100%;
     }
 }
