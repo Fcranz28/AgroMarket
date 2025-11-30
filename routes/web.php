@@ -63,8 +63,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update');
 
+    // Address Routes
+    Route::resource('addresses', App\Http\Controllers\AddressController::class)->only(['index', 'store', 'destroy']);
+
     // Reviews
     Route::post('/productos/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
+    // Reports
+    Route::post('/reportes', [App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
 
     // Onboarding Routes
     Route::prefix('onboarding')->name('onboarding.')->group(function () {
@@ -84,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Farmer Orders (as seller)
         Route::get('/pedidos', [OrderController::class, 'farmerOrders'])->name('farmer.orders');
+        Route::get('/pedidos/{order}/detalles', [OrderController::class, 'farmerShow'])->name('farmer.orders.show');
         Route::patch('/pedidos/{order}/status', [OrderController::class, 'updateStatus'])->name('farmer.orders.status');
         
         // Product Management (Reusing UserProductController but scoped to farmers)
@@ -103,6 +110,11 @@ Route::middleware(['auth'])->group(function () {
         
         // Admin Product CRUD (if separate from farmer's)
         Route::resource('productos', ProductCrudController::class);
+
+        // Admin Reports
+        Route::get('/reportes', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/reportes/{report}', [App\Http\Controllers\Admin\AdminReportController::class, 'show'])->name('reports.show');
+        Route::patch('/reportes/{report}/status', [App\Http\Controllers\Admin\AdminReportController::class, 'updateStatus'])->name('reports.status');
     });
 });
 

@@ -29,9 +29,27 @@ class AdminController extends Controller
         ));
     }
 
-    public function users()
+    public function users(Request $request)
     {
-        $users = User::latest()->paginate(10);
+        $query = User::withCount('reportsReceived');
+
+        // Search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort
+        if ($request->get('sort') === 'reports_desc') {
+            $query->orderBy('reports_received_count', 'desc');
+        } else {
+            $query->latest();
+        }
+
+        $users = $query->paginate(10);
         return view('admin.users', compact('users'));
     }
 

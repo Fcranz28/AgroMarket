@@ -55,9 +55,34 @@
                     </div>
 
                     <div class="checkout-form-group">
-                        <label for="shipping_address">Dirección de Envío</label>
-                        <textarea id="shipping_address" name="shipping_address" required rows="2" 
-                            placeholder=""></textarea>
+                        <label>Dirección de Envío</label>
+                        
+                        <!-- Hidden input to store the selected address for form submission -->
+                        <input type="hidden" id="shipping_address" name="shipping_address" required>
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
+
+                        <!-- Address List -->
+                        <div id="address-list" class="address-selection-list">
+                            <!-- Addresses will be loaded here via JS -->
+                        </div>
+
+                        <!-- Add New Address Button -->
+                        <button type="button" id="btn-add-address" class="btn-add-address">
+                            <i class="fas fa-plus"></i> Agregar Nueva Dirección
+                        </button>
+
+                        <!-- Map Modal/Container (Hidden by default) -->
+                        <div id="map-container" class="map-container" style="display: none;">
+                            <div class="map-search-box">
+                                <input type="text" id="map-search-input" placeholder="Buscar dirección...">
+                            </div>
+                            <div id="google-map" style="width: 100%; height: 300px;"></div>
+                            <div class="map-actions">
+                                <button type="button" id="btn-confirm-address" class="btn-confirm-address">Confirmar Dirección</button>
+                                <button type="button" id="btn-cancel-map" class="btn-cancel-map">Cancelar</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="checkout-form-group">
@@ -142,6 +167,15 @@
     </div>
 </div>
 @push('scripts')
-    @vite(['resources/js/checkout/index.js'])
+    <script>
+        window.isUserLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+        window.initMap = function() {
+            // Placeholder to prevent "initMap is not a function" error
+            // The actual initMap in address-map.js will overwrite this or be called manually
+            console.log('Maps API loaded, waiting for module...');
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places&callback=initMap" async defer></script>
+    @vite(['resources/js/checkout/index.js', 'resources/js/checkout/address-map.js', 'resources/css/checkout/addresses.css'])
 @endpush
 @endsection

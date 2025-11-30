@@ -68,6 +68,11 @@
                                         <div class="item-details">
                                             <h4>{{ $item->product->name }}</h4>
                                             <p>Cantidad: {{ $item->quantity }}</p>
+                                            @if($order->status === 'delivered')
+                                                <button class="btn-report-item" onclick="openReportModal('{{ $order->id }}', '{{ $item->product->id }}', '{{ $item->product->name }}')">
+                                                    <i class="fas fa-exclamation-triangle"></i> Reportar
+                                                </button>
+                                            @endif
                                         </div>
                                         <span class="item-price">S/. {{ number_format($item->price, 2) }}</span>
                                     </div>
@@ -183,32 +188,29 @@
                 <p>Administra tus direcciones de envío</p>
             </div>
 
-            <div class="addresses-grid">
-                @if($user->shipping_address)
-                    <div class="address-card">
-                        <div class="address-header">
-                            <h3>Dirección Principal</h3>
-                            <span class="default-badge">Principal</span>
-                        </div>
-                        <p class="address-text">{{ $user->shipping_address }}</p>
-                        @if($user->phone)
-                            <p class="address-phone">
-                                <i class="fas fa-phone"></i>
-                                {{ $user->phone }}
-                            </p>
-                        @endif
-                        <div class="address-actions">
-                            <button class="btn-link" onclick="editAddress()">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                        </div>
-                    </div>
-                @endif
+            <div id="addresses-grid" class="addresses-grid">
+                <!-- Addresses will be loaded here via JS -->
+            </div>
 
-                <button class="add-address-card" onclick="addAddress()">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Agregar Nueva Dirección</span>
-                </button>
+            <!-- Address Modal -->
+            <div id="addressModal" class="map-modal">
+                <div class="map-modal-content">
+                    <div class="section-header">
+                        <h2>Agregar Nueva Dirección</h2>
+                        <button class="btn-link" onclick="closeAddressModal()" style="font-size: 1.5rem;">&times;</button>
+                    </div>
+                    
+                    <div class="map-search-box">
+                        <input type="text" id="map-search-input" placeholder="Buscar dirección...">
+                    </div>
+                    
+                    <div id="google-map" class="map-container"></div>
+                    
+                    <div class="map-actions">
+                        <button type="button" class="btn-cancel" onclick="closeAddressModal()">Cancelar</button>
+                        <button type="button" class="btn-confirm" onclick="saveAddress()">Guardar Dirección</button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -275,8 +277,70 @@
     </div>
 </div>
 
+<!-- Report Modal -->
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeReportModal()">&times;</span>
+        <h2>Reportar Producto</h2>
+        <form id="reportForm" onsubmit="submitReport(event)">
+            @csrf
+            <input type="hidden" id="report_order_id" name="order_id">
+            <input type="hidden" id="report_product_id" name="product_id">
+            
+            <div class="form-group">
+                <label for="report_product_name">Producto</label>
+                <input type="text" id="report_product_name" name="product_name" readonly class="form-control-plaintext">
+            </div>
+
+            <div class="form-group">
+                <label for="report_reason">Motivo del Reporte</label>
+                <select id="report_reason" name="reason" required>
+                    <option value="">Seleccione un motivo</option>
+                    <option value="damaged">Producto dañado</option>
+                    <option value="wrong_item">Producto incorrecto</option>
+                    <option value="quality">Mala calidad</option>
+                    <option value="expired">Producto vencido</option>
+                    <option value="other">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="report_description">Descripción</label>
+                <textarea id="report_description" name="description" rows="4" placeholder="Describa el problema con detalle..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="report_evidence">Evidencias (Fotos)</label>
+                <div class="evidence-upload-container" onclick="document.getElementById('report_evidence').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Haz clic para subir fotos</p>
+                    <span class="upload-hint">Máximo 3 imágenes (JPG, PNG)</span>
+                </div>
+                <input type="file" id="report_evidence" name="evidence[]" accept="image/*" multiple style="display: none;" onchange="previewEvidence(this)">
+                <div id="evidence_preview" class="evidence-preview-grid"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="closeReportModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Enviar Reporte</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('styles')
-{{-- Styles loaded via app.css → orders/index.css --}}
+    @vite(['resources/css/profile/addresses.css'])
+@endpush
+
+@push('scripts')
+    <script>
+        window.initMap = function() {
+            console.log('Maps API loaded, waiting for module...');
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places&callback=initMap" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite(['resources/js/profile/addresses.js'])
 @endpush
 
 <script>
@@ -303,13 +367,7 @@
         });
     });
 
-    function editAddress() {
-        alert('Función de editar dirección - Por implementar');
-    }
 
-    function addAddress() {
-        alert('Función de agregar dirección - Por implementar');
-    }
 
     function previewAvatar(input) {
         if (input.files && input.files[0]) {
@@ -354,10 +412,119 @@
 
     // Close modal when clicking outside
     window.onclick = function(event) {
-        const modal = document.getElementById('trackingModal');
-        if (event.target == modal) {
-            modal.style.display = 'none';
+        const trackingModal = document.getElementById('trackingModal');
+        const reportModal = document.getElementById('reportModal');
+        if (event.target == trackingModal) {
+            trackingModal.style.display = 'none';
         }
+        if (event.target == reportModal) {
+            reportModal.style.display = 'none';
+        }
+    }
+
+    // Store order items data for report modal
+    const orderItems = {
+        @foreach($orders as $order)
+            '{{ $order->id }}': [
+                @foreach($order->items as $item)
+                    { id: '{{ $item->product->id }}', name: '{{ $item->product->name }}' },
+                @endforeach
+            ],
+        @endforeach
+    };
+
+    function openReportModal(orderId, productId, productName) {
+        const modal = document.getElementById('reportModal');
+        document.getElementById('report_order_id').value = orderId;
+        document.getElementById('report_product_id').value = productId;
+        document.getElementById('report_product_name').value = productName;
+        
+        modal.style.display = 'flex';
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModal').style.display = 'none';
+        document.getElementById('reportForm').reset();
+        document.getElementById('evidence_preview').innerHTML = '';
+    }
+
+    function previewEvidence(input) {
+        const previewContainer = document.getElementById('evidence_preview');
+        previewContainer.innerHTML = '';
+        
+        if (input.files) {
+            if (input.files.length > 3) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Límite excedido',
+                    text: 'Solo puedes subir un máximo de 3 imágenes.',
+                    confirmButtonColor: '#4caf50'
+                });
+                input.value = '';
+                return;
+            }
+
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'evidence-item';
+                    div.innerHTML = `<img src="${e.target.result}" alt="Evidence">`;
+                    previewContainer.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    function submitReport(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('reportForm');
+        const formData = new FormData(form);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Enviando...';
+
+        fetch('{{ route("reports.store") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Reporte Enviado',
+                text: 'Gracias por tu reporte. Lo revisaremos a la brevedad.',
+                confirmButtonColor: '#4caf50'
+            }).then(() => {
+                closeReportModal();
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema al enviar el reporte. Por favor intenta nuevamente.',
+                confirmButtonColor: '#dc3545'
+            });
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        });
     }
 </script>
 @endsection

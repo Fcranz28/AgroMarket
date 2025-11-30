@@ -32,7 +32,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $order->load(['items.product']);
+        $order->load(['items.product', 'invoice']);
 
         return view('orders.show', compact('order'));
     }
@@ -83,5 +83,28 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Estado actualizado correctamente'
         ]);
+    }
+    /**
+     * Show order details for farmer
+     */
+    public function farmerShow(Order $order)
+    {
+        // Verify user is a farmer
+        if (!Auth::user()->isFarmer()) {
+            abort(403);
+        }
+
+        // Verify that the order contains products from this farmer
+        $hasFarmerProducts = $order->items()->whereHas('product', function ($query) {
+            $query->where('user_id', Auth::id());
+        })->exists();
+
+        if (!$hasFarmerProducts) {
+            abort(403);
+        }
+
+        $order->load(['items.product', 'invoice']);
+        
+        return view('orders.show', compact('order'));
     }
 }

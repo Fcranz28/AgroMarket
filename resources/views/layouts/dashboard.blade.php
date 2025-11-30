@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') - AgroMarket</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/dashboard.css', 'resources/js/app.js'])
@@ -32,7 +33,11 @@
                             <i class="fas fa-users"></i> Usuarios
                         </a>
                     </li>
-                    <!-- Add more admin links here -->
+                    <li>
+                        <a href="{{ route('admin.reports.index') }}" class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                            <i class="fas fa-exclamation-circle"></i> Reportes
+                        </a>
+                    </li>
                 @elseif(auth()->user()->isFarmer())
                     <li>
                         <a href="{{ route('farmer.dashboard') }}" class="{{ request()->routeIs('farmer.dashboard') ? 'active' : '' }}">

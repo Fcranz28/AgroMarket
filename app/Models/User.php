@@ -72,6 +72,16 @@ class User extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function reportsReceived()
+    {
+        return $this->hasManyThrough(Report::class, Product::class);
+    }
+
     // Helpers
     public function isFarmer(): bool
     {

@@ -7,6 +7,25 @@
     {{-- Styles loaded via dashboard.css --}}
 
     <div class="users-container">
+        <!-- Search and Filter Section -->
+        <div class="actions-bar">
+            <form action="{{ route('admin.users') }}" method="GET">
+                <input type="text" name="search" placeholder="Buscar por nombre o email..." value="{{ request('search') }}" class="form-control">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                @if(request('search') || request('sort'))
+                    <a href="{{ route('admin.users') }}" class="btn btn-secondary" title="Limpiar filtros">
+                        <i class="fas fa-times"></i>
+                    </a>
+                @endif
+                
+                <a href="{{ route('admin.users', ['sort' => 'reports_desc', 'search' => request('search')]) }}" class="btn {{ request('sort') == 'reports_desc' ? 'btn-primary' : 'btn-secondary' }}">
+                    <i class="fas fa-exclamation-triangle"></i> Más Reportados
+                </a>
+            </form>
+        </div>
+
         <div class="card-table">
             <div class="table-responsive">
                 <table class="custom-table">
@@ -15,6 +34,7 @@
                             <th>ID</th>
                             <th>Usuario</th>
                             <th>Rol</th>
+                            <th>Reportes</th>
                             <th>Estado Verificación</th>
                             <th>Documento</th>
                             <th>Estado Cuenta</th>
@@ -35,6 +55,15 @@
                                     <span class="badge badge-role-{{ $user->role }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
+                                </td>
+                                <td>
+                                    @if($user->role == 'farmer')
+                                        <span class="badge {{ $user->reports_received_count > 0 ? 'badge-danger' : 'badge-secondary' }}" style="{{ $user->reports_received_count > 0 ? 'background-color: #fee2e2; color: #dc2626;' : '' }}">
+                                            {{ $user->reports_received_count }}
+                                        </span>
+                                    @else
+                                        <span style="color: var(--text-light);">-</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($user->role == 'farmer')
@@ -73,24 +102,6 @@
                                             </a>
                                         @endif
                                         
-                                        {{-- Existing Verify Logic (Hidden for now or kept as fallback? Keeping existing logic but styled) --}}
-                                        {{-- 
-                                        @if($user->role == 'farmer' && $user->verification_status == 'pending')
-                                            <form action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'approved']) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn btn-icon-check" title="Aprobar">
-                                                    <i class="fas fa-check-circle fa-lg"></i>
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'rejected']) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="action-btn btn-icon-ban" title="Rechazar">
-                                                    <i class="fas fa-times-circle fa-lg"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                        --}}
-
                                         @if($user->role != 'admin')
                                             <form action="{{ route('admin.ban', $user->id) }}" method="POST" style="display:inline;">
                                                 @csrf

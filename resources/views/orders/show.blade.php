@@ -4,7 +4,7 @@
 <div class="order-details-container">
     <div class="order-header">
         <div>
-            <a href="{{ route('orders.index') }}" class="back-link">
+            <a href="{{ auth()->user()->isFarmer() ? route('farmer.orders') : route('orders.index') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i> Volver a Mis Pedidos
             </a>
             <h1>Pedido #{{ $order->id }}</h1>
@@ -57,6 +57,13 @@
                     <strong>Total</strong>
                     <strong>S/. {{ number_format($order->total, 2) }}</strong>
                 </div>
+                @if($order->invoice)
+                    <div class="invoice-actions" style="margin-top: 1rem; text-align: center;">
+                        <a href="{{ route('invoice.download', $order->invoice) }}" class="btn-invoice-download" style="display: inline-block; background-color: #e74c3c; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                            <i class="fas fa-file-pdf"></i> Descargar Factura
+                        </a>
+                    </div>
+                @endif
             </div>
 
             <!-- Shipping Info -->

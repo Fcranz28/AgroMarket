@@ -20,6 +20,17 @@ class InvoicePolicy
             return Response::allow();
         }
 
+        // Allow farmers to view invoices if they have products in the order
+        if ($user && $user->isFarmer()) {
+            $hasFarmerProducts = $order->items()->whereHas('product', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->exists();
+
+            if ($hasFarmerProducts) {
+                return Response::allow();
+            }
+        }
+
         // For guest orders, we could implement a token-based access
         // For now, we'll allow access if current session matches guest email
         // This is a simplified version - in production, use signed URLs

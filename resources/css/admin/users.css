@@ -179,3 +179,103 @@
    display: flex;
    justify-content: flex-end;
 }
+
+/* Search and Filter Section */
+.actions-bar {
+   background-color: var(--card-bg);
+   padding: 1.5rem;
+   border-radius: 16px;
+   border: 1px solid var(--border);
+   box-shadow: var(--shadow-sm);
+   margin-bottom: 2rem !important;
+   /* Override inline style */
+   flex-wrap: wrap;
+   gap: 1rem;
+}
+
+.actions-bar form {
+   flex: 1;
+   display: flex;
+   gap: 10px;
+   min-width: 300px;
+   align-items: center;
+   flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+   .actions-bar {
+      padding: 1rem;
+   }
+
+   .actions-bar form {
+      min-width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+   }
+
+   .actions-bar .form-control {
+      width: 100%;
+   }
+
+   .actions-bar .btn {
+      width: 100%;
+      justify-content: center;
+   }
+}
+
+.actions-bar .form-control {
+   flex: 1;
+   padding: 0.75rem 1rem;
+   border: 1px solid var(--border);
+   border-radius: 8px;
+   font-size: 0.95rem;
+   color: var(--text-main);
+   background-color: var(--admin-bg);
+   transition: all 0.2s ease;
+}
+
+.actions-bar .form-control:focus {
+   outline: none;
+   border-color: var(--primary);
+   box-shadow: 0 0 0 3px rgba(122, 165, 55, 0.15);
+   background-color: var(--card-bg);
+}
+
+.actions-bar .btn {
+   padding: 0.75rem 1.25rem;
+   border-radius: 8px;
+   font-weight: 600;
+   font-size: 0.9rem;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   border: none;
+   display: inline-flex;
+   align-items: center;
+   gap: 8px;
+   white-space: nowrap;
+}
+
+.actions-bar .btn-primary {
+   background-color: var(--primary);
+   color: white;
+   box-shadow: var(--shadow-sm);
+}
+
+.actions-bar .btn-primary:hover {
+   background-color: #6a912f;
+   /* Darker shade */
+   transform: translateY(-1px);
+   box-shadow: var(--shadow-md);
+}
+
+.actions-bar .btn-secondary {
+   background-color: var(--admin-bg);
+   color: var(--text-light);
+   border: 1px solid var(--border);
+}
+
+.actions-bar .btn-secondary:hover {
+   background-color: var(--bg-hover);
+   color: var(--text-main);
+   border-color: var(--text-light);
+}
