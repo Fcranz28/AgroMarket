@@ -121,11 +121,11 @@ function updateCartSidebar() {
                     <h4>${item.name}</h4>
                     <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
                     <div class="quantity-controls">
-                        <button class="qty-btn qty-decrease" data-action="decrease">-</button>
+                        <button class="qty-btn qty-decrease" data-action="decrease"><i class="fas fa-minus"></i></button>
                         <span class="qty-display">${item.cantidad}</span>
-                        <button class="qty-btn qty-increase" data-action="increase">+</button>
+                        <button class="qty-btn qty-increase" data-action="increase"><i class="fas fa-plus"></i></button>
                     </div>
-                    <button class="remove-btn" data-action="remove">Eliminar</button>
+                    <button class="remove-btn" data-action="remove" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `;
         cartContent.appendChild(itemElement);

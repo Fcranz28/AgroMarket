@@ -134,10 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    sortSelect.addEventListener('change', () => {
-        currentSort = sortSelect.value;
-        loadProducts(); // Recarga los productos con el nuevo orden
-    });
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            currentSort = sortSelect.value;
+            loadProducts(); // Recarga los productos con el nuevo orden
+        });
+    }
 
     // Carga inicial de productos
     loadProducts();

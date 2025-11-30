@@ -27,7 +27,7 @@
 }
 
 .suggestion-item:hover {
-   background: var(--primary-bg);
+   background: var(--bg-primary);
 }
 
 .suggestion-item img {

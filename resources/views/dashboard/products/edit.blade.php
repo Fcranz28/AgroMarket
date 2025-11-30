@@ -48,7 +48,7 @@
             </div>
 
             <div class="product-form-row">
-                <div class="product-form-group col-md-6">
+                <div class="product-form-group">
                     <label for="unit">Unidad de Medida (Seleccione una o más)</label>
                     @php
                         // Get actual units from product_units table
@@ -80,7 +80,7 @@
                     <small class="text-muted">Haga clic en las unidades que desea vender.</small>
                 </div>
 
-                <div class="product-form-group col-md-6">
+                <div class="product-form-group">
                     <label>Stock y Precio por Unidad</label>
                     <div id="stock-container" class="stock-container">
                         <!-- Pre-fill existing units with stock and price -->
@@ -174,5 +174,11 @@
 @push('styles')
 {{-- Styles loaded via dashboard.css → dashboard/products/form.css --}}
 @endpush
+
+@push('scripts')
+    @vite(['resources/js/dashboard/products/form.js'])
+@endpush
+
+@endsection
 
 

@@ -3,7 +3,7 @@
    ========================================= */
 :root {
     /* Paleta Clara (Light Mode) - Pastel Sage */
-    --primary-bg: #f0f4e8;
+    --bg-primary: #f0f4e8;
     --card-bg: #ffffff;
     --text-main: #2a3e1f;
     --text-muted: #5a6f4a;
@@ -31,7 +31,7 @@
 
 :root[data-theme="dark"] {
     /* Paleta Oscura (Dark Mode) - Forest Night */
-    --primary-bg: #1a1e16;
+    --bg-primary: #1a1e16;
     --card-bg: #2e3228;
     --text-main: #f1edd4;
     --text-muted: #c8c4ab;
@@ -63,7 +63,7 @@
 }
 
 body {
-    background-color: var(--primary-bg);
+    background-color: var(--bg-primary);
     color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
@@ -173,7 +173,7 @@ ul {
 #searchForm {
     display: flex;
     align-items: center;
-    background: var(--primary-bg);
+    background: var(--bg-primary);
     border-radius: 50px;
     border: 1px solid var(--border-color);
     padding: 4px;
@@ -255,7 +255,7 @@ ul {
 
 .register-btn {
     background: var(--text-main);
-    color: var(--primary-bg);
+    color: var(--bg-primary);
 }
 
 .register-btn:hover {
@@ -309,7 +309,7 @@ ul {
     gap: 8px;
     padding: 8px 12px;
     border-radius: 50px;
-    background: var(--primary-bg);
+    background: var(--bg-primary);
     font-size: 0.9rem;
     border: 1px solid var(--border-color);
     transition: all 0.2s ease;
@@ -367,7 +367,7 @@ ul {
 
 .dropdown-content a:hover,
 .dropdown-content button:hover {
-    background-color: var(--primary-bg);
+    background-color: var(--bg-primary);
     color: var(--accent-color);
 }
 
@@ -619,7 +619,7 @@ ul {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--primary-bg);
+    background: var(--bg-primary);
     border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -1663,4 +1663,77 @@ ul {
     color: var(--text-main);
     /* Or white/black depending on contrast needs */
     color: #ffffff;
+}/* Cart Sidebar Button Styles */
+.quantity-controls {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   margin-top: 10px;
+}
+
+.qty-btn {
+   width: 28px;
+   height: 28px;
+   border-radius: 50%;
+   border: 1px solid var(--border-color);
+   background: var(--bg-primary);
+   color: var(--text-main);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+   transition: all 0.2s;
+   font-size: 0.8rem;
+}
+
+.qty-btn:hover {
+   background: var(--accent-color);
+   color: white;
+   border-color: var(--accent-color);
+}
+
+.qty-display {
+   font-weight: 600;
+   font-size: 1rem;
+   min-width: 20px;
+   text-align: center;
+}
+
+.remove-btn {
+   background: none;
+   border: none;
+   color: #e74c3c;
+   /* Red color for trash icon */
+   cursor: pointer;
+   font-size: 1.1rem;
+   padding: 5px;
+   transition: transform 0.2s, color 0.2s;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin-left: auto;
+   /* Push to the right if in flex container */
+}
+
+.remove-btn:hover {
+   color: #c0392b;
+   /* Darker red on hover */
+   transform: scale(1.1);
+}
+
+.cart-item-details {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+}
+
+/* Ensure remove button is positioned correctly */
+.cart-item {
+   position: relative;
+}
+
+.cart-item .remove-btn {
+   position: absolute;
+   bottom: 10px;
+   right: 10px;
 }

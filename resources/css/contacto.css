@@ -59,6 +59,12 @@
     margin-right: 1rem;
 }
 
+.info-item .icon img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+}
+
 .info-item i {
     font-size: 1.25rem;
     color: white;
@@ -82,7 +88,7 @@
 }
 
 .contact-form {
-    background: var(--primary-bg);
+    background: var(--bg-primary);
     padding: 4rem 3rem;
 }
 
@@ -263,7 +269,7 @@
 :root[data-theme="dark"] .form-group input,
 :root[data-theme="dark"] .form-group textarea,
 :root[data-theme="dark"] .form-group select {
-    background-color: var(--primary-bg);
+    background-color: var(--bg-primary);
     border-color: var(--border-color);
     color: var(--text-main);
 }

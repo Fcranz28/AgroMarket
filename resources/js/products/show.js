@@ -111,4 +111,67 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         document.dispatchEvent(event);
     });
+    // --- Review Image Upload Logic ---
+    const reviewDropZone = document.getElementById('reviewDropZone');
+    const reviewImageInput = document.getElementById('reviewImageInput');
+    const reviewUploadPlaceholder = document.getElementById('reviewUploadPlaceholder');
+    const reviewPreviewContainer = document.getElementById('reviewPreviewContainer');
+    const reviewImagePreview = document.getElementById('reviewImagePreview');
+    const removeReviewImageBtn = document.getElementById('removeReviewImage');
+
+    if (reviewDropZone && reviewImageInput) {
+        reviewDropZone.addEventListener('click', (e) => {
+            if (e.target !== removeReviewImageBtn) {
+                reviewImageInput.click();
+            }
+        });
+
+        reviewImageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    reviewImagePreview.src = e.target.result;
+                    reviewUploadPlaceholder.style.display = 'none';
+                    reviewPreviewContainer.style.display = 'flex';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        if (removeReviewImageBtn) {
+            removeReviewImageBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering dropzone click
+                reviewImageInput.value = '';
+                reviewPreviewContainer.style.display = 'none';
+                reviewUploadPlaceholder.style.display = 'flex';
+            });
+        }
+        
+        // Drag and Drop visual feedback
+        ['dragenter', 'dragover'].forEach(eventName => {
+            reviewDropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                reviewDropZone.classList.add('highlight');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            reviewDropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                reviewDropZone.classList.remove('highlight');
+            }, false);
+        });
+
+        reviewDropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                reviewImageInput.files = files;
+                // Trigger change event manually
+                const event = new Event('change');
+                reviewImageInput.dispatchEvent(event);
+            }
+        });
+    }
 });

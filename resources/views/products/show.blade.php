@@ -96,29 +96,36 @@
     <!-- Productos Relacionados -->
     <div class="related-products-section">
         <h2 class="product-detail-section-title">Productos que te pueden interesar</h2>
-        <div class="product-detail-related-grid">
-            @forelse($relatedProducts as $related)
-                <div class="product-detail-related-card">
-                    <a href="{{ route('products.show', $related->slug) }}" class="product-detail-related-link">
-                        <div class="product-detail-related-image">
-                            @if($related->image_path)
-                                <img src="{{ Storage::url($related->image_path) }}" alt="{{ $related->name }}">
-                            @elseif($related->image_url)
-                                <img src="{{ $related->image_url }}" alt="{{ $related->name }}">
-                            @else
-                                <img src="{{ asset('img/placeholder.png') }}" alt="Sin imagen">
-                            @endif
+        @if($relatedProducts->count() > 0)
+            <div class="product-detail-related-marquee">
+                <div class="marquee-track">
+                    {{-- Original Loop --}}
+                    @foreach($relatedProducts as $related)
+                        <div class="product-detail-related-card">
+                            <a href="{{ route('products.show', $related->slug) }}" class="product-detail-related-link">
+                                <div class="product-detail-related-image">
+                                    @if($related->image_path)
+                                        <img src="{{ Storage::url($related->image_path) }}" alt="{{ $related->name }}">
+                                    @elseif($related->image_url)
+                                        <img src="{{ $related->image_url }}" alt="{{ $related->name }}">
+                                    @else
+                                        <img src="{{ asset('img/placeholder.png') }}" alt="Sin imagen">
+                                    @endif
+                                </div>
+                                <div class="product-detail-related-info">
+                                    <h3>{{ $related->name }}</h3>
+                                    <p class="price">S/. {{ number_format($related->price, 2) }}</p>
+                                </div>
+                            </a>
                         </div>
-                        <div class="product-detail-related-info">
-                            <h3>{{ $related->name }}</h3>
-                            <p class="price">S/. {{ number_format($related->price, 2) }}</p>
-                        </div>
-                    </a>
+                    @endforeach
+
+
                 </div>
-            @empty
-                <p class="no-related">No hay productos relacionados disponibles.</p>
-            @endforelse
-        </div>
+            </div>
+        @else
+            <p class="no-related">No hay productos relacionados disponibles.</p>
+        @endif
     </div>
 
     <!-- Sección de Reseñas -->
@@ -147,8 +154,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="image">Foto (opcional):</label>
-                        <input type="file" name="image" id="image" class="form-control-file" accept="image/*">
+                        <label class="d-block mb-2">Foto (opcional):</label>
+                        <div class="review-image-upload" id="reviewDropZone">
+                            <input type="file" name="image" id="reviewImageInput" class="d-none" accept="image/*">
+                            <div class="upload-content" id="reviewUploadPlaceholder">
+                                <div class="upload-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </div>
+                                <p>Click para agregar foto</p>
+                            </div>
+                            <div class="review-preview-container" id="reviewPreviewContainer" style="display: none;">
+                                <img id="reviewImagePreview" src="" alt="Vista previa">
+                                <button type="button" id="removeReviewImage" class="remove-preview-btn">×</button>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Publicar Reseña</button>
@@ -165,13 +184,18 @@
             @forelse($product->reviews->sortByDesc('created_at') as $review)
                 <div class="product-detail-review-card">
                     <div class="product-detail-review-header">
-                        <span class="product-detail-review-user">{{ $review->user->name }}</span>
-                        <span class="product-detail-review-date">{{ $review->created_at->format('d/m/Y') }}</span>
-                    </div>
-                    <div class="product-detail-review-rating">
-                        @for($i = 1; $i <= 5; $i++)
-                            <span class="product-detail-star {{ $i <= $review->rating ? 'filled' : '' }}">★</span>
-                        @endfor
+                        <div class="review-avatar">
+                            {{ strtoupper(substr($review->user->name, 0, 1)) }}
+                        </div>
+                        <div class="review-meta">
+                            <span class="product-detail-review-user">{{ $review->user->name }}</span>
+                            <span class="product-detail-review-date">{{ $review->created_at->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="product-detail-review-rating">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="product-detail-star {{ $i <= $review->rating ? 'filled' : '' }}">★</span>
+                            @endfor
+                        </div>
                     </div>
                     <div class="product-detail-review-content">
                         <p>{{ $review->comment }}</p>

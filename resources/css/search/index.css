@@ -404,7 +404,7 @@
 }
 
 :root[data-theme="dark"] .search-filter-btn:hover {
-    background: var(--primary-bg);
+    background: var(--bg-primary);
     color: var(--text-main);
 }
 

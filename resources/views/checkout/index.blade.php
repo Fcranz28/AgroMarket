@@ -76,9 +76,7 @@
                     <button type="button" class="checkout-payment-tab active" data-method="card">
                         Tarjeta Crédito/Débito
                     </button>
-                    <button type="button" class="checkout-payment-tab" data-method="mercadopago">
-                        Mercado Pago
-                    </button>
+
                 </div>
 
                 <div class="checkout-payment-content">
@@ -113,9 +111,7 @@
                     </div>
 
                     <!-- Mercado Pago (Placeholder) -->
-                    <div class="checkout-payment-method" data-method="mercadopago">
-                        <p class="checkout-coming-soon">Mercado Pago estará disponible próximamente</p>
-                    </div>
+
                 </div>
             </div>
         </div>

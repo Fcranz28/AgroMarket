@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', function () {
    const previewContainer = document.getElementById('previewContainer');
 
    if (dropZone && imageInput) {
+      // Trigger file input on click
+      dropZone.addEventListener('click', () => imageInput.click());
+
       // Prevent default drag behaviors
       ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
          dropZone.addEventListener(eventName, preventDefaults, false);

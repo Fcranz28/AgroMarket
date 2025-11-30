@@ -8,8 +8,8 @@
 
 .dashboard-products-index-container .header-actions {
    display: flex;
-   justify-content: space-between;
-   align-items: center;
+   justify-content: center;
+   /* Centered or full width */
    margin-bottom: 2rem;
 }
 
@@ -19,6 +19,16 @@
    gap: 2rem;
 }
 
+.dashboard-products-index-container .btn-add-product {
+   width: 100%;
+   justify-content: center;
+   padding: 12px 20px;
+   font-size: 1.1rem;
+   background-color: #48bb78;
+   /* Match the green */
+   border-radius: 8px;
+}
+
 .dashboard-products-index-container .product-card {
    background: var(--bg-card);
    border-radius: 10px;
@@ -26,6 +36,8 @@
    box-shadow: var(--shadow-sm);
    transition: transform 0.2s;
    border: 1px solid var(--border-color);
+   display: flex;
+   flex-direction: column;
 }
 
 .dashboard-products-index-container .product-card:hover {
@@ -47,6 +59,9 @@
 
 .dashboard-products-index-container .product-details {
    padding: 1rem;
+   flex-grow: 1;
+   display: flex;
+   flex-direction: column;
 }
 
 .dashboard-products-index-container .product-details h3 {
@@ -65,11 +80,43 @@
    color: var(--text-secondary);
    font-size: 0.9rem;
    margin-bottom: 1rem;
+   flex-grow: 1;
 }
 
 .dashboard-products-index-container .actions {
    display: flex;
-   gap: 0.5rem;
+   gap: 10px;
+   justify-content: center;
+   width: 100%;
+   margin-top: auto;
+   /* Push to bottom */
+}
+
+.dashboard-products-index-container .actions .btn,
+.dashboard-products-index-container .actions form {
+   flex: 1;
+   display: flex;
+}
+
+.dashboard-products-index-container .actions form .btn {
+   width: 100%;
+   justify-content: center;
+}
+
+.dashboard-products-index-container .actions .btn {
+   justify-content: center;
+}
+
+/* Ensure the buttons container takes 85% of the card width if that's the specific request, 
+   or just make the buttons themselves take up space. 
+   The user said "ambos tenga el mismo ancho que ocupe un 85% de la card".
+   This likely means the row of buttons should be 85% of the card width.
+*/
+.dashboard-products-index-container .actions {
+   width: 90%;
+   /* Close to 85%, leaving some padding */
+   margin-left: auto;
+   margin-right: auto;
 }
 
 .dashboard-products-index-container .btn {
@@ -86,8 +133,8 @@
 }
 
 .dashboard-products-index-container .btn-sm {
-   padding: 0.25rem 0.75rem;
-   font-size: 0.875rem;
+   padding: 0.4rem 0.75rem;
+   font-size: 0.9rem;
 }
 
 .dashboard-products-index-container .btn-primary {
@@ -137,4 +184,6 @@
 
 .dashboard-products-index-container .d-inline {
    display: inline-block;
+   width: 100%;
+   /* For the form to take full width of its flex share */
 }

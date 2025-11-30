@@ -71,7 +71,7 @@
                 </div>
                 <div class="header-right">
                     <!-- Theme Toggle -->
-                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
+                    <button type="button" id="dashboardThemeToggle" class="theme-toggle" aria-label="Cambiar tema">
                         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>

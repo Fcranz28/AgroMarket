@@ -16,10 +16,11 @@ class FarmerController extends Controller
         }
 
         $products = $user->products()->count();
-        // Mocking sales data for now
-        $sales = 0; 
-        $revenue = 0;
+        $sales = 0; // Placeholder until Order logic is implemented
+        $revenue = 0; // Placeholder
 
-        return view('farmer.dashboard', compact('products', 'sales', 'revenue'));
+        $recentProducts = $user->products()->latest()->take(5)->get();
+
+        return view('farmer.dashboard', compact('products', 'sales', 'revenue', 'recentProducts'));
     }
 }

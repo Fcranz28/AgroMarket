@@ -154,16 +154,16 @@
 
             <div class="team-member" data-aos="fade-up" data-aos-delay="200">
                 <div class="team-photo">
-                    <i class="fas fa-user-tie"></i>
+                    <img src="{{ asset('img/team/franz.jpg') }}" alt="Franz Aguilar" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="team-info">
-                    <h4>Carlos Mendoza</h4>
+                    <h4>Franz Aguilar</h4>
                     <span class="team-role">Director de Tecnología</span>
-                    <p class="team-description">Especialista en soluciones tecnológicas para el sector agrícola, con enfoque en innovación digital.</p>
+                    <p class="team-description">Desarrollador Full Stack y creador de AgroMarket. Apasionado por conectar la tecnología con el campo para impulsar el desarrollo agrícola.</p>
                     <div class="team-social">
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fas fa-envelope"></i></a>
+                        <a href="www.linkedin.com/in/franz-kennedy-aguilar-cerna-5ab72226a" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://github.com/Fcranz28" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="https://web.facebook.com/franz.aguilarcerna/" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     </div>
                 </div>
             </div>

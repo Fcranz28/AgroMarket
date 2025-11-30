@@ -1,19 +1,8 @@
 /* Admin Dashboard Styles */
-:root {
-   --admin-bg: var(--bg-primary);
-   --card-bg: var(--bg-card);
-   --text-main: var(--text-primary);
-   --text-light: var(--text-secondary);
-   --primary: var(--accent-primary);
-   --success: var(--success);
-   --warning: var(--warning);
-   --danger: var(--danger);
-   --border: var(--border-color);
-}
 
 .admin-dashboard-wrapper {
-   padding: 20px;
-   background-color: var(--admin-bg);
+   padding: 0;
+   background-color: var(--bg-primary);
    min-height: 100vh;
 }
 
@@ -53,7 +42,7 @@
 /* Cards */
 .admin-stat-card {
    background-color: var(--card-bg);
-   border: 1px solid var(--border);
+   border: 1px solid var(--border-color);
    border-radius: 16px;
    box-shadow: var(--shadow-sm);
    padding: 24px;
@@ -65,7 +54,7 @@
 .admin-stat-card:hover {
    transform: translateY(-5px);
    box-shadow: var(--shadow-md);
-   border-color: var(--primary);
+   border-color: var(--accent-primary);
 }
 
 .admin-stat-icon {
@@ -81,20 +70,20 @@
 
 .admin-stat-icon i {
    font-size: 20px;
-   color: var(--primary);
+   color: var(--accent-primary);
 }
 
 .admin-stat-value {
    font-size: 24px;
    font-weight: 700;
-   color: var(--text-main);
+   color: var(--text-primary);
    margin-bottom: 4px;
 }
 
 .admin-stat-label {
    font-size: 14px;
    font-weight: 600;
-   color: var(--text-light);
+   color: var(--text-secondary);
    text-transform: uppercase;
    letter-spacing: 0.5px;
 }
@@ -120,7 +109,7 @@
 /* Charts Cards */
 .admin-chart-card {
    background-color: var(--card-bg);
-   border: 1px solid var(--border);
+   border: 1px solid var(--border-color);
    border-radius: 16px;
    padding: 24px;
    box-shadow: var(--shadow-sm);
@@ -137,13 +126,13 @@
 .admin-chart-title {
    font-size: 18px;
    font-weight: 700;
-   color: var(--text-main);
+   color: var(--text-primary);
    margin: 0;
 }
 
 .admin-chart-subtitle {
    font-size: 14px;
-   color: var(--text-light);
+   color: var(--text-secondary);
    margin-top: 4px;
 }
 
@@ -154,8 +143,8 @@
 
 .admin-chart-btn {
    background: transparent;
-   border: 1px solid var(--border);
-   color: var(--text-light);
+   border: 1px solid var(--border-color);
+   color: var(--text-secondary);
    padding: 4px 10px;
    border-radius: 8px;
    font-size: 12px;
@@ -166,8 +155,8 @@
 .admin-chart-btn:hover,
 .admin-chart-btn.active {
    background-color: var(--bg-hover);
-   color: var(--primary);
-   border-color: var(--primary);
+   color: var(--accent-primary);
+   border-color: var(--accent-primary);
 }
 
 /* Target Chart Specifics */
@@ -181,13 +170,13 @@
 .admin-target-item h4 {
    font-size: 16px;
    font-weight: 700;
-   color: var(--text-main);
+   color: var(--text-primary);
    margin: 0 0 4px 0;
 }
 
 .admin-target-item p {
    font-size: 12px;
-   color: var(--text-light);
+   color: var(--text-secondary);
    margin: 0;
 }
 
@@ -202,6 +191,6 @@
 }
 
 .admin-trend-label {
-   color: var(--text-light);
+   color: var(--text-secondary);
    margin-left: 4px;
 }

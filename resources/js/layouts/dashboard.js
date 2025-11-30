@@ -1,7 +1,7 @@
 // Dashboard Layout Scripts
 document.addEventListener('DOMContentLoaded', function () {
    // ===== THEME TOGGLE =====
-   const themeToggle = document.getElementById('themeToggle');
+   const themeToggle = document.getElementById('dashboardThemeToggle');
    const rootElement = document.documentElement;
 
    // Check for saved theme preference or default to system preference
@@ -19,19 +19,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
    // Toggle theme on button click
    if (themeToggle) {
-      themeToggle.addEventListener('click', function () {
+      console.log('Theme toggle button found');
+      themeToggle.addEventListener('click', function (e) {
+         e.preventDefault(); // Prevent any default behavior
+         console.log('Theme toggle clicked');
          const currentTheme = rootElement.getAttribute('data-theme');
+         console.log('Current theme:', currentTheme);
          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+         console.log('New theme:', newTheme);
 
          rootElement.setAttribute('data-theme', newTheme);
          localStorage.setItem('theme', newTheme);
 
          // Add rotation animation
+         const sunIcon = this.querySelector('.sun-icon');
+         const moonIcon = this.querySelector('.moon-icon');
+
          this.style.transform = 'rotate(360deg)';
          setTimeout(() => {
             this.style.transform = '';
          }, 300);
       });
+   } else {
+      console.error('Theme toggle button NOT found');
    }
 
    // ===== MOBILE MENU TOGGLE =====

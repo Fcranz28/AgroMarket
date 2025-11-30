@@ -55,11 +55,14 @@ export async function initializeStripeCheckout() {
          throw new Error(data.error || 'Error al crear la intención de pago');
       }
 
+      // Check for dark mode
+      const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+
       // Initialize Elements
       elements = stripe.elements({
          clientSecret: data.clientSecret,
          appearance: {
-            theme: 'stripe',
+            theme: isDarkMode ? 'night' : 'stripe',
             variables: {
                colorPrimary: '#4caf50',
             }

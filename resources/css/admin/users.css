@@ -1,5 +1,5 @@
 /* Admin Users Styles */
-:root {
+.users-container {
    --admin-bg: var(--bg-primary);
    --card-bg: var(--bg-card);
    --text-main: var(--text-primary);

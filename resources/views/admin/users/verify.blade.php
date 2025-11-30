@@ -3,7 +3,7 @@
 @section('title', 'Verificación de Agricultor')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid verify-farmer-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold">Verificación de Agricultor</h2>
         <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary">

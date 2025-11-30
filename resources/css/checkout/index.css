@@ -323,3 +323,107 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* =========================================
+       DARK MODE STYLES
+       ========================================= */
+    :root[data-theme="dark"] .checkout-container h1 {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-info-card,
+    :root[data-theme="dark"] .checkout-order-summary {
+        background: var(--card-bg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+    }
+
+    :root[data-theme="dark"] .checkout-info-card h2,
+    :root[data-theme="dark"] .checkout-order-summary h2 {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-form-group label {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-form-group input,
+    :root[data-theme="dark"] .checkout-form-group textarea,
+    :root[data-theme="dark"] .checkout-form-group select {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-form-group input:focus,
+    :root[data-theme="dark"] .checkout-form-group textarea:focus,
+    :root[data-theme="dark"] .checkout-form-group select:focus {
+        border-color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .checkout-payment-tab {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    :root[data-theme="dark"] .checkout-payment-tab:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    :root[data-theme="dark"] .checkout-payment-tab.active {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+        color: white;
+    }
+
+    :root[data-theme="dark"] .checkout-visa-logo span {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-visa-logo {
+        border-bottom-color: var(--border-color);
+    }
+
+    :root[data-theme="dark"] .checkout-security-badge {
+        border-top-color: var(--border-color);
+        color: var(--text-muted);
+    }
+
+    :root[data-theme="dark"] .checkout-cart-item {
+        border-bottom-color: var(--border-color);
+    }
+
+    :root[data-theme="dark"] .checkout-cart-item img {
+        background: var(--bg-primary);
+    }
+
+    :root[data-theme="dark"] .checkout-cart-item-name {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-cart-item-quantity {
+        color: var(--text-muted);
+    }
+
+    :root[data-theme="dark"] .checkout-cart-item-price {
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-summary-breakdown {
+        border-top-color: var(--border-color);
+    }
+
+    :root[data-theme="dark"] .checkout-summary-row {
+        color: var(--text-secondary);
+    }
+
+    :root[data-theme="dark"] .checkout-summary-row.checkout-total-row {
+        border-top-color: var(--border-color);
+        color: var(--text-main);
+    }
+
+    :root[data-theme="dark"] .checkout-summary-row.checkout-total-row span:last-child {
+        color: var(--accent-color);
+    }

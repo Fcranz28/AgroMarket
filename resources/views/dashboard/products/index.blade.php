@@ -5,9 +5,8 @@
 
 @section('content')
 <div class="dashboard-products-index-container">
-    <div class="header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <div></div>
-        <a href="{{ route('dashboard.productos.create') }}" class="btn btn-primary" style="background: #48bb78; border: none; padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+    <div class="header-actions">
+        <a href="{{ route('dashboard.productos.create') }}" class="btn btn-primary btn-add-product">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y12="12"></line>
