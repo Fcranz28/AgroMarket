@@ -30,7 +30,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'verification_status',
         'verification_document',
         'is_banned',

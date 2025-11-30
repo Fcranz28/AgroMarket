@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Exclude payment routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
-            'payment/*'
+            // 'payment/*' 
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

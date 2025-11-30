@@ -221,8 +221,10 @@ class UserProductController extends Controller
             'auth_check' => auth()->check()
         ]);
         
-        // OWNERSHIP CHECK DISABLED - ALL FARMERS CAN EDIT ANY PRODUCT
-        // TODO: Fix authentication in farmer dashboard
+        // Check ownership
+        if ($producto->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para editar este producto.');
+        }
         
         $categories = \App\Models\Category::all();
         return view('dashboard.products.edit', compact('producto', 'categories'));
@@ -233,8 +235,10 @@ class UserProductController extends Controller
      */
     public function update(Request $request, Product $producto)
     {
-        // OWNERSHIP CHECK DISABLED - ALL FARMERS CAN UPDATE ANY PRODUCT
-        // TODO: Fix authentication in farmer dashboard
+        // Check ownership
+        if ($producto->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para actualizar este producto.');
+        }
         
         \Log::info('Product update attempt', [
             'product_id' => $producto->id,
@@ -375,8 +379,10 @@ class UserProductController extends Controller
      */
     public function destroy(Product $producto)
     {
-        // OWNERSHIP CHECK DISABLED - ALL FARMERS CAN DELETE ANY PRODUCT
-        // TODO: Fix authentication in farmer dashboard
+        // Check ownership
+        if ($producto->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para eliminar este producto.');
+        }
         
         // Delete main image
         if ($producto->image_path) {

@@ -124,14 +124,13 @@ class ProductCrudController extends Controller
 
         // Use database transaction for data integrity
         \DB::transaction(function () use ($request, $validated, $product) {
+            $oldImagePath = $product->image_path;
+            $newImagePath = null;
+
             // Process new image if exists
             if ($request->hasFile('image')) {
-                // Delete old image
-                if ($product->image_path) {
-                    Storage::disk('public')->delete($product->image_path);
-                }
-                $imagePath = $request->file('image')->store('products', 'public');
-                $product->image_path = $imagePath;
+                $newImagePath = $request->file('image')->store('products', 'public');
+                $product->image_path = $newImagePath;
             }
 
             // Recalculate base values from new units
@@ -160,6 +159,11 @@ class ProductCrudController extends Controller
                         'price' => $request->price[$key]
                     ]);
                 }
+            }
+
+            // Only delete old image if transaction was successful and we have a new image
+            if ($newImagePath && $oldImagePath) {
+                Storage::disk('public')->delete($oldImagePath);
             }
         });
 

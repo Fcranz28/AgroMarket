@@ -66,11 +66,18 @@ class OrderController extends Controller
      */
     public function updateStatus(\Illuminate\Http\Request $request, Order $order)
     {
-        // Verify user is a farmer and owns products in this order
-        // For simplicity, we'll just check if they are a farmer for now, 
-        // but ideally we should check if they are the seller of items in this order.
+        // Verify user is a farmer
         if (!Auth::user()->isFarmer()) {
-            abort(403);
+            abort(403, 'Acceso denegado. Solo los agricultores pueden actualizar el estado.');
+        }
+
+        // Verify that the order contains at least one product belonging to this farmer
+        $hasFarmerProducts = $order->items()->whereHas('product', function ($query) {
+            $query->where('user_id', Auth::id());
+        })->exists();
+
+        if (!$hasFarmerProducts) {
+            abort(403, 'No tienes permiso para actualizar este pedido.');
         }
 
         $validated = $request->validate([
