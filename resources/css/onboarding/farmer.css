@@ -1,0 +1,208 @@
+/* Farmer Onboarding Styles */
+.verification-container {
+   min-height: 80vh;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   padding: 40px 20px;
+   background-color: var(--primary-bg, #f0f4e8);
+}
+
+.verification-card {
+   background: var(--card-bg, #ffffff);
+   border-radius: 24px;
+   padding: 40px;
+   width: 100%;
+   max-width: 800px;
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+   border: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* Progress Bar */
+.progress-container {
+   margin-bottom: 40px;
+}
+
+.progress-bar {
+   height: 8px;
+   background-color: var(--input-background-color, #e5e7eb);
+   border-radius: 4px;
+   overflow: hidden;
+   margin-bottom: 8px;
+}
+
+.progress-fill {
+   height: 100%;
+   background-color: var(--accent-color, #7AA537);
+   border-radius: 4px;
+   transition: width 0.3s ease;
+}
+
+.progress-text {
+   font-size: 0.85rem;
+   color: var(--text-muted, #6b7280);
+   font-weight: 500;
+}
+
+/* Header */
+.header-section {
+   text-align: center;
+   margin-bottom: 40px;
+}
+
+.header-section h2 {
+   font-size: 2rem;
+   font-weight: 700;
+   color: var(--text-main, #111827);
+   margin-bottom: 10px;
+}
+
+.header-section p {
+   color: var(--text-muted, #6b7280);
+   font-size: 1.1rem;
+}
+
+/* Form */
+.section-label {
+   display: block;
+   font-weight: 600;
+   color: var(--text-main, #111827);
+   margin-bottom: 12px;
+   font-size: 1rem;
+}
+
+.upload-area {
+   border: 2px dashed var(--border-color, #e5e7eb);
+   border-radius: 16px;
+   padding: 30px;
+   text-align: center;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   background-color: var(--input-background-color, #f9fafb);
+   position: relative;
+   overflow: hidden;
+}
+
+.upload-area:hover {
+   border-color: var(--accent-color, #7AA537);
+   background-color: var(--hover-background, rgba(122, 165, 55, 0.05));
+}
+
+.upload-content {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 12px;
+}
+
+.icon-circle {
+   width: 64px;
+   height: 64px;
+   background-color: var(--card-bg, #ffffff);
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+   color: var(--accent-color, #7AA537);
+}
+
+.icon-circle svg {
+   width: 32px;
+   height: 32px;
+}
+
+.upload-text {
+   font-weight: 500;
+   color: var(--text-main, #111827);
+   margin: 0;
+}
+
+.upload-hint {
+   font-size: 0.85rem;
+   color: var(--text-muted, #6b7280);
+   margin: 0;
+}
+
+.hidden-input {
+   display: none;
+}
+
+.preview-box {
+   margin-top: 15px;
+   display: none;
+}
+
+.preview-box img {
+   max-width: 100%;
+   max-height: 200px;
+   border-radius: 12px;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.documents-grid {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 20px;
+   margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+   .documents-grid {
+      grid-template-columns: 1fr;
+   }
+}
+
+/* Security Note */
+.security-note {
+   display: flex;
+   align-items: flex-start;
+   gap: 16px;
+   background-color: rgba(122, 165, 55, 0.1);
+   padding: 20px;
+   border-radius: 12px;
+   margin: 40px 0;
+   color: var(--text-main, #111827);
+}
+
+.security-note svg {
+   width: 24px;
+   height: 24px;
+   color: var(--accent-color, #7AA537);
+   flex-shrink: 0;
+}
+
+.note-content p {
+   margin: 4px 0 0 0;
+   font-size: 0.9rem;
+   color: var(--text-muted, #4b5563);
+}
+
+/* Submit Button */
+.submit-btn {
+   width: 100%;
+   padding: 16px;
+   background-color: var(--accent-color, #7AA537);
+   color: white;
+   border: none;
+   border-radius: 12px;
+   font-size: 1.1rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.2s;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 10px;
+}
+
+.submit-btn:hover {
+   background-color: var(--accent-hover, #6a912f);
+   transform: translateY(-2px);
+   box-shadow: 0 4px 12px rgba(122, 165, 55, 0.3);
+}
+
+.submit-btn svg {
+   width: 20px;
+   height: 20px;
+}

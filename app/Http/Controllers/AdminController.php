@@ -12,14 +12,88 @@ class AdminController extends Controller
         $pendingFarmers = User::pendingVerification()->count();
         $totalFarmers = User::farmers()->count();
         $totalUsers = User::where('role', User::ROLE_USER)->count();
+        
+        // Mock data or real counts if models exist
+        $totalProducts = \App\Models\Product::count();
+        $totalOrders = \App\Models\Order::count();
+        // Calculate total revenue from completed orders
+        $totalRevenue = \App\Models\Order::where('status', 'delivered')->sum('total');
 
-        return view('admin.dashboard', compact('pendingFarmers', 'totalFarmers', 'totalUsers'));
+        return view('admin.dashboard', compact(
+            'pendingFarmers', 
+            'totalFarmers', 
+            'totalUsers',
+            'totalProducts',
+            'totalOrders',
+            'totalRevenue'
+        ));
     }
 
     public function users()
     {
         $users = User::latest()->paginate(10);
         return view('admin.users', compact('users'));
+    }
+
+    public function verifyView(User $user)
+    {
+        return view('admin.users.verify', compact('user'));
+    }
+
+    public function checkDni(Request $request)
+    {
+        $request->validate([
+            'dni' => 'required|numeric|digits:8',
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $token = 'sk_12002.IKm739baMvp9BDi3QZOPiPlJS3EH5b8q';
+        $dni = $request->input('dni');
+        $user = User::find($request->input('user_id'));
+
+        try {
+            $client = new \GuzzleHttp\Client(['base_uri' => 'https://api.decolecta.com', 'verify' => false]);
+            
+            $response = $client->request('GET', '/v1/reniec/dni', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
+                'query' => ['numero' => $dni]
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Update user's DNI if successful
+            if ($data && isset($data['document_number'])) {
+                $user->update(['dni' => $data['document_number']]);
+                
+                // Check if request is AJAX
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['success' => true, 'data' => $data]);
+                }
+                
+                return back()->with('apiResult', ['success' => true, 'data' => $data]);
+            } else {
+                $message = 'No se encontraron datos para este DNI.';
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $message]);
+                }
+                
+                return back()->with('apiResult', ['success' => false, 'message' => $message]);
+            }
+
+        } catch (\Exception $e) {
+            $message = 'Error al consultar RENIEC: ' . $e->getMessage();
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $message]);
+            }
+            
+            return back()->with('apiResult', ['success' => false, 'message' => $message]);
+        }
     }
 
     public function verifyFarmer(User $user, $status)
@@ -30,7 +104,7 @@ class AdminController extends Controller
 
         $user->update(['verification_status' => $status]);
 
-        return back()->with('success', 'Estado del agricultor actualizado.');
+        return redirect()->route('admin.users')->with('success', 'Estado del agricultor actualizado correctamente.');
     }
 
     public function toggleBan(User $user)

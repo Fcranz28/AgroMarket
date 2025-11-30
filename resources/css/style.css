@@ -681,39 +681,41 @@ ul {
     padding: 0 20px;
     position: relative;
     z-index: 1;
+    overflow: hidden;
+    /* Hide overflow for infinite scroll */
 }
 
 .carousel-content {
     display: flex;
     gap: 24px;
-    overflow-x: auto;
     padding: 20px 0;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(42, 62, 31, 0.3) rgba(255, 255, 255, 0.1);
+    width: max-content;
+    /* Allow content to expand */
+    /* Remove scrollbar styles as we are using auto-scroll */
 }
 
-.carousel-content::-webkit-scrollbar {
-    height: 8px;
+/* Animation Class */
+.carousel-content.animate-scroll {
+    animation: scrollLeftToRight 30s linear infinite;
 }
 
-.carousel-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+.carousel-content.animate-scroll:hover {
+    animation-play-state: paused;
 }
 
-.carousel-content::-webkit-scrollbar-thumb {
-    background: rgba(42, 62, 31, 0.4);
-    border-radius: 10px;
-}
+@keyframes scrollLeftToRight {
+    0% {
+        transform: translateX(-50%);
+    }
 
-.carousel-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(42, 62, 31, 0.6);
+    100% {
+        transform: translateX(0);
+    }
 }
 
 .carousel-content .product-card {
     min-width: 280px;
-    scroll-snap-align: start;
+    /* Removed scroll-snap-align */
 }
 
 /* Dark mode adjustments for products section */
@@ -1612,4 +1614,53 @@ ul {
         /* Override 140px from tablet query */
         width: 100%;
     }
+}
+
+/* Load More Button Styles */
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    padding-bottom: 2rem;
+}
+
+.load-more-btn {
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.load-more-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(122, 165, 55, 0.3);
+}
+
+.load-more-btn:active {
+    transform: translateY(0);
+}
+
+/* Dark mode adjustments handled by variables, but ensuring contrast */
+[data-theme="dark"] .load-more-btn {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+[data-theme="dark"] .load-more-btn:hover {
+    background: var(--accent-color);
+    color: var(--text-main);
+    /* Or white/black depending on contrast needs */
+    color: #ffffff;
 }

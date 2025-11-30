@@ -1,0 +1,105 @@
+.onboarding-container {
+min-height: 80vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+background-color: var(--bg-primary, #f8f9fa);
+padding: 40px 20px;
+color: var(--text-main, #333);
+}
+.onboarding-header {
+text-align: center;
+margin-bottom: 50px;
+}
+.onboarding-header h1 {
+font-size: 2.5rem;
+font-weight: 700;
+color: var(--text-main, #333);
+margin-bottom: 10px;
+}
+.onboarding-header p {
+font-size: 1.1rem;
+color: var(--text-light, #666);
+}
+.role-selection {
+display: flex;
+gap: 30px;
+flex-wrap: wrap;
+justify-content: center;
+}
+.role-card {
+background: var(--card-bg, white);
+border-radius: 15px;
+padding: 40px;
+width: 300px;
+text-align: center;
+box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+transition: all 0.3s ease;
+cursor: pointer;
+border: 2px solid transparent;
+position: relative;
+overflow: hidden;
+}
+.role-card:hover {
+transform: translateY(-10px);
+box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+border-color: var(--accent-color, #7AA537);
+}
+.role-icon {
+width: 80px;
+height: 80px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 0 auto 20px;
+}
+.role-icon svg {
+width: 40px;
+height: 40px;
+}
+.user-icon {
+background-color: #e3f2fd;
+color: #2196f3;
+}
+.farmer-icon {
+background-color: #e8f5e9;
+color: #4caf50;
+}
+
+/* Dark Mode Adjustments for Icons */
+[data-theme="dark"] .user-icon {
+background-color: rgba(33, 150, 243, 0.2);
+color: #64b5f6;
+}
+[data-theme="dark"] .farmer-icon {
+background-color: rgba(76, 175, 80, 0.2);
+color: #81c784;
+}
+
+.role-card h3 {
+font-size: 1.5rem;
+margin-bottom: 15px;
+color: var(--text-main, #333);
+}
+.role-card p {
+color: var(--text-light, #666);
+line-height: 1.6;
+margin-bottom: 30px;
+}
+.role-btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 10px 25px;
+border-radius: 25px;
+background-color: var(--bg-secondary, #f0f0f0);
+color: var(--text-main, #333);
+font-weight: 600;
+transition: all 0.3s ease;
+}
+.role-card:hover .role-btn {
+background-color: var(--accent-color, #7AA537);
+color: white;
+}

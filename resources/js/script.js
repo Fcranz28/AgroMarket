@@ -6,9 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Manejar el tema oscuro/claro
     function updateTheme() {
+        if (!themeToggle) return;
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const isDarkTheme = currentTheme === 'dark';
         const themeIcon = themeToggle.querySelector('.theme-icon');
+
+        if (!themeIcon) return;
 
         if (isDarkTheme) {
             themeIcon.innerHTML = '\u003cpath d=\"M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z\"/\u003e';
@@ -143,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Muestra productos aleatorios en el grid.
+     * Muestra productos aleatorios en el grid con funcionalidad "Ver Más".
      */
     async function showRandomProducts() {
         if (!gridContainer) {
@@ -151,15 +154,44 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const loadMoreBtn = document.querySelector('.load-more-btn');
         const products = await fetchProducts();
 
-        // Mezcla los productos y toma 6
-        const randomProducts = products.sort(() => 0.5 - Math.random()).slice(0, 6);
+        // Mezclar productos una sola vez
+        const shuffledProducts = products.sort(() => 0.5 - Math.random());
 
-        gridContainer.innerHTML = ''; // Limpiar el contenedor
-        randomProducts.forEach(product => {
-            gridContainer.innerHTML += createProductCard(product);
-        });
+        let currentIndex = 0;
+        const itemsPerPage = 8;
+
+        // Función para renderizar el siguiente lote
+        const loadNextBatch = () => {
+            const nextBatch = shuffledProducts.slice(currentIndex, currentIndex + itemsPerPage);
+
+            nextBatch.forEach(product => {
+                gridContainer.innerHTML += createProductCard(product);
+            });
+
+            currentIndex += itemsPerPage;
+
+            // Ocultar botón si no hay más productos
+            if (currentIndex >= shuffledProducts.length) {
+                if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+            }
+        };
+
+        gridContainer.innerHTML = ''; // Limpiar inicial
+        loadNextBatch(); // Cargar primeros 8
+
+        // Event listener para el botón
+        if (loadMoreBtn) {
+            // Remover listeners anteriores para evitar duplicados si la función se llama varias veces
+            const newBtn = loadMoreBtn.cloneNode(true);
+            loadMoreBtn.parentNode.replaceChild(newBtn, loadMoreBtn);
+
+            newBtn.addEventListener('click', () => {
+                loadNextBatch();
+            });
+        }
     }
 
     /**
@@ -174,15 +206,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const products = await fetchProducts();
 
         // La API ya los devuelve por 'latest('id')', así que solo tomamos los primeros 5
-        const carouselProducts = products.slice(0, 5);
+        // Para el loop infinito, necesitamos suficientes items. Si hay pocos, los duplicamos más veces.
+        let carouselProducts = products.slice(0, 10); // Tomar más productos si es posible
 
         carouselContainer.innerHTML = ''; // Limpiar el contenedor
-        carouselProducts.forEach(product => {
-            carouselContainer.innerHTML += createProductCard(product);
-        });
 
-        // Aquí puedes agregar la inicialización de una librería de carrusel (como Swiper o Slick)
-        // si lo deseas. Por ahora, se mostrarán en línea.
+        // Función helper para renderizar
+        const renderCards = (items) => {
+            items.forEach(product => {
+                carouselContainer.innerHTML += createProductCard(product);
+            });
+        };
+
+        // Renderizar set original
+        renderCards(carouselProducts);
+
+        // Duplicar el contenido para el efecto de loop infinito
+        // Si hay pocos productos, duplicar varias veces para llenar la pantalla
+        if (carouselProducts.length > 0) {
+            renderCards(carouselProducts); // Primer duplicado
+            if (carouselProducts.length < 5) {
+                renderCards(carouselProducts); // Segundo duplicado si son pocos
+                renderCards(carouselProducts); // Tercer duplicado
+            }
+        }
+
+        // Agregar clase de animación
+        carouselContainer.classList.add('animate-scroll');
     }
 
     // Inicializar el carrusel y los productos aleatorios

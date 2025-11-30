@@ -278,6 +278,23 @@ class UserProductController extends Controller
 
             // Use database transaction for data integrity
             \DB::transaction(function () use ($request, $validatedData, $producto) {
+                // Handle image deletions
+                if ($request->has('delete_images')) {
+                    $imagesToDelete = $producto->images()->whereIn('id', $request->delete_images)->get();
+                    foreach ($imagesToDelete as $image) {
+                        // Delete file
+                        Storage::disk('public')->delete($image->image_path);
+                        
+                        // Check if this was the main image
+                        if ($producto->image_path === $image->image_path) {
+                            $producto->image_path = null;
+                            $producto->save();
+                        }
+                        
+                        $image->delete();
+                    }
+                }
+
                 // Handle new images if uploaded
                 if ($request->hasFile('image')) {
                     $images = $request->file('image');
@@ -312,6 +329,14 @@ class UserProductController extends Controller
 
                 // Update product basic info
                 $producto->update($validatedData);
+
+                // If image_path is still null (main image deleted and no new ones uploaded), pick one from existing
+                if (!$producto->image_path) {
+                    $firstImage = $producto->images()->first();
+                    if ($firstImage) {
+                        $producto->update(['image_path' => $firstImage->image_path]);
+                    }
+                }
 
                 // Sync product units: delete old units and create new ones
                 $producto->units()->delete();

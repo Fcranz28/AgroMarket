@@ -1,0 +1,416 @@
+/* Dashboard Products Form Styles (Create/Edit) */
+
+.dashboard-products-form-container {
+   max-width: 900px;
+   margin: 2rem auto;
+   padding: 0 1rem;
+}
+
+.dashboard-products-form-container .product-form-card {
+   background: var(--bg-card);
+   padding: 2.5rem;
+   border-radius: 20px;
+   box-shadow: var(--shadow-md);
+   border: 1px solid var(--border-color);
+   transition: all 0.3s ease;
+}
+
+.dashboard-products-form-container .product-form-card:hover {
+   box-shadow: var(--shadow-lg);
+}
+
+.dashboard-products-form-container .product-form-header {
+   margin-bottom: 2rem;
+   border-bottom: 2px solid var(--border-color);
+   padding-bottom: 1rem;
+}
+
+.dashboard-products-form-container .product-form-card h2 {
+   color: var(--text-primary);
+   font-size: 1.75rem;
+   font-weight: 700;
+   margin: 0;
+   display: flex;
+   align-items: center;
+   gap: 0.75rem;
+}
+
+.dashboard-products-form-container .product-form-card h2::before {
+   content: '';
+   width: 6px;
+   height: 2rem;
+   background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+   border-radius: 3px;
+}
+
+.dashboard-products-form-container .product-form-group {
+   margin-bottom: 1.75rem;
+}
+
+.dashboard-products-form-container .product-form-group label {
+   display: block;
+   margin-bottom: 0.5rem;
+   font-weight: 600;
+   color: var(--text-secondary);
+   font-size: 0.95rem;
+}
+
+.dashboard-products-form-container .product-form-control {
+   width: 100%;
+   padding: 0.875rem 1rem;
+   border: 2px solid var(--border-color);
+   border-radius: 12px;
+   font-size: 1rem;
+   transition: all 0.3s ease;
+   background: var(--bg-input);
+   color: var(--text-primary);
+}
+
+.dashboard-products-form-container .product-form-control:focus {
+   outline: none;
+   border-color: var(--accent-primary);
+   background: var(--bg-card);
+   box-shadow: 0 0 0 4px rgba(122, 165, 55, 0.1);
+}
+
+.dashboard-products-form-container .product-form-control::placeholder {
+   color: var(--text-muted);
+}
+
+.dashboard-products-form-container select.product-form-control {
+   cursor: pointer;
+   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0aec0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+   background-repeat: no-repeat;
+   background-position: right 1rem center;
+   padding-right: 2.5rem;
+   appearance: none;
+}
+
+.dashboard-products-form-container .product-form-row {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+   gap: 2rem;
+   margin-bottom: 2rem;
+}
+
+.dashboard-products-form-container .text-muted {
+   font-size: 0.85rem;
+   color: var(--text-muted);
+   margin-top: 0.5rem;
+   display: block;
+}
+
+/* Stock Container */
+.dashboard-products-form-container .stock-container {
+   background: var(--bg-input);
+   padding: 1.25rem;
+   border-radius: 16px;
+   border: 2px dashed var(--border-color);
+   min-height: 180px;
+   max-height: 400px;
+   overflow-y: auto;
+   transition: all 0.3s ease;
+}
+
+.dashboard-products-form-container .empty-stock-state {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   height: 100%;
+   min-height: 140px;
+   color: var(--text-muted);
+   text-align: center;
+   gap: 1rem;
+}
+
+.dashboard-products-form-container .empty-stock-state svg {
+   width: 48px;
+   height: 48px;
+   opacity: 0.5;
+}
+
+.dashboard-products-form-container .stock-item {
+   background: var(--bg-card);
+   padding: 1rem;
+   border-radius: 12px;
+   border: 1px solid var(--border-color);
+   margin-bottom: 1rem;
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   animation: slideIn 0.3s ease-out;
+   box-shadow: var(--shadow-sm);
+}
+
+.dashboard-products-form-container .stock-item:hover {
+   border-color: var(--accent-primary);
+   transform: translateY(-2px);
+}
+
+.dashboard-products-form-container .stock-label {
+   font-weight: 700;
+   color: var(--text-primary);
+   font-size: 0.95rem;
+   padding-bottom: 0.5rem;
+   border-bottom: 1px solid var(--border-color);
+   margin-bottom: 0.5rem;
+}
+
+.dashboard-products-form-container .stock-input-group {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 1rem;
+}
+
+/* Image Upload */
+.dashboard-products-form-container .image-upload-container {
+   border: 3px dashed var(--border-color);
+   border-radius: 16px;
+   padding: 3rem 2rem;
+   text-align: center;
+   position: relative;
+   transition: all 0.3s ease;
+   background: var(--bg-input);
+   cursor: pointer;
+   min-height: 250px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-direction: column;
+}
+
+.dashboard-products-form-container .image-upload-container:hover,
+.dashboard-products-form-container .image-upload-container.highlight {
+   border-color: var(--accent-primary);
+   background: rgba(122, 165, 55, 0.05);
+   transform: scale(1.01);
+}
+
+.dashboard-products-form-container .upload-icon-wrapper {
+   width: 64px;
+   height: 64px;
+   background: var(--bg-card);
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin-bottom: 1.5rem;
+   box-shadow: var(--shadow-sm);
+   color: var(--accent-primary);
+   transition: all 0.3s ease;
+}
+
+.dashboard-products-form-container .image-upload-container:hover .upload-icon-wrapper {
+   transform: scale(1.1) rotate(10deg);
+   color: var(--accent-hover);
+}
+
+.dashboard-products-form-container .upload-placeholder p {
+   font-size: 1.1rem;
+   font-weight: 600;
+   color: var(--text-primary);
+   margin-bottom: 0.5rem;
+}
+
+.dashboard-products-form-container .file-info {
+   font-size: 0.9rem;
+   color: var(--text-muted);
+}
+
+.dashboard-products-form-container .preview-container {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+   gap: 1.5rem;
+   width: 100%;
+   margin-top: 2rem;
+}
+
+.dashboard-products-form-container .image-preview-item {
+   position: relative;
+   aspect-ratio: 1;
+   border-radius: 12px;
+   overflow: hidden;
+   border: 2px solid var(--border-color);
+   box-shadow: var(--shadow-sm);
+   transition: all 0.3s ease;
+}
+
+.dashboard-products-form-container .image-preview-item:hover {
+   transform: scale(1.05);
+   border-color: var(--accent-primary);
+}
+
+.dashboard-products-form-container .image-preview-item img {
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+}
+
+/* Form Actions */
+.dashboard-products-form-container .product-form-actions {
+   display: flex;
+   gap: 1rem;
+   justify-content: flex-end;
+   margin-top: 3rem;
+   padding-top: 2rem;
+   border-top: 1px solid var(--border-color);
+}
+
+.dashboard-products-form-container .product-btn {
+   padding: 0.875rem 2rem;
+   border-radius: 12px;
+   font-weight: 600;
+   font-size: 1rem;
+   transition: all 0.3s ease;
+   cursor: pointer;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   border: none;
+}
+
+.dashboard-products-form-container .product-btn-primary {
+   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+   color: white;
+   box-shadow: 0 4px 15px rgba(122, 165, 55, 0.3);
+}
+
+.dashboard-products-form-container .product-btn-primary:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 6px 20px rgba(122, 165, 55, 0.4);
+}
+
+.dashboard-products-form-container .product-btn-secondary {
+   background: var(--bg-input);
+   color: var(--text-secondary);
+   border: 1px solid var(--border-color);
+}
+
+.dashboard-products-form-container .product-btn-secondary:hover {
+   background: var(--bg-card);
+   color: var(--text-primary);
+   border-color: var(--text-muted);
+}
+
+.dashboard-products-form-container .alert {
+   border-radius: 12px;
+   padding: 1rem 1.5rem;
+   margin-bottom: 2rem;
+   border: 1px solid transparent;
+}
+
+.dashboard-products-form-container .alert-danger {
+   background: rgba(255, 184, 184, 0.15);
+   border-color: var(--danger);
+   color: #c53030;
+}
+
+.dashboard-products-form-container .error-message {
+   color: var(--danger);
+   font-size: 0.875rem;
+   margin-top: 0.5rem;
+   display: block;
+}
+
+@keyframes slideIn {
+   from {
+      opacity: 0;
+      transform: translateY(-10px);
+   }
+
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+@media (max-width: 768px) {
+   .dashboard-products-form-container .product-form-card {
+      padding: 1.5rem;
+   }
+
+   .dashboard-products-form-container .product-form-row {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+   }
+
+   .dashboard-products-form-container .product-form-actions {
+      flex-direction: column-reverse;
+   }
+
+   .dashboard-products-form-container .product-btn {
+      width: 100%;
+   }
+}
+
+/* Unit Selection Grid */
+.dashboard-products-form-container .unit-selection-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+   gap: 0.75rem;
+   margin-bottom: 0.5rem;
+}
+
+.dashboard-products-form-container .unit-option {
+   background: var(--bg-card);
+   border: 2px solid var(--border-color);
+   border-radius: 12px;
+   padding: 0.75rem 0.5rem;
+   text-align: center;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   font-size: 0.9rem;
+   font-weight: 500;
+   color: var(--text-secondary);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   user-select: none;
+   position: relative;
+}
+
+.dashboard-products-form-container .unit-option:hover {
+   border-color: var(--accent-color);
+   background: rgba(122, 165, 55, 0.1);
+}
+
+.dashboard-products-form-container .unit-option.active {
+   background: var(--accent-color);
+   border-color: var(--accent-hover);
+   color: white;
+   box-shadow: 0 4px 12px rgba(122, 165, 55, 0.4);
+   transform: translateY(-2px);
+   font-weight: 700;
+}
+
+/* Checkmark Badge */
+.dashboard-products-form-container .unit-option.active::after {
+   content: '✓';
+   position: absolute;
+   top: -8px;
+   right: -8px;
+   background: white;
+   color: var(--accent-color);
+   width: 20px;
+   height: 20px;
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 12px;
+   font-weight: 900;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+   border: 2px solid var(--accent-color);
+}
+
+/* Dark Mode Adjustments for Checkmark */
+[data-theme="dark"] .dashboard-products-form-container .unit-option.active::after {
+   background: var(--card-bg);
+   color: var(--accent-color);
+   border-color: var(--accent-color);
+}
+
+.dashboard-products-form-container .d-none {
+   display: none;
+}

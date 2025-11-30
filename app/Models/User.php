@@ -38,6 +38,9 @@ class User extends Authenticatable
         'dni_front',
         'dni_back',
         'face_photo',
+        'phone',
+        'dni',
+        'avatar',
     ];
 
     /**

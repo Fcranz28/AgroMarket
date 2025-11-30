@@ -1,0 +1,54 @@
+/* Autocomplete Suggestions */
+.search-suggestions {
+   position: absolute;
+   top: calc(100% + 5px);
+   left: 0;
+   right: 0;
+   background: var(--card-bg);
+   border-radius: 8px;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   max-height: 400px;
+   overflow-y: auto;
+   z-index: 1000;
+}
+
+.suggestions-list {
+   padding: 8px 0;
+}
+
+.suggestion-item {
+   display: flex;
+   align-items: center;
+   padding: 10px 15px;
+   text-decoration: none;
+   color: var(--text-main);
+   transition: background 0.2s;
+   gap: 12px;
+}
+
+.suggestion-item:hover {
+   background: var(--primary-bg);
+}
+
+.suggestion-item img {
+   width: 50px;
+   height: 50px;
+   object-fit: cover;
+   border-radius: 4px;
+}
+
+.suggestion-info {
+   flex: 1;
+}
+
+.suggestion-name {
+   font-size: 0.9rem;
+   font-weight: 500;
+   margin-bottom: 4px;
+}
+
+.suggestion-price {
+   font-size: 0.85rem;
+   color: var(--accent-color);
+   font-weight: 600;
+}

@@ -19,6 +19,7 @@ Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show'
 Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.submit');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+Route::get('/api/search', [App\Http\Controllers\SearchController::class, 'search'])->name('api.search');
 
 // Checkout & Payment (Guest Access Allowed)
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
@@ -62,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update');
 
+    // Reviews
+    Route::post('/productos/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
     // Onboarding Routes
     Route::prefix('onboarding')->name('onboarding.')->group(function () {
         Route::get('/', [App\Http\Controllers\OnboardingController::class, 'welcome'])->name('welcome');
@@ -92,6 +96,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
         Route::get('/usuarios', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
+        Route::get('/usuarios/{user}/verificar', [App\Http\Controllers\AdminController::class, 'verifyView'])->name('verify.view');
+        Route::post('/usuarios/consultar-dni', [App\Http\Controllers\AdminController::class, 'checkDni'])->name('check.dni');
         Route::post('/usuarios/{user}/verificar/{status}', [App\Http\Controllers\AdminController::class, 'verifyFarmer'])->name('verify');
         Route::post('/usuarios/{user}/ban', [App\Http\Controllers\AdminController::class, 'toggleBan'])->name('ban');
         

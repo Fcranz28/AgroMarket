@@ -1,14 +1,23 @@
-@import 'tailwindcss';
+/* Tailwind CSS removed - causing conflicts with custom CSS */
+/* Using custom CSS framework instead */
 
 /* Estilos base */
 @import 'style.css';
 @import 'style2.css';
 
 /* Estilos específicos de páginas */
-@import 'login.css'; 
-@import 'contacto.css'; 
+@import 'login.css';
+@import 'contacto.css';
 @import 'nosotros.css';
 @import 'categorias.css';
 @import 'pedidos.css';
 @import 'CRUD.css';
-
+@import 'onboarding/farmer.css';
+@import 'layouts/app.css';
+@import 'checkout/index.css';
+@import 'orders/index.css';
+@import 'orders/show.css';
+@import 'products/show.css';
+@import 'search/index.css';
+@import 'about.css';
+@import 'onboarding/welcome.css';

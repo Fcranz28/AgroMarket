@@ -1,0 +1,207 @@
+/* Admin Dashboard Styles */
+:root {
+   --admin-bg: var(--bg-primary);
+   --card-bg: var(--bg-card);
+   --text-main: var(--text-primary);
+   --text-light: var(--text-secondary);
+   --primary: var(--accent-primary);
+   --success: var(--success);
+   --warning: var(--warning);
+   --danger: var(--danger);
+   --border: var(--border-color);
+}
+
+.admin-dashboard-wrapper {
+   padding: 20px;
+   background-color: var(--admin-bg);
+   min-height: 100vh;
+}
+
+/* Grid Layouts */
+.admin-dashboard-grid {
+   display: grid;
+   grid-template-columns: repeat(1, 1fr);
+   gap: 24px;
+   margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+   .admin-dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+   }
+}
+
+@media (min-width: 1024px) {
+   .admin-dashboard-grid {
+      grid-template-columns: repeat(4, 1fr);
+   }
+}
+
+.admin-charts-grid {
+   display: grid;
+   grid-template-columns: 1fr;
+   gap: 24px;
+   margin-bottom: 24px;
+}
+
+@media (min-width: 1024px) {
+   .admin-charts-grid {
+      grid-template-columns: 2fr 1fr;
+   }
+}
+
+/* Cards */
+.admin-stat-card {
+   background-color: var(--card-bg);
+   border: 1px solid var(--border);
+   border-radius: 16px;
+   box-shadow: var(--shadow-sm);
+   padding: 24px;
+   display: flex;
+   flex-direction: column;
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-stat-card:hover {
+   transform: translateY(-5px);
+   box-shadow: var(--shadow-md);
+   border-color: var(--primary);
+}
+
+.admin-stat-icon {
+   width: 46px;
+   height: 46px;
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background-color: var(--bg-hover);
+   margin-bottom: 16px;
+}
+
+.admin-stat-icon i {
+   font-size: 20px;
+   color: var(--primary);
+}
+
+.admin-stat-value {
+   font-size: 24px;
+   font-weight: 700;
+   color: var(--text-main);
+   margin-bottom: 4px;
+}
+
+.admin-stat-label {
+   font-size: 14px;
+   font-weight: 600;
+   color: var(--text-light);
+   text-transform: uppercase;
+   letter-spacing: 0.5px;
+}
+
+.admin-stat-trend {
+   display: flex;
+   align-items: center;
+   gap: 4px;
+   font-size: 12px;
+   font-weight: 500;
+   margin-top: auto;
+   padding-top: 12px;
+}
+
+.trend-up {
+   color: var(--success);
+}
+
+.trend-down {
+   color: var(--danger);
+}
+
+/* Charts Cards */
+.admin-chart-card {
+   background-color: var(--card-bg);
+   border: 1px solid var(--border);
+   border-radius: 16px;
+   padding: 24px;
+   box-shadow: var(--shadow-sm);
+   overflow: hidden;
+}
+
+.admin-chart-header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 20px;
+}
+
+.admin-chart-title {
+   font-size: 18px;
+   font-weight: 700;
+   color: var(--text-main);
+   margin: 0;
+}
+
+.admin-chart-subtitle {
+   font-size: 14px;
+   color: var(--text-light);
+   margin-top: 4px;
+}
+
+.admin-chart-actions {
+   display: flex;
+   gap: 10px;
+}
+
+.admin-chart-btn {
+   background: transparent;
+   border: 1px solid var(--border);
+   color: var(--text-light);
+   padding: 4px 10px;
+   border-radius: 8px;
+   font-size: 12px;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+
+.admin-chart-btn:hover,
+.admin-chart-btn.active {
+   background-color: var(--bg-hover);
+   color: var(--primary);
+   border-color: var(--primary);
+}
+
+/* Target Chart Specifics */
+.admin-target-info {
+   display: flex;
+   justify-content: space-between;
+   margin-top: 20px;
+   text-align: center;
+}
+
+.admin-target-item h4 {
+   font-size: 16px;
+   font-weight: 700;
+   color: var(--text-main);
+   margin: 0 0 4px 0;
+}
+
+.admin-target-item p {
+   font-size: 12px;
+   color: var(--text-light);
+   margin: 0;
+}
+
+/* Full Width Chart */
+.admin-full-width-chart {
+   grid-column: 1 / -1;
+}
+
+.admin-chart-target-container {
+   display: flex;
+   justify-content: center;
+}
+
+.admin-trend-label {
+   color: var(--text-light);
+   margin-left: 4px;
+}
