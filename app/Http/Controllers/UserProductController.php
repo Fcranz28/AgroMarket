@@ -187,9 +187,9 @@ class UserProductController extends Controller
             return back()->withErrors($e->errors())->withInput()->with('error', 'Por favor corrige los errores del formulario.');
         } catch (\Exception $e) {
             \Log::error('Error creating product', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'error' => $e->getMessage(), // In production with APP_DEBUG=false, this should be safe enough, but we avoid dumping full SQL if possible or rely on standard handling.
+                // 'file' => $e->getFile(), // Removed to avoid path leakage
+                // 'line' => $e->getLine()
             ]);
             return back()->withInput()->with('error', 'Error al crear el producto: ' . $e->getMessage());
         }
@@ -367,8 +367,8 @@ class UserProductController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error updating product', [
                 'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                // 'file' => $e->getFile(),
+                // 'line' => $e->getLine()
             ]);
             return back()->withInput()->with('error', 'Error al actualizar el producto: ' . $e->getMessage());
         }

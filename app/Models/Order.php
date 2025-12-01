@@ -20,7 +20,8 @@ class Order extends Model
         'guest_lastname',
         'guest_email',
         'document_type',
-        'document_number'
+        'document_number',
+        'uuid'
     ];
 
     /**
@@ -42,8 +43,33 @@ class Order extends Model
     /**
      * Get the invoice for the order
      */
+    /**
+     * Get the invoice for the order
+     */
     public function invoice()
     {
         return $this->hasOne(Invoice::class);
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            if (empty($order->uuid)) {
+                $order->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
     }
 }

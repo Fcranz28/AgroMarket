@@ -88,7 +88,7 @@
                                     <strong>S/. {{ number_format($order->total, 2) }}</strong>
                                 </div>
                                 <div class="order-actions">
-                                    <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline">
+                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-outline">
                                         Ver Detalles
                                     </a>
                                     

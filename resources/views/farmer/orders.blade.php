@@ -121,7 +121,7 @@
                                     <i class="fas fa-eye"></i> Ver Detalles
                                 </a>
                                 @if(in_array($order->status, ['pending', 'processing']))
-                                    <button class="farmer-btn farmer-btn-primary" onclick="updateOrderStatus({{ $order->id }}, '{{ $order->status }}')">
+                                    <button class="farmer-btn farmer-btn-primary" onclick="updateOrderStatus('{{ $order->uuid }}', '{{ $order->status }}')">
                                         <i class="fas fa-truck"></i> Actualizar Estado
                                     </button>
                                 @endif
