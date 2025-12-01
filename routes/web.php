@@ -16,7 +16,7 @@ use App\Http\Controllers\LoginController; // <-- Lo añadimos para el login
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
-Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.submit');
+Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.submit')->middleware('throttle:3,1');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 Route::get('/api/search', [App\Http\Controllers\SearchController::class, 'search'])->name('api.search');
