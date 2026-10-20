@@ -29,7 +29,7 @@ class UserProductController extends Controller
     public function create()
     {
         if (! auth()->user()->isVerified() && ! auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'Debes ser un agricultor verificado para publicar productos.');
+            return redirect()->route('farmer.dashboard')->with('error', 'Debes ser un agricultor verificado para publicar productos.');
         }
         $categories = \App\Models\Category::all();
 
@@ -67,7 +67,7 @@ class UserProductController extends Controller
         if (! auth()->user()->isVerified() && ! auth()->user()->isAdmin()) {
             \Log::warning('Unauthorized product creation attempt', ['user_id' => auth()->id()]);
 
-            return redirect()->route('dashboard')->with('error', 'Debes ser un agricultor verificado para publicar productos.');
+            return redirect()->route('farmer.dashboard')->with('error', 'Debes ser un agricultor verificado para publicar productos.');
         }
 
         try {
@@ -203,13 +203,13 @@ class UserProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(Product $producto)
     {
-        if ($product->user_id !== auth()->id()) {
+        if ($producto->user_id !== auth()->id()) {
             abort(403, 'No estás autorizado para ver este producto.');
         }
 
-        return view('dashboard.products.show', compact('product'));
+        return view('dashboard.products.show', ['product' => $producto]);
     }
 
     /**

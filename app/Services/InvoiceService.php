@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Support\AmountInWords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -189,7 +190,7 @@ class InvoiceService
         }
 
         // Convert total to words (simplified version)
-        $totalWords = $this->numberToWords($totalImpVenta);
+        $totalWords = AmountInWords::soles($totalImpVenta);
 
         $payload = [
             'ublVersion' => '2.1',
@@ -247,65 +248,5 @@ class InvoiceService
             'xml_url' => null,
             'cdr_url' => null,
         ]);
-    }
-
-    /**
-     * Convert number to Spanish words (simplified version)
-     */
-    private function numberToWords(float $amount): string
-    {
-        $integerPart = floor($amount);
-        $decimalPart = round(($amount - $integerPart) * 100);
-
-        // This is a simplified version
-        // For production, use a library like luecano/numero-a-letras
-        return sprintf('SON %s CON %02d/100 SOLES',
-            $this->simpleNumberToWords($integerPart),
-            $decimalPart
-        );
-    }
-
-    /**
-     * Simple number to words conversion (basic implementation)
-     */
-    private function simpleNumberToWords(int $number): string
-    {
-        // Basic implementation - for production use proper library
-        $units = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
-        $tens = ['', '', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
-        $hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
-
-        if ($number == 0) {
-            return 'CERO';
-        }
-        if ($number == 100) {
-            return 'CIEN';
-        }
-
-        $words = '';
-
-        // Hundreds
-        $h = floor($number / 100);
-        if ($h > 0) {
-            $words .= $hundreds[$h].' ';
-            $number %= 100;
-        }
-
-        // Tens and units
-        if ($number >= 20) {
-            $t = floor($number / 10);
-            $u = $number % 10;
-            $words .= $tens[$t];
-            if ($u > 0) {
-                $words .= ' Y '.$units[$u];
-            }
-        } elseif ($number >= 10) {
-            $special = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
-            $words .= $special[$number - 10];
-        } elseif ($number > 0) {
-            $words .= $units[$number];
-        }
-
-        return trim($words);
     }
 }
