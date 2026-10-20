@@ -218,7 +218,6 @@
 @endpush
 
 @push('scripts')
-@push('scripts')
     @vite(['resources/js/products/show.js'])
 @endpush
 @endsection
