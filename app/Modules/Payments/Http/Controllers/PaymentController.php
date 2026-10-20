@@ -4,8 +4,6 @@ namespace App\Modules\Payments\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Catalog\Exceptions\InsufficientStockException;
-use App\Modules\Invoicing\Models\Invoice;
-use App\Modules\Invoicing\Services\InvoiceService;
 use App\Modules\Orders\Actions\PlaceOrderAction;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
@@ -116,7 +114,7 @@ class PaymentController extends Controller
                 new OA\Property(property: 'success', type: 'boolean', example: true),
                 new OA\Property(property: 'order_id', type: 'string', format: 'uuid'),
                 new OA\Property(property: 'redirect', type: 'string', format: 'uri'),
-                new OA\Property(property: 'invoice_url', type: 'string', format: 'uri', nullable: true, description: 'Solo para invitados: URL firmada (7 días) del comprobante'),
+                new OA\Property(property: 'invoice_url', type: 'string', format: 'uri', nullable: true, description: 'Solo para invitados: URL firmada (7 días) del comprobante. Muestra "en proceso" hasta que el worker de colas lo genera.'),
             ])),
             new OA\Response(response: 400, description: 'El pago no está completado', content: new OA\JsonContent(ref: '#/components/schemas/Error')),
             new OA\Response(response: 409, description: 'Pago ya registrado o sin stock (se reembolsa)', content: new OA\JsonContent(ref: '#/components/schemas/Error')),
@@ -170,15 +168,15 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
         }
 
-        $invoice = $this->generateInvoice($order);
-
+        // The receipt is issued in the background (OrderPlaced → Invoicing); guests get a
+        // signed link that waits until it is ready.
         return response()->json([
             'success' => true,
             'order_id' => $order->uuid,
             'redirect' => Auth::check() ? route('orders.show', $order) : route('home'),
-            'invoice_url' => $invoice && ! Auth::check()
-                ? URL::temporarySignedRoute('invoice.guest-download', now()->addDays(7), $invoice)
-                : null,
+            'invoice_url' => Auth::check()
+                ? null
+                : URL::temporarySignedRoute('orders.guest-invoice', now()->addDays(7), $order),
         ]);
     }
 
@@ -233,20 +231,6 @@ class PaymentController extends Controller
             $this->gateway->refund($paymentIntentId);
         } catch (Throwable $exception) {
             Log::critical('Automatic refund failed', ['payment_intent' => $paymentIntentId, 'error' => $exception->getMessage()]);
-        }
-    }
-
-    /**
-     * Invoice generation must never undo a paid order, so it runs after the order is committed.
-     */
-    private function generateInvoice(Order $order): ?Invoice
-    {
-        try {
-            return app(InvoiceService::class)->generateInvoice($order);
-        } catch (Throwable $exception) {
-            Log::error('Invoice generation failed', ['order_id' => $order->id, 'error' => $exception->getMessage()]);
-
-            return null;
         }
     }
 }

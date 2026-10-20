@@ -4,6 +4,7 @@ namespace App\Modules\Orders\Actions;
 
 use App\Modules\Catalog\Exceptions\InsufficientStockException;
 use App\Modules\Catalog\Services\StockService;
+use App\Modules\Orders\Events\OrderPlaced;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -14,7 +15,8 @@ class PlaceOrderAction
     public function __construct(private StockService $stock) {}
 
     /**
-     * Take the stock and create a paid order with its items in a single transaction.
+     * Take the stock and create a paid order with its items in a single transaction, then
+     * announce it with OrderPlaced (after the commit, so queued listeners see the order).
      *
      * @param  Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, quantity: int, price: string}>  $lines  priced by CartPricingService
      * @param  array{shipping_address: string, phone: string, guest_name: string, guest_lastname: string, guest_email: string, document_type: string, document_number: string}  $customer
@@ -24,7 +26,7 @@ class PlaceOrderAction
      */
     public function execute(Collection $lines, int $totalCents, array $customer, string $paymentIntentId, ?int $userId): Order
     {
-        return DB::transaction(function () use ($lines, $totalCents, $customer, $paymentIntentId, $userId) {
+        $order = DB::transaction(function () use ($lines, $totalCents, $customer, $paymentIntentId, $userId) {
             $this->stock->reserve($lines);
 
             $order = Order::create([
@@ -40,5 +42,9 @@ class PlaceOrderAction
 
             return $order;
         });
+
+        OrderPlaced::dispatch($order);
+
+        return $order;
     }
 }

@@ -4,10 +4,12 @@ namespace App\Modules\Invoicing\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Invoicing\Models\Invoice;
+use App\Modules\Orders\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use OpenApi\Attributes as OA;
 
 class InvoiceController extends Controller
@@ -30,6 +32,23 @@ class InvoiceController extends Controller
         abort_if($invoice->order->user_id !== null, 403);
 
         return $this->pdfResponse($invoice);
+    }
+
+    /**
+     * Guest receipt page by order (signed URL returned right after paying). The receipt is
+     * issued by a queue worker: until it exists the page reloads itself, then it shows a
+     * signed download link.
+     */
+    public function guestReceipt(Order $order): Response
+    {
+        abort_if($order->user_id !== null, 403);
+
+        $invoice = $order->invoice;
+        $isReady = $invoice && ! $invoice->isPending();
+
+        return response()->view('invoices.guest', [
+            'downloadUrl' => $isReady ? URL::temporarySignedRoute('invoice.guest-download', now()->addDay(), $invoice) : null,
+        ], $isReady ? 200 : 202);
     }
 
     private function pdfResponse(Invoice $invoice): Response|RedirectResponse

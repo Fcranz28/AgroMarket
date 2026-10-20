@@ -169,14 +169,11 @@ async function handleSubmit(e) {
          // Clear cart
          localStorage.removeItem('carrito');
 
-         // Guests receive a signed link to download their receipt
+         // Guests receive a signed link to their receipt, which is issued in the background:
+         // the link shows a waiting page until it is ready.
          if (data.invoice_url) {
-            const link = document.createElement('a');
-            link.href = data.invoice_url;
-            link.download = '';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            window.location.href = data.invoice_url;
+            return;
          }
 
          // Redirect to order confirmation
