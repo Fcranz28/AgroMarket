@@ -18,10 +18,10 @@ return new class extends Migration
             } else {
                 $table->string('address');
             }
-            
+
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
-            
+
             // Drop unused columns if they exist
             $table->dropColumn(['city', 'country', 'phone']);
         });

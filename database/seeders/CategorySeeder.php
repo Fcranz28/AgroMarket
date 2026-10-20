@@ -27,7 +27,7 @@ class CategorySeeder extends Seeder
             'Frutos Secos',
             'Semillas',
             'Flores y Plantas',
-            'Procesados Artesanales'
+            'Procesados Artesanales',
         ];
 
         foreach ($categories as $category) {

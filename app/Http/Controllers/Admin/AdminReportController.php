@@ -20,6 +20,7 @@ class AdminReportController extends Controller
     public function show(Report $report)
     {
         $report->load(['user', 'product.user', 'order']);
+
         return response()->json($report);
     }
 
@@ -27,12 +28,12 @@ class AdminReportController extends Controller
     {
         $request->validate([
             'status' => 'required|in:pending,reviewed,resolved,dismissed',
-            'admin_notes' => 'nullable|string'
+            'admin_notes' => 'nullable|string',
         ]);
 
         $report->update([
             'status' => $request->status,
-            'admin_notes' => $request->admin_notes
+            'admin_notes' => $request->admin_notes,
         ]);
 
         return response()->json(['message' => 'Reporte actualizado correctamente']);

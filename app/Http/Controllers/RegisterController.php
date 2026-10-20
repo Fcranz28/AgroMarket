@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers; // <-- Revisa si esta es la carpeta
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException; // Para manejar errores
+use Illuminate\Support\Facades\Hash;
+
+// Para manejar errores
 
 class RegisterController extends Controller
 {

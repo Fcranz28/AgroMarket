@@ -11,6 +11,7 @@ class AddressController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         return response()->json($user->addresses);
     }
 
