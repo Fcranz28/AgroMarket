@@ -12,6 +12,17 @@ async function fetchProductos() {
     return _productosCache;
 }
 
+/**
+ * A cart line is a product in a given unit; the same product can be in the cart in several units.
+ */
+function cartKey(item) {
+    return `${item.id}:${item.unit_id ?? ''}`;
+}
+
+function findCartItem(key) {
+    return carrito.find(item => cartKey(item) === key);
+}
+
 function updateCartCount() {
     const cartCount = document.querySelector('.cart-count');
     const cartCountMobile = document.querySelector('.cart-count-mobile');
@@ -26,7 +37,7 @@ function updateCartCount() {
 }
 
 function addToCart(producto) {
-    const existingProduct = carrito.find(item => item.id === producto.id);
+    const existingProduct = findCartItem(cartKey(producto));
     if (existingProduct) {
         existingProduct.cantidad += 1;
     } else {
@@ -49,8 +60,8 @@ function addToCart(producto) {
     });
 }
 
-function removeFromCart(productId) {
-    const producto = carrito.find(item => item.id === productId);
+function removeFromCart(key) {
+    const producto = findCartItem(key);
     if (producto) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -61,7 +72,7 @@ function removeFromCart(productId) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                carrito = carrito.filter(item => item.id !== productId);
+                carrito = carrito.filter(item => cartKey(item) !== key);
                 updateCartSidebar();
                 updateCartCount();
                 saveCartToLocalStorage();
@@ -79,8 +90,8 @@ function removeFromCart(productId) {
     }
 }
 
-function updateQuantity(productId, newQuantity) {
-    const product = carrito.find(item => item.id === productId);
+function updateQuantity(key, newQuantity) {
+    const product = findCartItem(key);
     if (product) {
         if (newQuantity > 0) {
             product.cantidad = newQuantity;
@@ -88,7 +99,7 @@ function updateQuantity(productId, newQuantity) {
             updateCartCount();
             saveCartToLocalStorage();
         } else {
-            removeFromCart(productId);
+            removeFromCart(key);
         }
     }
 }
@@ -115,12 +126,12 @@ function updateCartSidebar() {
 
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-item';
-        itemElement.dataset.productId = item.id;
+        itemElement.dataset.cartKey = cartKey(item);
         itemElement.innerHTML = `
                 <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}">
                 <div class="cart-item-details">
                     <h4>${escapeHtml(item.name)}</h4>
-                    <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
+                    <p>S/. ${Number(item.price || 0).toFixed(2)} /${escapeHtml(item.unit)}</p>
                     <div class="quantity-controls">
                         <button class="qty-btn qty-decrease" data-action="decrease"><i class="fas fa-minus"></i></button>
                         <span class="qty-display">${escapeHtml(item.cantidad)}</span>
@@ -237,15 +248,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const cartItem = e.target.closest('.cart-item');
             if (!cartItem) return;
 
-            const productId = parseInt(cartItem.dataset.productId, 10);
+            const key = cartItem.dataset.cartKey;
+            const item = findCartItem(key);
             const action = e.target.closest('button')?.dataset.action;
 
+            if (!item) return;
+
             if (action === 'increase') {
-                updateQuantity(productId, carrito.find(item => item.id === productId).cantidad + 1);
+                updateQuantity(key, item.cantidad + 1);
             } else if (action === 'decrease') {
-                updateQuantity(productId, carrito.find(item => item.id === productId).cantidad - 1);
+                updateQuantity(key, item.cantidad - 1);
             } else if (action === 'remove') {
-                removeFromCart(productId);
+                removeFromCart(key);
             }
         });
     }
@@ -256,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for custom event from product detail page
     document.addEventListener('add-to-cart-detail', (e) => {
         const { product, quantity } = e.detail;
-        const existingProduct = carrito.find(item => item.id === product.id && item.unit === product.unit);
+        const existingProduct = findCartItem(cartKey(product));
 
         if (existingProduct) {
             existingProduct.cantidad += quantity;

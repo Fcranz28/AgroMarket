@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const increaseBtn = document.getElementById('increaseQty');
     const addToCartBtn = document.getElementById('addToCartBtn');
     const priceDisplay = document.querySelector('.product-detail-price');
+    let selectedUnitId = null;
 
     // --- Gallery Logic ---
     const mainImage = document.getElementById('mainImage');
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             selectedUnitInput.value = unit;
             selectedPriceInput.value = price;
+            selectedUnitId = this.dataset.unitId ? parseInt(this.dataset.unitId, 10) : null;
 
             // Update UI
             updateStock(stock);
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const productToAdd = {
             ...product,
             unit: selectedUnit,
+            unit_id: selectedUnitId,
             price: selectedPrice, // Use the selected unit price
             cantidad: quantity
         };

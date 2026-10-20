@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminProductRequest;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class ProductCrudController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $products = Product::with('category')->get();
 
@@ -24,7 +27,7 @@ class ProductCrudController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
         $categories = Category::all();
 
@@ -34,56 +37,21 @@ class ProductCrudController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(AdminProductRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'unit' => 'required|array|min:1',
-            'stock' => 'required|array|min:1',
-            'price' => 'required|array|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        DB::transaction(function () use ($request) {
+            $product = Product::create([
+                ...$request->safe()->only(['category_id', 'name', 'description']),
+                'user_id' => $request->user()->id,
+                'slug' => Str::slug($request->validated('name')).'-'.Str::random(8),
+                'unit' => $request->units()[0]['unit'],
+                'price' => 0,
+                'stock' => 0,
+                'image_path' => $request->file('image')?->store('products', 'public'),
+            ]);
 
-        // Procesar imagen
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            // Guardar en storage/app/public/products
-            $imagePath = $file->store('products', 'public');
-        }
-
-        // Crear slug
-        $slug = Str::slug($request->name).'-'.Str::random(5);
-
-        // Calculate base values
-        $basePrice = min($request->price);
-        $baseUnit = $request->unit[0];
-        $baseStock = array_sum($request->stock);
-
-        $product = Product::create([
-            'user_id' => $request->user()->id,
-            'category_id' => $validated['category_id'],
-            'name' => $validated['name'],
-            'slug' => $slug,
-            'description' => $validated['description'],
-            'price' => $basePrice,
-            'unit' => $baseUnit,
-            'stock' => $baseStock,
-            'image_path' => $imagePath,
-        ]);
-
-        // Save product units
-        foreach ($request->unit as $key => $unit) {
-            if (isset($request->stock[$key]) && isset($request->price[$key])) {
-                $product->units()->create([
-                    'unit' => $unit,
-                    'stock' => $request->stock[$key],
-                    'price' => $request->price[$key],
-                ]);
-            }
-        }
+            $product->syncUnits($request->units());
+        });
 
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto creado correctamente');
@@ -92,85 +60,43 @@ class ProductCrudController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Product $producto): View
     {
-        $product = Product::findOrFail($id);
-
-        return view('admin.products.show', compact('product'));
+        return view('admin.products.show', ['product' => $producto]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Product $producto): View
     {
-        $product = Product::findOrFail($id);
         $categories = Category::all();
 
-        return view('admin.products.edit', compact('product', 'categories'));
+        return view('admin.products.edit', ['product' => $producto, 'categories' => $categories]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(AdminProductRequest $request, Product $producto): RedirectResponse
     {
-        $product = Product::findOrFail($id);
+        $oldImagePath = $producto->image_path;
+        $newImagePath = $request->file('image')?->store('products', 'public');
 
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'unit' => 'required|array|min:1',
-            'stock' => 'required|array|min:1',
-            'price' => 'required|array|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        DB::transaction(function () use ($request, $producto, $newImagePath) {
+            $producto->fill($request->safe()->only(['category_id', 'name', 'description']));
 
-        // Use database transaction for data integrity
-        \DB::transaction(function () use ($request, $validated, $product) {
-            $oldImagePath = $product->image_path;
-            $newImagePath = null;
-
-            // Process new image if exists
-            if ($request->hasFile('image')) {
-                $newImagePath = $request->file('image')->store('products', 'public');
-                $product->image_path = $newImagePath;
+            if ($newImagePath) {
+                $producto->image_path = $newImagePath;
             }
 
-            // Recalculate base values from new units
-            $basePrice = min($request->price);
-            $baseUnit = $request->unit[0];
-            $baseStock = array_sum($request->stock);
-
-            $product->update([
-                'category_id' => $validated['category_id'],
-                'name' => $validated['name'],
-                'description' => $validated['description'],
-                'price' => $basePrice,
-                'unit' => $baseUnit,
-                'stock' => $baseStock,
-                'image_path' => $product->image_path,
-            ]);
-
-            // Sync product units: delete old units and create new ones
-            $product->units()->delete();
-
-            foreach ($request->unit as $key => $unit) {
-                if (isset($request->stock[$key]) && isset($request->price[$key])) {
-                    $product->units()->create([
-                        'unit' => $unit,
-                        'stock' => $request->stock[$key],
-                        'price' => $request->price[$key],
-                    ]);
-                }
-            }
-
-            // Only delete old image if transaction was successful and we have a new image
-            if ($newImagePath && $oldImagePath) {
-                Storage::disk('public')->delete($oldImagePath);
-            }
+            $producto->save();
+            $producto->syncUnits($request->units());
         });
+
+        if ($newImagePath && $oldImagePath) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
 
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto actualizado correctamente');
@@ -179,16 +105,14 @@ class ProductCrudController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Product $producto): RedirectResponse
     {
-        $product = Product::findOrFail($id);
-
         Storage::disk('public')->delete(array_filter([
-            $product->image_path,
-            ...$product->images()->pluck('image_path'),
+            $producto->image_path,
+            ...$producto->images()->pluck('image_path'),
         ]));
 
-        $product->delete();
+        $producto->delete();
 
         return redirect()->route('admin.productos.index')
             ->with('success', 'Producto eliminado correctamente');

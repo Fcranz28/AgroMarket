@@ -150,11 +150,11 @@
 
                 <div class="checkout-summary-breakdown">
                     <div class="checkout-summary-row">
-                        <span>Subtotal</span>
+                        <span>Op. gravada</span>
                         <span id="subtotal-amount">S/. 0.00</span>
                     </div>
                     <div class="checkout-summary-row">
-                        <span>IGV (18%)</span>
+                        <span>IGV (18%, incluido)</span>
                         <span id="tax-amount">S/. 0.00</span>
                     </div>
                     <div class="checkout-summary-row checkout-total-row">

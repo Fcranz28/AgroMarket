@@ -3,39 +3,75 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductUnit;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class CartPricingService
 {
     /**
-     * Price a cart using server-side product data only.
+     * Price a cart using server-side product data only. Prices already include IGV.
      *
-     * Duplicate products are merged so the same product cannot be priced twice.
+     * Each line is a product in a unit. Lines without a unit use the product's cheapest
+     * unit (the price shown in the catalog), or the product itself for legacy products
+     * without units. Repeated lines are merged.
      *
-     * @param  array<int, array{id: int|string, cantidad: int|string}>  $cart
-     * @return array{lines: Collection<int, array{product_id: int, quantity: int, price: string}>, total_cents: int, hash: string}
+     * @param  array<int, array{id: int|string, unit_id?: int|string|null, cantidad: int|string}>  $cart
+     * @return array{lines: Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, quantity: int, price: string}>, total_cents: int, hash: string}
+     *
+     * @throws ValidationException
      */
     public function price(array $cart): array
     {
-        $quantities = collect($cart)
-            ->groupBy(fn (array $item) => (int) $item['id'])
-            ->map(fn (Collection $items) => $items->sum(fn (array $item) => (int) $item['cantidad']))
-            ->sortKeys();
+        $products = Product::query()
+            ->with('units')
+            ->whereIn('id', collect($cart)->pluck('id')->map(fn ($id) => (int) $id))
+            ->get()
+            ->keyBy('id');
 
-        $products = Product::query()->whereIn('id', $quantities->keys())->get()->keyBy('id');
-
-        $lines = $quantities->map(fn (int $quantity, int $productId) => [
-            'product_id' => $productId,
-            'quantity' => $quantity,
-            'price' => (string) $products[$productId]->price,
-        ])->values();
+        $lines = collect($cart)
+            ->map(fn (array $item) => [
+                ...$this->resolveUnit($products[(int) $item['id']], $item['unit_id'] ?? null),
+                'quantity' => (int) $item['cantidad'],
+            ])
+            ->groupBy(fn (array $line) => "{$line['product_id']}:{$line['product_unit_id']}")
+            ->map(fn (Collection $group) => [...$group->first(), 'quantity' => $group->sum('quantity')])
+            ->sortKeys()
+            ->values();
 
         $totalCents = $lines->sum(fn (array $line) => $this->toCents($line['price']) * $line['quantity']);
+
+        $hashSource = $lines->map(fn (array $line) => [$line['product_id'], $line['product_unit_id'], $line['quantity']]);
 
         return [
             'lines' => $lines,
             'total_cents' => $totalCents,
-            'hash' => hash('sha256', $quantities->toJson()),
+            'hash' => hash('sha256', $hashSource->toJson()),
+        ];
+    }
+
+    /**
+     * @return array{product_id: int, product_unit_id: int|null, unit: string, price: string}
+     *
+     * @throws ValidationException
+     */
+    private function resolveUnit(Product $product, int|string|null $unitId): array
+    {
+        $unit = filled($unitId)
+            ? $product->units->firstWhere('id', (int) $unitId)
+            : $product->units->sortBy(fn (ProductUnit $unit) => (float) $unit->price)->first();
+
+        if (filled($unitId) && ! $unit) {
+            throw ValidationException::withMessages([
+                'cart' => "La unidad seleccionada para {$product->name} ya no está disponible.",
+            ]);
+        }
+
+        return [
+            'product_id' => $product->id,
+            'product_unit_id' => $unit?->id,
+            'unit' => $unit->unit ?? $product->unit,
+            'price' => (string) ($unit->price ?? $product->price),
         ];
     }
 

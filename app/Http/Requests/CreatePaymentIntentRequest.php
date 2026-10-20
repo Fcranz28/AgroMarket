@@ -24,6 +24,7 @@ class CreatePaymentIntentRequest extends FormRequest
         return [
             'cart' => 'required|array|min:1|max:50',
             'cart.*.id' => 'required|integer|exists:products,id',
+            'cart.*.unit_id' => 'nullable|integer|exists:product_units,id',
             'cart.*.cantidad' => 'required|integer|min:1|max:1000',
         ];
     }
@@ -40,6 +41,7 @@ class CreatePaymentIntentRequest extends FormRequest
             'cart.min' => 'Tu carrito está vacío.',
             'cart.max' => 'Tu carrito tiene demasiados productos.',
             'cart.*.id.exists' => 'Uno de los productos de tu carrito ya no está disponible.',
+            'cart.*.unit_id.exists' => 'Una de las unidades de tu carrito ya no está disponible.',
             'cart.*.cantidad.min' => 'La cantidad mínima por producto es 1.',
             'cart.*.cantidad.max' => 'La cantidad máxima por producto es 1000.',
         ];
