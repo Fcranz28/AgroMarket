@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Catalog\Models;
 
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use App\Modules\Catalog\Database\Factories\ProductFactory;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[UseFactory(ProductFactory::class)]
 class Product extends Model
 {
     use HasFactory, SoftDeletes;

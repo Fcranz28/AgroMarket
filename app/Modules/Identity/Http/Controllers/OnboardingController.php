@@ -5,7 +5,6 @@ namespace App\Modules\Identity\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Identity\Http\Requests\FarmerVerificationRequest;
 use App\Modules\Identity\Http\Requests\SelectRoleRequest;
-use App\Models\Category;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,11 +31,12 @@ class OnboardingController extends Controller
             : redirect()->route('onboarding.user');
     }
 
+    /**
+     * The category list is provided by the Catalog module (view composer).
+     */
     public function userPreferences(): View
     {
-        $categories = Category::all();
-
-        return view('onboarding.user', compact('categories'));
+        return view('onboarding.user');
     }
 
     public function savePreferences(Request $request): RedirectResponse

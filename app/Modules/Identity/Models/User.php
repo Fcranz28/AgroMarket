@@ -2,8 +2,6 @@
 
 namespace App\Modules\Identity\Models;
 
-use App\Models\Product;
-use App\Models\Report;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -75,19 +73,13 @@ class User extends Authenticatable
         ];
     }
 
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-
+    /**
+     * Relations owned by other modules (products, reportsReceived) are registered by those
+     * modules with User::resolveRelationUsing(), so Identity does not depend on them.
+     */
     public function addresses()
     {
         return $this->hasMany(Address::class);
-    }
-
-    public function reportsReceived()
-    {
-        return $this->hasManyThrough(Report::class, Product::class);
     }
 
     // Helpers

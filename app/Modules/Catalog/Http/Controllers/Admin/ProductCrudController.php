@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Modules\Catalog\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminProductRequest;
-use App\Models\Category;
-use App\Models\Product;
+use App\Modules\Catalog\Http\Requests\AdminProductRequest;
+use App\Modules\Catalog\Models\Category;
+use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -103,7 +103,7 @@ class ProductCrudController extends Controller
     }
 
     /**
-     * Remove the specified resource from the catalog (soft delete, see UserProductController::destroy).
+     * Remove the specified resource from the catalog (soft delete, see FarmerProductController::destroy).
      */
     public function destroy(Product $producto): RedirectResponse
     {

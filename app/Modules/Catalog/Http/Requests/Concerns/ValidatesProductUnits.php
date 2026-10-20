@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Concerns;
+namespace App\Modules\Catalog\Http\Requests\Concerns;
 
 use Illuminate\Validation\Validator;
 

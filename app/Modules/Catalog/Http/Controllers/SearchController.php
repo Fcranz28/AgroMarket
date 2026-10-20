@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Catalog\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Product;
+use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Models\Category;
+use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;

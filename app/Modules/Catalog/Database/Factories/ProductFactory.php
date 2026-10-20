@@ -1,17 +1,25 @@
 <?php
 
-namespace Database\Factories;
+namespace App\Modules\Catalog\Database\Factories;
 
-use App\Models\Category;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\Category;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Catalog\Models\Product>
  */
 class ProductFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<Product>
+     */
+    protected $model = Product::class;
+
     /**
      * Define the model's default state.
      *

@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Category;
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\ProductUnit;
+use App\Modules\Catalog\Models\Category;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Identity\Models\User;
 use App\Services\CartPricingService;
 use App\Services\InvoiceService;

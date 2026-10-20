@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Category;
+use App\Modules\Catalog\Models\Category;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

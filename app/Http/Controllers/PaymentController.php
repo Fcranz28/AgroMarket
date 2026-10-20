@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\InsufficientStockException;
 use App\Http\Requests\CreatePaymentIntentRequest;
 use App\Http\Requests\ProcessPaymentRequest;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Modules\Catalog\Exceptions\InsufficientStockException;
+use App\Modules\Catalog\Services\StockService;
 use App\Services\CartPricingService;
 use App\Services\InvoiceService;
 use App\Services\PaymentGateway;
-use App\Services\StockService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

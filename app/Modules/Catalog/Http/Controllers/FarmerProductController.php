@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Catalog\Http\Controllers;
 
-use App\Http\Requests\FarmerProductRequest;
-use App\Models\Category;
-use App\Models\Product;
+use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Http\Requests\FarmerProductRequest;
+use App\Modules\Catalog\Models\Category;
+use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-class UserProductController extends Controller
+class FarmerProductController extends Controller
 {
     /**
      * Display a listing of the resource.

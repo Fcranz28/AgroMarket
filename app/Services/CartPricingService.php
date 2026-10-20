@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\ProductUnit;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductUnit;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 

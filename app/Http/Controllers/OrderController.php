@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateOrderStatusRequest;
 use App\Models\Order;
+use App\Modules\Catalog\Services\StockService;
 use App\Services\PaymentGateway;
-use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
