@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Modules\Moderation\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Report;
+use App\Modules\Moderation\Models\Report;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 

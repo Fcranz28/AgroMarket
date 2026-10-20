@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Moderation\Http\Controllers;
 
-use App\Http\Requests\StoreReportRequest;
-use App\Models\Report;
+use App\Http\Controllers\Controller;
+use App\Modules\Moderation\Http\Requests\StoreReportRequest;
+use App\Modules\Moderation\Models\Report;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
