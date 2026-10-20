@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-<meta name="stripe-key" content="{{ env('STRIPE_KEY') }}">
+<meta name="stripe-key" content="{{ config('services.stripe.key') }}">
 @endpush
 
 @section('content')

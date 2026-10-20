@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Product;
 use App\Policies\ProductPolicy;
 use App\Services\FirebaseTokenVerifier;
+use App\Services\PaymentGateway;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(FirebaseTokenVerifier::class, fn () => new FirebaseTokenVerifier(
             config('services.firebase.project_id'),
+        ));
+
+        $this->app->singleton(PaymentGateway::class, fn () => new PaymentGateway(
+            config('services.stripe.secret'),
+            config('services.stripe.currency'),
         ));
     }
 
