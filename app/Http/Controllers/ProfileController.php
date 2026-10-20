@@ -18,19 +18,19 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'dni' => 'nullable|string|max:8',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists and it's not an OAuth URL
-            if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-                \Storage::delete('public/' . $user->avatar);
+            if ($user->avatar && ! filter_var($user->avatar, FILTER_VALIDATE_URL)) {
+                \Storage::delete('public/'.$user->avatar);
             }
-            
+
             // Store new avatar
             $path = $request->file('avatar')->store('avatars', 'public');
             $validated['avatar'] = $path;
@@ -55,15 +55,15 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         // Verify current password
-        if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors([
-                'current_password' => 'La contraseña actual no es correcta'
+                'current_password' => 'La contraseña actual no es correcta',
             ]);
         }
 
         // Update password
         $user->update([
-            'password' => Hash::make($validated['password'])
+            'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()->route('orders.index')

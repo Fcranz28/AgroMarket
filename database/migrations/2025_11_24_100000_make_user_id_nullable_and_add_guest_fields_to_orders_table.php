@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             // Make user_id nullable
             $table->unsignedBigInteger('user_id')->nullable()->change();
-            
+
             // Add guest fields
             $table->string('guest_name')->nullable()->after('user_id');
             $table->string('guest_lastname')->nullable()->after('guest_name');
@@ -31,18 +31,18 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             // Revert user_id to not null (CAUTION: this might fail if there are null values)
-            // We won't strictly enforce not null on rollback to avoid data loss issues during dev, 
+            // We won't strictly enforce not null on rollback to avoid data loss issues during dev,
             // or we could delete guest orders. For now, just dropping columns.
-            
+
             $table->dropColumn([
                 'guest_name',
                 'guest_lastname',
                 'guest_email',
                 'document_type',
-                'document_number'
+                'document_number',
             ]);
-            
-            // $table->unsignedBigInteger('user_id')->nullable(false)->change(); 
+
+            // $table->unsignedBigInteger('user_id')->nullable(false)->change();
         });
     }
 };

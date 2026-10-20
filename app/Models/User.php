@@ -13,12 +13,17 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     const ROLE_USER = 'user';
+
     const ROLE_FARMER = 'farmer';
+
     const ROLE_ADMIN = 'admin';
 
     const STATUS_NONE = 'none';
+
     const STATUS_PENDING = 'pending';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_REJECTED = 'rejected';
 
     /**
@@ -112,12 +117,14 @@ class User extends Authenticatable
     public function getFirstnameAttribute(): string
     {
         $parts = explode(' ', $this->name);
+
         return $parts[0];
     }
 
     public function getLastnameAttribute(): string
     {
         $parts = explode(' ', $this->name);
+
         return count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
     }
 }
