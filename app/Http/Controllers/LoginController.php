@@ -30,7 +30,7 @@ class LoginController extends Controller
         ]);
 
         // Rate Limiting Key
-        $throttleKey = Str::lower($request->email) . '|' . $request->ip();
+        $throttleKey = Str::lower($request->email).'|'.$request->ip();
 
         // Check if too many attempts
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
@@ -47,7 +47,7 @@ class LoginController extends Controller
         // 2. Intentar iniciar sesión
         // El 'remember' es para la casilla "Recuérdame"
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            
+
             // Clear rate limiter on success
             RateLimiter::clear($throttleKey);
 
@@ -55,6 +55,20 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+
+            if ($user->is_banned) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                throw ValidationException::withMessages([
+                    'email' => 'Tu cuenta ha sido suspendida.',
+                ]);
+            }
+
+            if (! $user->onboarding_completed && ! $user->isAdmin()) {
+                return redirect()->route('onboarding.welcome');
+            }
 
             if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');

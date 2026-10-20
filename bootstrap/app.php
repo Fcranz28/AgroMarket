@@ -13,11 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
             'role' => \App\Http\Middleware\CheckRole::class,
+            'onboarding.pending' => \App\Http\Middleware\EnsureOnboardingPending::class,
         ]);
 
         $middleware->web(append: [
+            \App\Http\Middleware\EnsureNotBanned::class,
             \App\Http\Middleware\EnsureOnboarding::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);

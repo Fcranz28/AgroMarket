@@ -17,7 +17,7 @@ beforeEach(function () {
 });
 
 it('stores farmer verification documents on the private disk', function () {
-    $user = User::factory()->pendingOnboarding()->create();
+    $user = User::factory()->farmer()->pendingOnboarding()->create();
 
     $this->actingAs($user)->post(route('onboarding.verification'), [
         'face_photo' => UploadedFile::fake()->image('selfie.jpg'),
