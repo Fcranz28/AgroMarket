@@ -15,29 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            AdminSeeder::class,
+            CategorySeeder::class,
+        ]);
 
-        // Create Admin User
-        User::firstOrCreate(
-            ['email' => 'admin@agromarket.com'],
-            [
-                'name' => 'Administrador',
-                'password' => bcrypt('password'),
-                'role' => User::ROLE_ADMIN,
-                'verification_status' => User::STATUS_APPROVED,
-            ]
-        );
-
-        // Create Test User
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            [
+        if (app()->environment('local')) {
+            User::factory()->create([
                 'name' => 'Test User',
-                'password' => bcrypt('password'),
-                'role' => User::ROLE_USER,
-            ]
-        );
-
-        $this->call(CategorySeeder::class);
+                'email' => 'test@example.com',
+            ]);
+        }
     }
 }

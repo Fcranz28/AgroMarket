@@ -4,21 +4,26 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\Order;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class InvoiceService
 {
     private const FACTURA = '01';
+
     private const BOLETA = '03';
-    
+
     private string $apiUrl;
+
     private string $apiToken;
+
     private string $companyRuc;
+
     private string $companyRazonSocial;
+
     private string $serieFactura;
+
     private string $serieBoleta;
 
     public function __construct()
@@ -76,17 +81,17 @@ class InvoiceService
             Log::error('Invoice generation failed', [
                 'order_id' => $order->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             // If invoice was created, mark as error
             if (isset($invoice)) {
                 $invoice->update([
                     'status' => 'error',
-                    'error_message' => $e->getMessage()
+                    'error_message' => $e->getMessage(),
                 ]);
             }
-            
+
             throw $e;
         }
     }
@@ -141,7 +146,7 @@ class InvoiceService
             $precioConIgv = $precioBase * 1.18;
 
             $details[] = [
-                'codProducto' => 'PROD' . $item->product_id,
+                'codProducto' => 'PROD'.$item->product_id,
                 'unidad' => 'NIU', // Unidad de medida
                 'descripcion' => $item->product->name ?? 'Producto',
                 'cantidad' => floatval($item->quantity),
@@ -152,19 +157,19 @@ class InvoiceService
                 'igv' => round($igv, 2),
                 'tipAfeIgv' => '10', // Gravado - Operación Onerosa
                 'totalImpuestos' => round($igv, 2),
-                'mtoPrecioUnitario' => round($precioConIgv, 2)
+                'mtoPrecioUnitario' => round($precioConIgv, 2),
             ];
         }
 
         // Get customer data
-        $customerName = $order->user_id 
-            ? $order->user->name 
-            : trim($order->guest_name . ' ' . $order->guest_lastname);
-        
+        $customerName = $order->user_id
+            ? $order->user->name
+            : trim($order->guest_name.' '.$order->guest_lastname);
+
         $customerEmail = $order->user_id ? $order->user->email : $order->guest_email;
 
         // Determine customer document type for API
-        $clientTipoDoc = match($order->document_type) {
+        $clientTipoDoc = match ($order->document_type) {
             'RUC' => '6',
             'DNI' => '1',
             'Pasaporte' => '7',
@@ -195,7 +200,7 @@ class InvoiceService
             'fechaEmision' => now()->format('Y-m-d\TH:i:sP'),
             'formaPago' => [
                 'moneda' => 'PEN',
-                'tipo' => 'Contado'
+                'tipo' => 'Contado',
             ],
             'tipoMoneda' => 'PEN',
             'client' => [
@@ -203,12 +208,12 @@ class InvoiceService
                 'numDoc' => $order->document_number,
                 'rznSocial' => $customerName,
                 'address' => [
-                    'direccion' => $order->shipping_address ?? ''
-                ]
+                    'direccion' => $order->shipping_address ?? '',
+                ],
             ],
             'company' => [
                 'ruc' => $this->companyRuc,
-                'razonSocial' => $this->companyRazonSocial
+                'razonSocial' => $this->companyRazonSocial,
             ],
             'mtoOperGravadas' => round($totalOperGravadas, 2),
             'mtoIGV' => round($totalIgv, 2),
@@ -220,9 +225,9 @@ class InvoiceService
             'legends' => [
                 [
                     'code' => '1000',
-                    'value' => $totalWords
-                ]
-            ]
+                    'value' => $totalWords,
+                ],
+            ],
         ];
 
         return $payload;
@@ -233,18 +238,14 @@ class InvoiceService
      */
     private function saveInvoiceJson(Invoice $invoice, array $payload): void
     {
-        $filename = "invoices/{$invoice->serie}-{$invoice->correlativo}.json";
-        
-        // Save to public disk
-        Storage::disk('public')->put($filename, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        
-        // Update invoice status and URL
+        Storage::disk('local')->put($invoice->jsonPath(), json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
         $invoice->update([
             'status' => 'success',
             'api_response' => ['message' => 'JSON generado localmente'],
-            'pdf_url' => Storage::url($filename), // We use pdf_url to store the JSON URL for now
+            'pdf_url' => null,
             'xml_url' => null,
-            'cdr_url' => null
+            'cdr_url' => null,
         ]);
     }
 
@@ -258,7 +259,7 @@ class InvoiceService
 
         // This is a simplified version
         // For production, use a library like luecano/numero-a-letras
-        return sprintf('SON %s CON %02d/100 SOLES', 
+        return sprintf('SON %s CON %02d/100 SOLES',
             $this->simpleNumberToWords($integerPart),
             $decimalPart
         );
@@ -274,28 +275,34 @@ class InvoiceService
         $tens = ['', '', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
         $hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
 
-        if ($number == 0) return 'CERO';
-        if ($number == 100) return 'CIEN';
-        
+        if ($number == 0) {
+            return 'CERO';
+        }
+        if ($number == 100) {
+            return 'CIEN';
+        }
+
         $words = '';
-        
+
         // Hundreds
         $h = floor($number / 100);
         if ($h > 0) {
-            $words .= $hundreds[$h] . ' ';
+            $words .= $hundreds[$h].' ';
             $number %= 100;
         }
-        
+
         // Tens and units
         if ($number >= 20) {
             $t = floor($number / 10);
             $u = $number % 10;
             $words .= $tens[$t];
-            if ($u > 0) $words .= ' Y ' . $units[$u];
-        } else if ($number >= 10) {
+            if ($u > 0) {
+                $words .= ' Y '.$units[$u];
+            }
+        } elseif ($number >= 10) {
             $special = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
             $words .= $special[$number - 10];
-        } else if ($number > 0) {
+        } elseif ($number > 0) {
             $words .= $units[$number];
         }
 

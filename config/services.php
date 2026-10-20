@@ -42,6 +42,11 @@ return [
         'currency' => 'pen',
     ],
 
+    'decolecta' => [
+        'token' => env('DECOLECTA_TOKEN'),
+        'url' => env('DECOLECTA_URL', 'https://api.decolecta.com'),
+    ],
+
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
     ],

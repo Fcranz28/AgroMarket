@@ -51,6 +51,11 @@ Route::post('/logout', function () {
     return redirect()->route('home');
 })->name('logout');
 
+// Descarga de comprobantes para compras como invitado (enlace firmado)
+Route::get('/factura/{invoice}/descargar-invitado', [App\Http\Controllers\InvoiceController::class, 'guestDownload'])
+    ->middleware('signed')
+    ->name('invoice.guest-download');
+
 // RUTAS PARA USUARIOS LOGUEADOS
 Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
@@ -106,6 +111,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
         Route::get('/usuarios', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
         Route::get('/usuarios/{user}/verificar', [App\Http\Controllers\AdminController::class, 'verifyView'])->name('verify.view');
+        Route::get('/usuarios/{user}/documentos/{document}', App\Http\Controllers\Admin\VerificationDocumentController::class)
+            ->whereIn('document', ['face_photo', 'dni_front', 'dni_back'])
+            ->name('verification.document');
         Route::post('/usuarios/consultar-dni', [App\Http\Controllers\AdminController::class, 'checkDni'])->name('check.dni');
         Route::post('/usuarios/{user}/verificar/{status}', [App\Http\Controllers\AdminController::class, 'verifyFarmer'])->name('verify');
         Route::post('/usuarios/{user}/ban', [App\Http\Controllers\AdminController::class, 'toggleBan'])->name('ban');
