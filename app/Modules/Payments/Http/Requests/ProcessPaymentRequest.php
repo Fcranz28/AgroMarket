@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Modules\Payments\Http\Requests;
 
 class ProcessPaymentRequest extends CreatePaymentIntentRequest
 {

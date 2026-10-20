@@ -7,7 +7,7 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
 use App\Services\InvoiceService;
-use App\Services\PaymentGateway;
+use App\Modules\Payments\Services\PaymentGateway;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;

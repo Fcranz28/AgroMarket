@@ -3,7 +3,7 @@
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
-use App\Services\PaymentGateway;
+use App\Modules\Payments\Services\PaymentGateway;
 use Illuminate\Support\Facades\Storage;
 use Stripe\PaymentIntent;
 

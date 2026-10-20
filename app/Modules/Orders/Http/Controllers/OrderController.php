@@ -3,17 +3,15 @@
 namespace App\Modules\Orders\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Services\StockService;
+use App\Modules\Orders\Events\OrderCancelled;
 use App\Modules\Orders\Http\Requests\UpdateOrderStatusRequest;
 use App\Modules\Orders\Models\Order;
-use App\Modules\Catalog\Services\StockService;
-use App\Services\PaymentGateway;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
-use Throwable;
 
 class OrderController extends Controller
 {
@@ -85,7 +83,7 @@ class OrderController extends Controller
             new OA\Response(response: 422, description: 'Estado inválido o pedido ya cerrado', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ],
     )]
-    public function updateStatus(UpdateOrderStatusRequest $request, Order $order, StockService $stock, PaymentGateway $gateway): JsonResponse
+    public function updateStatus(UpdateOrderStatusRequest $request, Order $order, StockService $stock): JsonResponse
     {
         if ($order->isFinal()) {
             return response()->json(['success' => false, 'message' => 'Este pedido ya fue cerrado y no puede cambiar de estado.'], 422);
@@ -109,18 +107,15 @@ class OrderController extends Controller
             $order->update(['status' => Order::STATUS_CANCELLED]);
         });
 
-        if ($order->payment_status === 'paid' && $order->stripe_payment_intent_id) {
-            try {
-                $gateway->refund($order->stripe_payment_intent_id);
-                $order->update(['payment_status' => 'refunded']);
-            } catch (Throwable $exception) {
-                Log::critical('Refund after cancellation failed', ['order_id' => $order->id, 'error' => $exception->getMessage()]);
+        $wasPaid = $order->payment_status === 'paid';
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Pedido cancelado. El reembolso no se pudo procesar automáticamente; el equipo lo revisará.',
-                ]);
-            }
+        OrderCancelled::dispatch($order);
+
+        if ($wasPaid && $order->refresh()->payment_status !== 'refunded') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pedido cancelado. El reembolso no se pudo procesar automáticamente; el equipo lo revisará.',
+            ]);
         }
 
         return response()->json(['success' => true, 'message' => 'Pedido cancelado y reembolsado.']);

@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Payments\Http\Controllers;
 
-use App\Http\Requests\CreatePaymentIntentRequest;
-use App\Http\Requests\ProcessPaymentRequest;
+use App\Http\Controllers\Controller;
+use App\Modules\Payments\Http\Requests\CreatePaymentIntentRequest;
+use App\Modules\Payments\Http\Requests\ProcessPaymentRequest;
 use App\Models\Invoice;
 use App\Modules\Catalog\Exceptions\InsufficientStockException;
 use App\Modules\Orders\Actions\PlaceOrderAction;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
 use App\Services\InvoiceService;
-use App\Services\PaymentGateway;
+use App\Modules\Payments\Services\PaymentGateway;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
