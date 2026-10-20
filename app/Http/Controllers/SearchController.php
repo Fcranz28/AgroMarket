@@ -2,90 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class SearchController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Maximum number of products returned by a search.
+     */
+    private const RESULT_LIMIT = 60;
+
+    public function index(Request $request): View
     {
-        $query = $request->query('q', '');
-        $categorySlug = $request->query('category', 'all');
-        
+        $query = (string) $request->query('q', '');
+        $categorySlug = (string) $request->query('category', 'all');
+
         $categories = Category::all();
-        
+
         return view('search.index', compact('categories', 'query', 'categorySlug'));
     }
-    
-    public function search(Request $request)
+
+    public function search(Request $request): JsonResponse
     {
-        $query = $request->query('q', '');
-        $categorySlug = $request->query('category', '');
-        $sort = $request->query('sort', 'featured');
-        
-        $productsQuery = Product::query();
-        
-        // Filter by search query
-        if (!empty($query)) {
-            $productsQuery->where('name', 'LIKE', "%{$query}%")
-                ->orWhere('description', 'LIKE', "%{$query}%");
-        }
-        
-        // Filter by category
-        if (!empty($categorySlug) && $categorySlug !== 'all') {
-            $productsQuery->whereHas('category', function($q) use ($categorySlug) {
-                $q->where('slug', $categorySlug);
-            });
-        }
-        
-        // Sorting
-        switch ($sort) {
-            case 'price-asc':
-                $productsQuery->orderBy('price', 'asc');
-                break;
-            case 'price-desc':
-                $productsQuery->orderBy('price', 'desc');
-                break;
-            case 'name-asc':
-                $productsQuery->orderBy('name', 'asc');
-                break;
-            case 'name-desc':
-                $productsQuery->orderBy('name', 'desc');
-                break;
-            default:
-                $productsQuery->orderBy('created_at', 'desc');
-        }
-        
-        $products = $productsQuery->with('category')->get()->map(function($product) {
-            return [
+        $term = trim((string) $request->query('q', ''));
+        $categorySlug = (string) $request->query('category', '');
+
+        $products = Product::query()
+            ->with('category')
+            ->when($term !== '', fn ($query) => $query->search($term))
+            ->when(! in_array($categorySlug, ['', 'all', 'todos'], true), fn ($query) => $query->whereHas(
+                'category',
+                fn ($query) => $query->where('slug', $categorySlug),
+            ))
+            ->tap(fn ($query) => match ($request->query('sort')) {
+                'price-asc' => $query->orderBy('price'),
+                'price-desc' => $query->orderByDesc('price'),
+                'name-asc' => $query->orderBy('name'),
+                'name-desc' => $query->orderByDesc('name'),
+                default => $query->latest(),
+            })
+            ->limit(self::RESULT_LIMIT)
+            ->get()
+            ->map(fn (Product $product) => [
                 'id' => $product->id,
                 'slug' => $product->slug,
                 'name' => $product->name,
                 'price' => $product->price,
                 'unit' => $product->unit ?? 'kg',
-                'image_path' => $product->image_path ? asset('storage/' . $product->image_path) : null,
+                'image_path' => $product->image_path ? asset('storage/'.$product->image_path) : null,
                 'image_url' => $product->image_url,
-                'category_name' => $product->category->name ?? null,
-            ];
-        });
-        
-        return response()->json(['products' => $products]);
+                'category_name' => $product->category?->name,
+            ]);
+
+        return response()->json(['products' => $products, 'total' => $products->count()]);
     }
-    
-    public function suggestions(Request $request)
+
+    public function suggestions(Request $request): JsonResponse
     {
-        $query = $request->query('q', '');
-        
-        if (strlen($query) < 2) {
+        $term = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($term) < 2) {
             return response()->json(['suggestions' => []]);
         }
-        
-        $products = Product::where('name', 'LIKE', "%{$query}%")
+
+        $products = Product::search($term, includeDescription: false)
             ->select(['id', 'name', 'slug', 'image_path', 'price'])
             ->limit(5)
             ->get();
-        
+
         return response()->json(['suggestions' => $products]);
     }
 }

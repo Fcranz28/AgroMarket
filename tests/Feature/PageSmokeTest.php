@@ -95,18 +95,22 @@ it('lets admins create products', function () {
         ->and($product->units)->toHaveCount(2);
 });
 
-it('removes gallery images when an admin deletes a product', function () {
+it('soft deletes products so order history keeps its images', function () {
     Storage::fake('public');
     Storage::disk('public')->put('products/main.jpg', 'x');
     Storage::disk('public')->put('products/gallery.jpg', 'x');
     $product = Product::factory()->create(['image_path' => 'products/main.jpg']);
     ProductImage::create(['product_id' => $product->id, 'image_path' => 'products/gallery.jpg']);
+    $item = OrderItem::factory()->for($product)->create();
 
     $this->actingAs(User::factory()->admin()->create())
         ->delete(route('admin.productos.destroy', $product))
         ->assertRedirect(route('admin.productos.index'));
 
-    Storage::disk('public')->assertMissing(['products/main.jpg', 'products/gallery.jpg']);
+    expect($product->fresh()->trashed())->toBeTrue()
+        ->and($item->fresh()->product->name)->toBe($product->name);
+    Storage::disk('public')->assertExists(['products/main.jpg', 'products/gallery.jpg']);
+    $this->get(route('products.show', $product->slug))->assertNotFound();
 });
 
 it('generates invoices for orders above one thousand soles', function () {

@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     /**
      * Los atributos que se pueden asignar masivamente.
      *
@@ -89,6 +91,22 @@ class Product extends Model
             'price' => min(array_column($units, 'price')),
             'stock' => array_sum(array_column($units, 'stock')),
         ]);
+    }
+
+    /**
+     * Match the term against the name or description, treating LIKE wildcards literally.
+     */
+    public function scopeSearch(Builder $query, string $term, bool $includeDescription = true): void
+    {
+        $like = '%'.addcslashes($term, '\\%_').'%';
+
+        $query->where(function (Builder $query) use ($like, $includeDescription) {
+            $query->where('name', 'like', $like);
+
+            if ($includeDescription) {
+                $query->orWhere('description', 'like', $like);
+            }
+        });
     }
 
     /**

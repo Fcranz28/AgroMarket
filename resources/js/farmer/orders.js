@@ -37,7 +37,8 @@ window.updateOrderStatus = function (orderId, currentStatus) {
             'pending': 'Pendiente',
             'processing': 'En Proceso',
             'shipped': 'Enviado',
-            'delivered': 'Entregado'
+            'delivered': 'Entregado',
+            'cancelled': 'Cancelado (devuelve stock y reembolsa)'
         },
         inputValue: currentStatus,
         inputPlaceholder: 'Selecciona nuevo estado',
@@ -61,7 +62,7 @@ window.updateOrderStatus = function (orderId, currentStatus) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire('¡Actualizado!', 'El estado del pedido ha sido actualizado', 'success')
+                        Swal.fire('¡Actualizado!', data.message || 'El estado del pedido ha sido actualizado', 'success')
                             .then(() => {
                                 location.reload();
                             });

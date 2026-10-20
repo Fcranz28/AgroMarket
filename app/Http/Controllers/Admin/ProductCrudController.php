@@ -103,15 +103,10 @@ class ProductCrudController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from the catalog (soft delete, see UserProductController::destroy).
      */
     public function destroy(Product $producto): RedirectResponse
     {
-        Storage::disk('public')->delete(array_filter([
-            $producto->image_path,
-            ...$producto->images()->pluck('image_path'),
-        ]));
-
         $producto->delete();
 
         return redirect()->route('admin.productos.index')

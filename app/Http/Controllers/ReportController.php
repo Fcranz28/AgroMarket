@@ -2,45 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReportRequest;
 use App\Models\Report;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreReportRequest $request): JsonResponse
     {
-        $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'product_id' => 'required|exists:products,id',
-            'reason' => 'required|string|max:255',
-            'description' => 'required|string',
-            'evidence.*' => 'nullable|image|max:2048' // Max 2MB per image
-        ]);
-
-        $evidencePaths = [];
-        if ($request->hasFile('evidence')) {
-            foreach ($request->file('evidence') as $file) {
-                // Store in 'reports' directory in public disk
-                $path = $file->store('reports', 'public');
-                $evidencePaths[] = Storage::url($path);
-            }
-        }
+        $evidencePaths = collect($request->file('evidence', []))
+            ->map(fn (UploadedFile $file) => Storage::url($file->store('reports', 'public')))
+            ->values()
+            ->all();
 
         $report = Report::create([
-            'user_id' => Auth::id(),
-            'order_id' => $request->order_id,
-            'product_id' => $request->product_id,
-            'reason' => $request->reason,
-            'description' => $request->description,
+            'user_id' => $request->user()->id,
+            'order_id' => $request->integer('order_id'),
+            'product_id' => $request->integer('product_id'),
+            'reason' => $request->validated('reason'),
+            'description' => $request->validated('description'),
             'evidence' => $evidencePaths,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         return response()->json([
             'message' => 'Reporte enviado correctamente',
-            'report' => $report
+            'report' => $report->only(['id', 'status', 'created_at']),
         ]);
     }
 }

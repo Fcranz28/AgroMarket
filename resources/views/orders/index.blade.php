@@ -69,7 +69,7 @@
                                             <h4>{{ $item->product->name }}</h4>
                                             <p>Cantidad: {{ $item->quantity }}</p>
                                             @if($order->status === 'delivered')
-                                                <button class="btn-report-item" onclick="openReportModal('{{ $order->id }}', '{{ $item->product->id }}', '{{ $item->product->name }}')">
+                                                <button class="btn-report-item" onclick="openReportModal(@js($order->id), @js($item->product->id), @js($item->product->name))">
                                                     <i class="fas fa-exclamation-triangle"></i> Reportar
                                                 </button>
                                             @endif
