@@ -96,6 +96,18 @@ Sigue estos pasos para levantar el proyecto en tu entorno local:
     php artisan serve
     ```
 
+## 📚 Documentación de la API (Swagger)
+
+Los endpoints que devuelven JSON (catálogo, búsqueda, pagos, login social, direcciones, reportes, facturas y las acciones JSON del agricultor y del admin) están documentados con OpenAPI usando [L5-Swagger](https://github.com/DarkaOnLine/L5-Swagger).
+
+1.  **Generar la especificación** (también en cada despliegue):
+    ```bash
+    php artisan l5-swagger:generate
+    ```
+2.  **Abrir Swagger UI** en `/api/documentation`. El JSON queda en `/docs?api-docs.json`.
+
+En local la documentación es pública. En cualquier otro entorno solo la ven los administradores con sesión iniciada. Las definiciones están en atributos OpenAPI (`#[OA\Get]`, `#[OA\Post]`, etc.) sobre los métodos de los controladores y las piezas compartidas en `app/OpenApi/OpenApiSpec.php`; al agregar o cambiar un endpoint JSON, actualiza sus atributos (`tests/Feature/ApiDocumentationTest.php` verifica que estén todos).
+
 ## 🤝 Cómo Colaborar
 
 ¡Agradecemos tu interés en mejorar AgroMarket! Si deseas contribuir, por favor sigue estos pasos:

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 use Throwable;
 
 class OrderController extends Controller
@@ -63,6 +64,26 @@ class OrderController extends Controller
     /**
      * Update order status. Cancelling returns the stock and refunds the payment.
      */
+    #[OA\Patch(
+        path: '/agricultor/pedidos/{order}/status',
+        summary: 'Cambiar el estado de un pedido',
+        description: 'Solo el agricultor dueño de todos los ítems del pedido. Los pedidos entregados o cancelados no cambian. Cancelar devuelve el stock y reembolsa el pago en Stripe.',
+        security: [['session' => [], 'csrf' => []]],
+        tags: ['Agricultor'],
+        parameters: [new OA\Parameter(name: 'order', in: 'path', required: true, description: 'UUID del pedido', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['status'], properties: [
+            new OA\Property(property: 'status', type: 'string', enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
+        ])),
+        responses: [
+            new OA\Response(response: 200, description: 'Estado actualizado', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: true),
+                new OA\Property(property: 'message', type: 'string', example: 'Pedido cancelado y reembolsado.'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(response: 422, description: 'Estado inválido o pedido ya cerrado', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
+        ],
+    )]
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order, StockService $stock, PaymentGateway $gateway): JsonResponse
     {
         if ($order->isFinal()) {

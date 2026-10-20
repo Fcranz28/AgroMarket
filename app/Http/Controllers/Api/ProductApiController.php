@@ -6,12 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request; // <-- 1. Importa Request
+use OpenApi\Attributes as OA;
 
 class ProductApiController extends Controller
 {
     /**
      * Maneja la solicitud de productos con filtros y ordenamiento.
      */
+    #[OA\Get(
+        path: '/api/productos',
+        summary: 'Catálogo de productos',
+        tags: ['Catálogo'],
+        parameters: [
+            new OA\Parameter(name: 'category', in: 'query', required: false, description: 'Slug de la categoría (all/todos = todas)', schema: new OA\Schema(type: 'string', example: 'tuberculos')),
+            new OA\Parameter(ref: '#/components/parameters/sort'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Productos publicados', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'products', type: 'array', items: new OA\Items(ref: '#/components/schemas/CatalogProduct')),
+            ])),
+            new OA\Response(ref: '#/components/responses/TooManyRequests', response: 429),
+        ],
+    )]
     public function index(Request $request): JsonResponse
     {
         // 2. Lee los parámetros de la URL (?category=...&sort=...)

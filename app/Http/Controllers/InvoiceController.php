@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use OpenApi\Attributes as OA;
 
 class InvoiceController extends Controller
 {
@@ -51,6 +52,31 @@ class InvoiceController extends Controller
     /**
      * Get invoice data as JSON (for display in dashboards)
      */
+    #[OA\Get(
+        path: '/factura/{invoice}',
+        summary: 'Datos de una factura',
+        description: 'Visible para el dueño del pedido, los agricultores con productos en él y los admins.',
+        security: [['session' => []]],
+        tags: ['Cliente'],
+        parameters: [new OA\Parameter(name: 'invoice', in: 'path', required: true, description: 'UUID de la factura', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Factura y pedido', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'invoice', type: 'object', properties: [
+                    new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+                    new OA\Property(property: 'tipo_doc', type: 'string', enum: ['01', '03'], description: '01 = Factura, 03 = Boleta'),
+                    new OA\Property(property: 'numero_completo', type: 'string', example: 'B001-000123'),
+                    new OA\Property(property: 'subtotal', type: 'string', example: '100.00'),
+                    new OA\Property(property: 'igv', type: 'string', example: '18.00'),
+                    new OA\Property(property: 'total', type: 'string', example: '118.00'),
+                    new OA\Property(property: 'status', type: 'string', enum: ['pending', 'processing', 'success', 'error']),
+                ]),
+                new OA\Property(property: 'order', type: 'object'),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/NotFound', response: 404),
+        ],
+    )]
     public function show(Invoice $invoice)
     {
         $this->authorize('view', $invoice);

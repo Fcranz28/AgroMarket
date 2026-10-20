@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Attributes as OA;
 
 class AdminController extends Controller
 {
@@ -65,6 +66,32 @@ class AdminController extends Controller
         return view('admin.users.verify', compact('user'));
     }
 
+    #[OA\Post(
+        path: '/admin/usuarios/consultar-dni',
+        summary: 'Consultar un DNI en RENIEC',
+        description: 'Solo admins. Con `Accept: application/json` responde JSON; si el DNI existe, lo guarda en el usuario.',
+        security: [['session' => [], 'csrf' => []]],
+        tags: ['Admin'],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['dni', 'user_id'], properties: [
+            new OA\Property(property: 'dni', type: 'string', pattern: '^\d{8}$', example: '12345678'),
+            new OA\Property(property: 'user_id', type: 'integer'),
+        ])),
+        responses: [
+            new OA\Response(response: 200, description: 'Resultado de la consulta', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'success', type: 'boolean'),
+                new OA\Property(property: 'message', type: 'string', nullable: true, example: 'No se encontraron datos para este DNI.'),
+                new OA\Property(property: 'data', type: 'object', nullable: true, properties: [
+                    new OA\Property(property: 'document_number', type: 'string'),
+                    new OA\Property(property: 'first_name', type: 'string'),
+                    new OA\Property(property: 'first_last_name', type: 'string'),
+                    new OA\Property(property: 'second_last_name', type: 'string'),
+                ]),
+            ])),
+            new OA\Response(ref: '#/components/responses/Unauthenticated', response: 401),
+            new OA\Response(ref: '#/components/responses/Forbidden', response: 403),
+            new OA\Response(ref: '#/components/responses/ValidationFailed', response: 422),
+        ],
+    )]
     public function checkDni(CheckDniRequest $request): JsonResponse|RedirectResponse
     {
         $token = config('services.decolecta.token');
