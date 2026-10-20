@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "darkaonline/l5-swagger": "^11.2",
         "guzzlehttp/guzzle": "^7.10",
         "kreait/firebase-php": "^7.23",
         "laravel/framework": "^12.0",

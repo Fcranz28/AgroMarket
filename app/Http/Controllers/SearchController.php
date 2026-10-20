@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use OpenApi\Attributes as OA;
 
 class SearchController extends Controller
 {
@@ -25,6 +26,24 @@ class SearchController extends Controller
         return view('search.index', compact('categories', 'query', 'categorySlug'));
     }
 
+    #[OA\Get(
+        path: '/api/search',
+        summary: 'Buscar productos',
+        description: 'Busca en nombre y descripción (los comodines % y _ se toman literalmente). Devuelve como máximo 60 resultados.',
+        tags: ['Catálogo'],
+        parameters: [
+            new OA\Parameter(name: 'q', in: 'query', required: false, schema: new OA\Schema(type: 'string', example: 'papa')),
+            new OA\Parameter(name: 'category', in: 'query', required: false, description: 'Slug de la categoría (all/todos = todas)', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(ref: '#/components/parameters/sort'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Resultados', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'products', type: 'array', items: new OA\Items(ref: '#/components/schemas/SearchProduct')),
+                new OA\Property(property: 'total', type: 'integer', example: 3),
+            ])),
+            new OA\Response(ref: '#/components/responses/TooManyRequests', response: 429),
+        ],
+    )]
     public function search(Request $request): JsonResponse
     {
         $term = trim((string) $request->query('q', ''));
@@ -60,6 +79,27 @@ class SearchController extends Controller
         return response()->json(['products' => $products, 'total' => $products->count()]);
     }
 
+    #[OA\Get(
+        path: '/api/suggestions',
+        summary: 'Sugerencias del buscador',
+        description: 'Hasta 5 productos cuyo nombre contiene el término. Con menos de 2 caracteres devuelve una lista vacía.',
+        tags: ['Catálogo'],
+        parameters: [
+            new OA\Parameter(name: 'q', in: 'query', required: true, schema: new OA\Schema(type: 'string', minLength: 2, example: 'pa')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Sugerencias', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'suggestions', type: 'array', items: new OA\Items(properties: [
+                    new OA\Property(property: 'id', type: 'integer'),
+                    new OA\Property(property: 'name', type: 'string'),
+                    new OA\Property(property: 'slug', type: 'string'),
+                    new OA\Property(property: 'image_path', type: 'string', nullable: true),
+                    new OA\Property(property: 'price', type: 'string'),
+                ])),
+            ])),
+            new OA\Response(ref: '#/components/responses/TooManyRequests', response: 429),
+        ],
+    )]
     public function suggestions(Request $request): JsonResponse
     {
         $term = trim((string) $request->query('q', ''));

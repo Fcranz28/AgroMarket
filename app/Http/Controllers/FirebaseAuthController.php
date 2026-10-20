@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use OpenApi\Attributes as OA;
 
 class FirebaseAuthController extends Controller
 {
@@ -23,6 +24,34 @@ class FirebaseAuthController extends Controller
     /**
      * Authenticate a user with a verified Firebase ID token.
      */
+    #[OA\Post(
+        path: '/auth/firebase',
+        summary: 'Login o registro con Google/Facebook',
+        description: 'Recibe el ID token de Firebase, verifica su firma y abre la sesión web. Con isRegistering=false y un correo sin cuenta responde redirect_to_register; con isRegistering=true y una cuenta existente responde redirect_to_login.',
+        security: [['csrf' => []]],
+        tags: ['Autenticación'],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['idToken'], properties: [
+            new OA\Property(property: 'idToken', type: 'string', maxLength: 4096, description: 'ID token devuelto por Firebase Auth'),
+            new OA\Property(property: 'isRegistering', type: 'boolean', default: false),
+        ])),
+        responses: [
+            new OA\Response(response: 200, description: 'Sesión iniciada o redirección sugerida', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'success', type: 'boolean'),
+                new OA\Property(property: 'action', type: 'string', enum: ['login', 'register', 'redirect_to_register', 'redirect_to_login']),
+                new OA\Property(property: 'redirect', type: 'string', format: 'uri'),
+                new OA\Property(property: 'message', type: 'string', nullable: true),
+                new OA\Property(property: 'user', nullable: true, properties: [
+                    new OA\Property(property: 'id', type: 'integer'),
+                    new OA\Property(property: 'name', type: 'string'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email'),
+                ], type: 'object'),
+            ])),
+            new OA\Response(response: 401, description: 'Token inválido o falsificado', content: new OA\JsonContent(ref: '#/components/schemas/Error')),
+            new OA\Response(response: 403, description: 'Cuenta suspendida', content: new OA\JsonContent(ref: '#/components/schemas/Error')),
+            new OA\Response(response: 422, description: 'Correo no verificado o datos inválidos', content: new OA\JsonContent(ref: '#/components/schemas/Error')),
+            new OA\Response(ref: '#/components/responses/TooManyRequests', response: 429),
+        ],
+    )]
     public function authenticate(FirebaseAuthRequest $request, FirebaseTokenVerifier $verifier): JsonResponse
     {
         try {
