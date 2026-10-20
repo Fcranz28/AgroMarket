@@ -30,12 +30,7 @@ export async function initializeStripeCheckout() {
          return;
       }
 
-      // Calculate subtotal and tax (18% IGV)
-      const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.cantidad), 0);
-      const tax = subtotal * 0.18;
-      const total = subtotal + tax;
-
-      // Create payment intent
+      // The server prices the cart (IGV included); only ids, units and quantities are sent
       const response = await fetch('/payment/create-intent', {
          method: 'POST',
          headers: {
@@ -43,9 +38,7 @@ export async function initializeStripeCheckout() {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
          },
          body: JSON.stringify({
-            amount: total,
-            cart: cart,
-            tax: tax
+            cart: cartPayload(cart)
          })
       });
 
@@ -156,7 +149,7 @@ async function handleSubmit(e) {
             },
             body: JSON.stringify({
                payment_intent_id: paymentIntent.id,
-               cart: cart,
+               cart: cartPayload(cart),
                shipping_address: shippingAddress,
                phone: phone,
                guest_name: guestName,
@@ -219,4 +212,15 @@ if (document.readyState === 'loading') {
    document.addEventListener('DOMContentLoaded', initializeStripeCheckout);
 } else {
    initializeStripeCheckout();
+}
+
+/**
+ * Only send what the server needs to price the cart.
+ */
+function cartPayload(cart) {
+   return cart.map(item => ({
+      id: item.id,
+      unit_id: item.unit_id ?? null,
+      cantidad: item.cantidad,
+   }));
 }

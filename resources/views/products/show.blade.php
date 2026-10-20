@@ -52,6 +52,7 @@
                             @foreach($product->units as $unit)
                                 <button type="button" 
                                         class="product-detail-unit-btn {{ $loop->first ? 'active' : '' }}" 
+                                        data-unit-id="{{ $unit->id }}"
                                         data-unit="{{ $unit->unit }}" 
                                         data-price="{{ $unit->price }}" 
                                         data-stock="{{ $unit->stock }}">

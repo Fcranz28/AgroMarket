@@ -43,11 +43,12 @@ function displayCartSummary() {
         cartItems.appendChild(itemDiv);
     });
 
-    // Calculate tax (18% IGV)
-    const tax = subtotal * 0.18;
-    const total = subtotal + tax;
+    // Prices already include IGV (18%): show the breakdown of the same total
+    const total = subtotal;
+    const base = total / 1.18;
+    const tax = total - base;
 
-    subtotalElement.textContent = `S/. ${subtotal.toFixed(2)}`;
+    subtotalElement.textContent = `S/. ${base.toFixed(2)}`;
     taxElement.textContent = `S/. ${tax.toFixed(2)}`;
     totalElement.textContent = `S/. ${total.toFixed(2)}`;
 }

@@ -16,6 +16,18 @@ class Product extends Model
      * @var array
      */
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'stock' => 'integer',
+        ];
+    }
+
     protected $fillable = [
         'name',
         'slug',
@@ -25,9 +37,11 @@ class Product extends Model
         'stock',
         'image_path',
         'category_id',
-        'user_id'
+        'user_id',
     ];
-    public function user(){
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
@@ -56,14 +70,36 @@ class Product extends Model
     }
 
     /**
+     * Replace the product units, keeping the ids of units that still exist so carts and
+     * order history that reference them stay valid. The base price, unit and stock shown
+     * in the catalog are derived from the units.
+     *
+     * @param  list<array{unit: string, stock: int, price: string}>  $units
+     */
+    public function syncUnits(array $units): void
+    {
+        $this->units()->whereNotIn('unit', array_column($units, 'unit'))->delete();
+
+        foreach ($units as $unit) {
+            $this->units()->updateOrCreate(['unit' => $unit['unit']], $unit);
+        }
+
+        $this->update([
+            'unit' => $units[0]['unit'],
+            'price' => min(array_column($units, 'price')),
+            'stock' => array_sum(array_column($units, 'stock')),
+        ]);
+    }
+
+    /**
      * Obtiene la URL completa de la imagen
      */
     public function getImageUrlAttribute(): string
     {
         if ($this->image_path) {
-            return asset('storage/' . $this->image_path);
+            return asset('storage/'.$this->image_path);
         }
+
         return asset('img/placeholder.png');
     }
-        
 }

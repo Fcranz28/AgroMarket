@@ -140,16 +140,17 @@ class InvoiceService
         // Build details array
         $details = [];
         foreach ($order->items as $item) {
-            $precioBase = floatval($item->price); // El precio es la base (Op. Gravada)
-            $subtotal = $precioBase * $item->quantity;
-            $igv = $subtotal * 0.18;
-            $totalItem = $subtotal + $igv;
-            $precioConIgv = $precioBase * 1.18;
+            // Los precios publicados incluyen IGV: se desglosa la base a partir del total de la línea
+            $precioConIgv = (float) $item->price;
+            $totalItem = round($precioConIgv * $item->quantity, 2);
+            $subtotal = round($totalItem / 1.18, 2);
+            $igv = round($totalItem - $subtotal, 2);
+            $precioBase = $precioConIgv / 1.18;
 
             $details[] = [
                 'codProducto' => 'PROD'.$item->product_id,
                 'unidad' => 'NIU', // Unidad de medida
-                'descripcion' => $item->product->name ?? 'Producto',
+                'descripcion' => trim(($item->product->name ?? 'Producto').($item->unit ? " ({$item->unit})" : '')),
                 'cantidad' => floatval($item->quantity),
                 'mtoValorUnitario' => round($precioBase, 2),
                 'mtoValorVenta' => round($subtotal, 2),

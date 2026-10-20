@@ -7,10 +7,10 @@ use App\Http\Requests\CreatePaymentIntentRequest;
 use App\Http\Requests\ProcessPaymentRequest;
 use App\Models\Invoice;
 use App\Models\Order;
-use App\Models\Product;
 use App\Services\CartPricingService;
 use App\Services\InvoiceService;
 use App\Services\PaymentGateway;
+use App\Services\StockService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,6 +34,7 @@ class PaymentController extends Controller
     public function __construct(
         private PaymentGateway $gateway,
         private CartPricingService $pricing,
+        private StockService $stock,
     ) {}
 
     /**
@@ -153,21 +154,13 @@ class PaymentController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, array{product_id: int, quantity: int, price: string}>  $lines
+     * @param  \Illuminate\Support\Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, quantity: int, price: string}>  $lines
      *
      * @throws InsufficientStockException
      */
     private function createOrder(ProcessPaymentRequest $request, $lines, int $totalCents): Order
     {
-        foreach ($lines as $line) {
-            $product = Product::whereKey($line['product_id'])->lockForUpdate()->firstOrFail();
-
-            if ((int) $product->stock < $line['quantity']) {
-                throw new InsufficientStockException("Stock insuficiente para el producto: {$product->name}.");
-            }
-
-            $product->decrement('stock', $line['quantity']);
-        }
+        $this->stock->reserve($lines);
 
         $order = Order::create([
             'user_id' => Auth::id(),
