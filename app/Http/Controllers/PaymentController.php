@@ -2,242 +2,206 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InsufficientStockException;
+use App\Http\Requests\CreatePaymentIntentRequest;
+use App\Http\Requests\ProcessPaymentRequest;
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product; // Added
+use App\Models\Product;
+use App\Services\CartPricingService;
+use App\Services\InvoiceService;
+use App\Services\PaymentGateway;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Added
-use Stripe\Stripe;
-use Stripe\PaymentIntent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\SignatureVerificationException;
+use Stripe\Webhook;
+use Throwable;
+use UnexpectedValueException;
 
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        // NOTE: No auth middleware to allow guest checkout
-        Stripe::setApiKey(env('STRIPE_SECRET'));
-    }
+    /**
+     * Minimum card payment accepted by Stripe for PEN, in cents.
+     */
+    private const MINIMUM_AMOUNT_CENTS = 200;
+
+    public function __construct(
+        private PaymentGateway $gateway,
+        private CartPricingService $pricing,
+    ) {}
 
     /**
-     * Create a payment intent
+     * Create a payment intent for the server-side priced cart.
      */
-    public function createPaymentIntent(Request $request)
+    public function createPaymentIntent(CreatePaymentIntentRequest $request): JsonResponse
     {
-        try {
-            $request->validate([
-                'cart' => 'required|array',
-                'cart.*.id' => 'required|exists:products,id',
-                'cart.*.cantidad' => 'required|integer|min:1'
-            ]);
+        $pricedCart = $this->pricing->price($request->validated('cart'));
 
-            // Calculate total from database
-            $amount = 0;
-            foreach ($request->cart as $item) {
-                $product = Product::find($item['id']);
-                if ($product) {
-                    $amount += $product->price * $item['cantidad'];
-                }
-            }
-
-            // Enforce minimum amount for Stripe (approx $0.50 USD)
-            // S/. 2.00 is safely above the limit
-            if ($amount < 2.00) {
-                return response()->json([
-                    'error' => 'El monto mínimo de compra para pagos con tarjeta es de S/. 2.00. Por favor, agregue más productos a su carrito.'
-                ], 400);
-            }
-            
-            // Create Stripe Payment Intent
-            $paymentIntent = PaymentIntent::create([
-                'amount' => (int)($amount * 100), // Convert to cents
-                'currency' => 'pen', // Peruvian Sol
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                ],
-                'metadata' => [
-                    'user_id' => Auth::id(),
-                    'cart_items' => count($request->cart)
-                ]
-            ]);
-
+        if ($pricedCart['total_cents'] < self::MINIMUM_AMOUNT_CENTS) {
             return response()->json([
-                'clientSecret' => $paymentIntent->client_secret,
-                'paymentIntentId' => $paymentIntent->id
-            ]);
-
-        } catch (\Stripe\Exception\InvalidRequestException $e) {
-            \Log::error('Stripe Invalid Request: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Error en la solicitud de pago: ' . $e->getMessage()
+                'error' => 'El monto mínimo de compra para pagos con tarjeta es de S/. 2.00. Por favor, agregue más productos a su carrito.',
             ], 400);
-        } catch (\Exception $e) {
-            \Log::error('Payment Intent creation failed: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Error al iniciar el sistema de pagos. Por favor intente nuevamente.'
-            ], 500);
         }
-    }
 
-    /**
-     * Process payment and create order
-     */
-    public function processPayment(Request $request)
-    {
         try {
-            $request->validate([
-                'payment_intent_id' => 'required|string',
-                'cart' => 'required|array',
-                'cart.*.id' => 'required|exists:products,id',
-                'cart.*.cantidad' => 'required|integer|min:1',
-                'shipping_address' => 'required|string',
-                'phone' => 'required|string',
-                // Guest/Customer Info Validation
-                'guest_name' => 'required|string',
-                'guest_lastname' => 'required|string',
-                'guest_email' => 'required|email',
-                'document_type' => 'required|string',
-                'document_number' => 'required|string',
+            $paymentIntent = $this->gateway->createIntent($pricedCart['total_cents'], [
+                'user_id' => Auth::id(),
+                'cart_hash' => $pricedCart['hash'],
             ]);
+        } catch (ApiErrorException $exception) {
+            Log::error('Stripe payment intent creation failed', ['error' => $exception->getMessage()]);
 
-            // Verify payment intent
-            $paymentIntent = PaymentIntent::retrieve($request->payment_intent_id);
+            return response()->json(['error' => 'Error al iniciar el sistema de pagos. Por favor intente nuevamente.'], 502);
+        }
 
-            if ($paymentIntent->status !== 'succeeded') {
-                return response()->json([
-                    'error' => 'El pago no se ha completado'
-                ], 400);
+        return response()->json([
+            'clientSecret' => $paymentIntent->client_secret,
+            'paymentIntentId' => $paymentIntent->id,
+        ]);
+    }
+
+    /**
+     * Verify a succeeded payment intent against the cart and create the order.
+     */
+    public function processPayment(ProcessPaymentRequest $request): JsonResponse
+    {
+        $paymentIntentId = $request->validated('payment_intent_id');
+
+        if (Order::where('stripe_payment_intent_id', $paymentIntentId)->exists()) {
+            return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
+        }
+
+        try {
+            $paymentIntent = $this->gateway->retrieveIntent($paymentIntentId);
+        } catch (ApiErrorException $exception) {
+            Log::warning('Stripe payment intent lookup failed', ['payment_intent' => $paymentIntentId, 'error' => $exception->getMessage()]);
+
+            return response()->json(['error' => 'No se pudo verificar el pago.'], 422);
+        }
+
+        if ($paymentIntent->status !== 'succeeded') {
+            return response()->json(['error' => 'El pago no se ha completado'], 400);
+        }
+
+        $pricedCart = $this->pricing->price($request->validated('cart'));
+
+        if ($paymentIntent->amount !== $pricedCart['total_cents']
+            || $paymentIntent->currency !== $this->gateway->currency()
+            || ($paymentIntent->metadata['cart_hash'] ?? null) !== $pricedCart['hash']) {
+            Log::warning('Payment intent does not match cart', ['payment_intent' => $paymentIntentId]);
+
+            return response()->json(['error' => 'El pago no coincide con el contenido del carrito.'], 422);
+        }
+
+        try {
+            $order = DB::transaction(fn () => $this->createOrder($request, $pricedCart['lines'], $pricedCart['total_cents']));
+        } catch (InsufficientStockException $exception) {
+            $this->refund($paymentIntentId);
+
+            return response()->json(['error' => $exception->getMessage().' Se reembolsó tu pago.'], 409);
+        } catch (UniqueConstraintViolationException) {
+            return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
+        }
+
+        $this->generateInvoice($order);
+
+        return response()->json([
+            'success' => true,
+            'order_id' => $order->uuid,
+            'redirect' => Auth::check() ? route('orders.show', $order) : route('home'),
+        ]);
+    }
+
+    /**
+     * Stripe webhook handler. Only signed events are accepted.
+     */
+    public function webhook(Request $request): JsonResponse
+    {
+        $webhookSecret = config('services.stripe.webhook_secret');
+
+        if (blank($webhookSecret)) {
+            Log::error('Stripe webhook received but STRIPE_WEBHOOK_SECRET is not configured');
+
+            return response()->json(['error' => 'Webhook not configured'], 400);
+        }
+
+        try {
+            $event = Webhook::constructEvent($request->getContent(), (string) $request->header('Stripe-Signature'), $webhookSecret);
+        } catch (SignatureVerificationException|UnexpectedValueException) {
+            return response()->json(['error' => 'Invalid signature'], 400);
+        }
+
+        $paymentIntent = $event->data->object;
+
+        match ($event->type) {
+            'payment_intent.succeeded' => Order::where('stripe_payment_intent_id', $paymentIntent->id)
+                ->update(['payment_status' => 'paid']),
+            'payment_intent.payment_failed' => Log::warning('Stripe payment failed', ['payment_intent' => $paymentIntent->id]),
+            default => null,
+        };
+
+        return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, array{product_id: int, quantity: int, price: string}>  $lines
+     *
+     * @throws InsufficientStockException
+     */
+    private function createOrder(ProcessPaymentRequest $request, $lines, int $totalCents): Order
+    {
+        foreach ($lines as $line) {
+            $product = Product::whereKey($line['product_id'])->lockForUpdate()->firstOrFail();
+
+            if ((int) $product->stock < $line['quantity']) {
+                throw new InsufficientStockException("Stock insuficiente para el producto: {$product->name}.");
             }
 
-            return DB::transaction(function () use ($request) {
-                // Calculate total and verify stock
-                $total = 0;
-                $orderItemsData = [];
+            $product->decrement('stock', $line['quantity']);
+        }
 
-                foreach ($request->cart as $item) {
-                    // Lock the product row for update to prevent race conditions
-                    $product = Product::where('id', $item['id'])->lockForUpdate()->first();
+        $order = Order::create([
+            'user_id' => Auth::id(),
+            'total' => $totalCents / 100,
+            'status' => 'pending',
+            'shipping_address' => $request->validated('shipping_address'),
+            'phone' => $request->validated('phone'),
+            'stripe_payment_intent_id' => $request->validated('payment_intent_id'),
+            'payment_status' => 'paid',
+            'guest_name' => $request->validated('guest_name'),
+            'guest_lastname' => $request->validated('guest_lastname'),
+            'guest_email' => $request->validated('guest_email'),
+            'document_type' => $request->validated('document_type'),
+            'document_number' => $request->validated('document_number'),
+        ]);
 
-                    if (!$product) {
-                        throw new \Exception("Producto no encontrado: ID " . $item['id']);
-                    }
+        $order->items()->createMany($lines->all());
 
-                    if ($product->stock < $item['cantidad']) {
-                        throw new \Exception("Stock insuficiente para el producto: " . $product->name);
-                    }
+        return $order;
+    }
 
-                    // Decrement stock
-                    $product->decrement('stock', $item['cantidad']);
-
-                    $total += $product->price * $item['cantidad'];
-                    
-                    $orderItemsData[] = [
-                        'product_id' => $product->id,
-                        'quantity' => $item['cantidad'],
-                        'price' => $product->price
-                    ];
-                }
-
-                // Create order
-                $order = Order::create([
-                    'user_id' => Auth::id(), // Nullable now
-                    'total' => $total,
-                    'status' => 'pending',
-                    'shipping_address' => $request->shipping_address,
-                    'phone' => $request->phone,
-                    'stripe_payment_intent_id' => $request->payment_intent_id,
-                    'payment_status' => 'paid',
-                    // Guest fields
-                    'guest_name' => $request->guest_name,
-                    'guest_lastname' => $request->guest_lastname,
-                    'guest_email' => $request->guest_email,
-                    'document_type' => $request->document_type,
-                    'document_number' => $request->document_number,
-                ]);
-
-                // Create order items
-                foreach ($orderItemsData as $itemData) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $itemData['product_id'],
-                        'quantity' => $itemData['quantity'],
-                        'price' => $itemData['price']
-                    ]);
-                }
-
-                // Generate electronic invoice
-                try {
-                    $invoiceService = new \App\Services\InvoiceService();
-                    $invoice = $invoiceService->generateInvoice($order);
-                    \Log::info('Invoice generated successfully', [
-                        'order_id' => $order->id,
-                        'invoice_id' => $invoice->id,
-                        'invoice_number' => $invoice->numero_completo
-                    ]);
-                } catch (\Exception $e) {
-                    // Don't fail the order if invoice generation fails
-                    \Log::error('Invoice generation failed', [
-                        'order_id' => $order->id,
-                        'error' => $e->getMessage()
-                    ]);
-                    // Continue with order processing
-                }
-
-                // Determine redirect URL
-                $redirectUrl = Auth::check() ? route('orders.show', $order) : route('home'); // Using model for route binding
-
-                return response()->json([
-                    'success' => true,
-                    'order_id' => $order->id,
-                    'redirect' => $redirectUrl
-                ]);
-            });
-
-        } catch (\Exception $e) {
-            \Log::error('Payment processing failed: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Error al procesar el pago: ' . $e->getMessage()
-            ], 500);
+    private function refund(string $paymentIntentId): void
+    {
+        try {
+            $this->gateway->refund($paymentIntentId);
+        } catch (Throwable $exception) {
+            Log::critical('Automatic refund failed', ['payment_intent' => $paymentIntentId, 'error' => $exception->getMessage()]);
         }
     }
 
     /**
-     * Stripe webhook handler
+     * Invoice generation must never undo a paid order, so it runs after the order is committed.
      */
-    public function webhook(Request $request)
+    private function generateInvoice(Order $order): void
     {
-        $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
-        $webhookSecret = env('STRIPE_WEBHOOK_SECRET');
-
         try {
-            if ($webhookSecret) {
-                $event = \Stripe\Webhook::constructEvent(
-                    $payload, $sigHeader, $webhookSecret
-                );
-            } else {
-                $event = json_decode($payload);
-            }
-
-            // Handle the event
-            switch ($event->type) {
-                case 'payment_intent.succeeded':
-                    $paymentIntent = $event->data->object;
-                    \Log::info('Payment succeeded: ' . $paymentIntent->id);
-                    break;
-                case 'payment_intent.payment_failed':
-                    $paymentIntent = $event->data->object;
-                    \Log::error('Payment failed: ' . $paymentIntent->id);
-                    break;
-                default:
-                    \Log::info('Unhandled event type: ' . $event->type);
-            }
-
-            return response()->json(['status' => 'success']);
-
-        } catch (\Exception $e) {
-            \Log::error('Webhook error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 400);
+            app(InvoiceService::class)->generateInvoice($order);
+        } catch (Throwable $exception) {
+            Log::error('Invoice generation failed', ['order_id' => $order->id, 'error' => $exception->getMessage()]);
         }
     }
 }

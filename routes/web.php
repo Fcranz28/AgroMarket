@@ -23,8 +23,8 @@ Route::get('/api/search', [App\Http\Controllers\SearchController::class, 'search
 
 // Checkout & Payment (Guest Access Allowed)
 Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
-Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process');
+Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent')->middleware('throttle:20,1');
+Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process')->middleware('throttle:10,1');
 
 // Firebase Authentication
 Route::post('/auth/firebase', [App\Http\Controllers\FirebaseAuthController::class, 'authenticate'])
@@ -122,7 +122,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Stripe Webhook (outside auth middleware)
 Route::post('/stripe/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('stripe.webhook');
 
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('products.show');
 

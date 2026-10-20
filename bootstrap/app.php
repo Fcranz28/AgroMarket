@@ -16,15 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
-        
+
         $middleware->web(append: [
             \App\Http\Middleware\EnsureOnboarding::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
-        
-        // Exclude payment routes from CSRF verification
+
         $middleware->validateCsrfTokens(except: [
-            // 'payment/*' 
+            'stripe/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
