@@ -44,11 +44,19 @@ class Invoice extends Model
     }
 
     /**
+     * Path of the generated invoice JSON on the private disk.
+     */
+    public function jsonPath(): string
+    {
+        return "invoices/{$this->serie}-{$this->correlativo}.json";
+    }
+
+    /**
      * Get the formatted invoice type name
      */
     public function getTipoNombreAttribute()
     {
-        return match($this->tipo_doc) {
+        return match ($this->tipo_doc) {
             '01' => 'Factura',
             '03' => 'Boleta',
             default => 'Comprobante',

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OnboardingController extends Controller
@@ -32,6 +32,7 @@ class OnboardingController extends Controller
     public function userPreferences()
     {
         $categories = \App\Models\Category::all();
+
         return view('onboarding.user', compact('categories'));
     }
 
@@ -39,7 +40,7 @@ class OnboardingController extends Controller
     {
         // Here we would save preferences (e.g., attach categories to user)
         // For now, we just complete onboarding
-        
+
         $user = Auth::user();
         $user->update(['onboarding_completed' => true]);
 
@@ -60,10 +61,10 @@ class OnboardingController extends Controller
         ]);
 
         $user = Auth::user();
-        
-        $facePath = $request->file('face_photo')->store('verification/faces', 'public');
-        $dniFrontPath = $request->file('dni_front')->store('verification/dni', 'public');
-        $dniBackPath = $request->file('dni_back')->store('verification/dni', 'public');
+
+        $facePath = $request->file('face_photo')->store('verification/faces', 'local');
+        $dniFrontPath = $request->file('dni_front')->store('verification/dni', 'local');
+        $dniBackPath = $request->file('dni_back')->store('verification/dni', 'local');
 
         $user->update([
             'face_photo' => $facePath,

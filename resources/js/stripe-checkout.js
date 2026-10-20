@@ -176,6 +176,16 @@ async function handleSubmit(e) {
          // Clear cart
          localStorage.removeItem('carrito');
 
+         // Guests receive a signed link to download their receipt
+         if (data.invoice_url) {
+            const link = document.createElement('a');
+            link.href = data.invoice_url;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+         }
+
          // Redirect to order confirmation
          window.location.href = data.redirect;
       }

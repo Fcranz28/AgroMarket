@@ -41,7 +41,7 @@
                         <label class="fw-bold text-muted mb-2">Foto de Rostro (Selfie)</label>
                         <div class="evidence-img-container">
                             @if($user->face_photo)
-                                <img src="{{ asset('storage/' . $user->face_photo) }}" class="img-fluid rounded evidence-img" alt="Selfie">
+                                <img src="{{ route('admin.verification.document', [$user, 'face_photo']) }}" class="img-fluid rounded evidence-img" alt="Selfie">
                             @else
                                 <div class="alert alert-secondary">No hay foto disponible</div>
                             @endif
@@ -53,7 +53,7 @@
                             <label class="fw-bold text-muted mb-2">DNI (Frontal)</label>
                             <div class="evidence-img-container">
                                 @if($user->dni_front)
-                                    <img src="{{ asset('storage/' . $user->dni_front) }}" class="img-fluid rounded evidence-img" alt="DNI Frontal">
+                                    <img src="{{ route('admin.verification.document', [$user, 'dni_front']) }}" class="img-fluid rounded evidence-img" alt="DNI Frontal">
                                 @else
                                     <div class="alert alert-secondary">No hay foto disponible</div>
                                 @endif
@@ -63,7 +63,7 @@
                             <label class="fw-bold text-muted mb-2">DNI (Reverso)</label>
                             <div class="evidence-img-container">
                                 @if($user->dni_back)
-                                    <img src="{{ asset('storage/' . $user->dni_back) }}" class="img-fluid rounded evidence-img" alt="DNI Reverso">
+                                    <img src="{{ route('admin.verification.document', [$user, 'dni_back']) }}" class="img-fluid rounded evidence-img" alt="DNI Reverso">
                                 @else
                                     <div class="alert alert-secondary">No hay foto disponible</div>
                                 @endif

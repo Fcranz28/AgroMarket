@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\InsufficientStockException;
 use App\Http\Requests\CreatePaymentIntentRequest;
 use App\Http\Requests\ProcessPaymentRequest;
+use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartPricingService;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
@@ -107,12 +109,15 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
         }
 
-        $this->generateInvoice($order);
+        $invoice = $this->generateInvoice($order);
 
         return response()->json([
             'success' => true,
             'order_id' => $order->uuid,
             'redirect' => Auth::check() ? route('orders.show', $order) : route('home'),
+            'invoice_url' => $invoice && ! Auth::check()
+                ? URL::temporarySignedRoute('invoice.guest-download', now()->addDays(7), $invoice)
+                : null,
         ]);
     }
 
@@ -196,12 +201,14 @@ class PaymentController extends Controller
     /**
      * Invoice generation must never undo a paid order, so it runs after the order is committed.
      */
-    private function generateInvoice(Order $order): void
+    private function generateInvoice(Order $order): ?Invoice
     {
         try {
-            app(InvoiceService::class)->generateInvoice($order);
+            return app(InvoiceService::class)->generateInvoice($order);
         } catch (Throwable $exception) {
             Log::error('Invoice generation failed', ['order_id' => $order->id, 'error' => $exception->getMessage()]);
+
+            return null;
         }
     }
 }

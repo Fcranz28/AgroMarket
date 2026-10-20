@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
-use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
 class InvoiceController extends Controller
@@ -11,36 +13,36 @@ class InvoiceController extends Controller
     /**
      * Download invoice PDF
      */
-    /**
-     * Download invoice PDF
-     */
-    public function download(Invoice $invoice)
+    public function download(Invoice $invoice): Response|RedirectResponse
     {
         $this->authorize('view', $invoice);
 
-        // If we have a local JSON file (stored in pdf_url for now)
-        if ($invoice->pdf_url && str_contains($invoice->pdf_url, '.json')) {
-            // Convert storage URL to path
-            $path = str_replace('/storage', '', parse_url($invoice->pdf_url, PHP_URL_PATH));
-            
-            if (Storage::disk('public')->exists($path)) {
-                $jsonContent = Storage::disk('public')->get($path);
-                $data = json_decode($jsonContent, true);
+        return $this->pdfResponse($invoice);
+    }
 
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.pdf', compact('data'));
-                
-                return $pdf->download("{$invoice->serie}-{$invoice->correlativo}.pdf");
-            }
+    /**
+     * Download a guest order's invoice through a signed URL.
+     */
+    public function guestDownload(Invoice $invoice): Response|RedirectResponse
+    {
+        abort_if($invoice->order->user_id !== null, 403);
+
+        return $this->pdfResponse($invoice);
+    }
+
+    private function pdfResponse(Invoice $invoice): Response|RedirectResponse
+    {
+        $path = $invoice->jsonPath();
+
+        if (Storage::disk('local')->exists($path)) {
+            $data = json_decode(Storage::disk('local')->get($path), true);
+
+            return Pdf::loadView('invoices.pdf', compact('data'))
+                ->download("{$invoice->serie}-{$invoice->correlativo}.pdf");
         }
 
-        // If we have a PDF URL from APIs Peru (legacy)
-        if ($invoice->pdf_url) {
-            return redirect($invoice->pdf_url);
-        }
-
-        // Check for specific statuses
         if ($invoice->status === 'error') {
-            return back()->with('error', 'La factura no pudo ser generada. Error: ' . $invoice->error_message);
+            return back()->with('error', 'El comprobante no pudo ser generado. Contáctanos para emitirlo nuevamente.');
         }
 
         abort(404, 'Documento no disponible');
@@ -68,7 +70,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'invoice' => $invoice,
-            'order' => $invoice->order
+            'order' => $invoice->order,
         ]);
     }
 }
