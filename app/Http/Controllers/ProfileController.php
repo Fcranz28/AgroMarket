@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
@@ -12,28 +15,18 @@ class ProfileController extends Controller
     /**
      * Update user profile
      */
-    public function update(Request $request)
+    public function update(UpdateProfileRequest $request): RedirectResponse
     {
-        $user = Auth::user();
+        $user = $request->user();
+        $validated = $request->safe()->except(['current_password', 'avatar']);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
-            'phone' => 'nullable|string|max:20',
-            'dni' => 'nullable|string|max:8',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-        ]);
-
-        // Handle avatar upload
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists and it's not an OAuth URL
+            // OAuth avatars are external URLs, only local files are deleted
             if ($user->avatar && ! filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-                \Storage::delete('public/'.$user->avatar);
+                Storage::disk('public')->delete($user->avatar);
             }
 
-            // Store new avatar
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $validated['avatar'] = $path;
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
         $user->update($validated);

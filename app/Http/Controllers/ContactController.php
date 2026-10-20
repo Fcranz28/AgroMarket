@@ -2,25 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ContactController extends Controller
 {
-    public function show()
+    /**
+     * The contact form is delivered by Formspree directly from the browser.
+     */
+    public function show(): View
     {
         return view('contact');
-    }
-
-    public function submit(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'message' => 'required|string|min:10',
-        ]);
-
-        // Aquí iría la lógica para enviar correo
-        // Mail::to('admin@agromarket.com')->send(new ContactForm($validated));
-
-        return back()->with('status', 'Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.');
     }
 }

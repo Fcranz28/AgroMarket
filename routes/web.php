@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route; // <-- Lo añadimos para el login
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
-Route::post('/contacto', [ContactController::class, 'submit'])->name('contact.submit')->middleware('throttle:3,1');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
 Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
 
@@ -34,7 +33,7 @@ Route::post('/auth/firebase', [App\Http\Controllers\FirebaseAuthController::clas
 
 // Registro
 Route::get('/register', [RegisterController::class, 'create'])->name('register'); // Muestra el form
-Route::post('/register', [RegisterController::class, 'store']); // Procesa el form
+Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1'); // Procesa el form
 
 // Login (Asumiendo que también crearás LoginController)
 // Por ahora, solo mostramos la vista, pero necesitarás un 'store'
