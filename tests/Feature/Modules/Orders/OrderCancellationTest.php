@@ -5,10 +5,9 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Events\OrderCancelled;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
-use App\Modules\Payments\Services\PaymentGateway;
+use App\Modules\Payments\Jobs\RefundPayment;
 use Illuminate\Support\Facades\Event;
-
-use function Pest\Laravel\mock;
+use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
     $this->farmer = User::factory()->farmer()->verified()->create();
@@ -26,15 +25,24 @@ it('announces the cancellation with an event', function () {
     Event::assertDispatched(OrderCancelled::class, fn (OrderCancelled $event) => $event->order->is($this->order));
 });
 
-it('keeps the order cancelled when the refund fails', function () {
-    mock(PaymentGateway::class)->shouldReceive('refund')->andThrow(new RuntimeException('Stripe caído'));
+it('queues the refund on the payments queue', function () {
+    Queue::fake();
 
     $this->actingAs($this->farmer)
         ->patchJson(route('farmer.orders.status', $this->order), ['status' => 'cancelled'])
         ->assertSuccessful()
-        ->assertJsonFragment(['message' => 'Pedido cancelado. El reembolso no se pudo procesar automáticamente; el equipo lo revisará.']);
+        ->assertJsonFragment(['message' => 'Pedido cancelado. El reembolso se está procesando.']);
 
-    expect($this->order->fresh())
-        ->status->toBe('cancelled')
-        ->payment_status->toBe('paid');
+    Queue::assertPushedOn('payments', RefundPayment::class, fn (RefundPayment $job) => $job->orderId === $this->order->id);
+    expect($this->order->fresh()->status)->toBe('cancelled');
+});
+
+it('marks the order as refund_failed when every retry fails', function () {
+    $job = new RefundPayment($this->order->stripe_payment_intent_id, $this->order->id);
+
+    $job->failed(new RuntimeException('Stripe caído'));
+
+    expect($this->order->fresh()->payment_status)->toBe('refund_failed')
+        ->and($job->tries)->toBe(5)
+        ->and($job->uniqueId())->toBe($this->order->stripe_payment_intent_id);
 });
