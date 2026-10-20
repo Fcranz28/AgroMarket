@@ -63,7 +63,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Invoice Routes
     Route::get('/factura/{invoice}/descargar', [App\Http\Controllers\InvoiceController::class, 'download'])->name('invoice.download');
-    Route::get('/factura/{invoice}/ver', [App\Http\Controllers\InvoiceController::class, 'view'])->name('invoice.view');
     Route::get('/factura/{invoice}', [App\Http\Controllers\InvoiceController::class, 'show'])->name('invoice.show');
 
     // Profile Routes

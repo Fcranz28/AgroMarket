@@ -49,19 +49,6 @@ class InvoiceController extends Controller
     }
 
     /**
-     * View invoice details
-     */
-    public function view(Invoice $invoice)
-    {
-        // Verify user can access this invoice
-        $this->authorize('view', $invoice);
-
-        $invoice->load('order.items.product');
-
-        return view('invoices.view', compact('invoice'));
-    }
-
-    /**
      * Get invoice data as JSON (for display in dashboards)
      */
     public function show(Invoice $invoice)

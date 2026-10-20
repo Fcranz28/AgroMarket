@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductCrudController extends Controller
 {
@@ -17,6 +17,7 @@ class ProductCrudController extends Controller
     public function index()
     {
         $products = Product::with('category')->get();
+
         return view('admin.products.index', compact('products'));
     }
 
@@ -26,6 +27,7 @@ class ProductCrudController extends Controller
     public function create()
     {
         $categories = Category::all();
+
         return view('admin.products.create', compact('categories'));
     }
 
@@ -53,7 +55,7 @@ class ProductCrudController extends Controller
         }
 
         // Crear slug
-        $slug = Str::slug($request->name) . '-' . Str::random(5);
+        $slug = Str::slug($request->name).'-'.Str::random(5);
 
         // Calculate base values
         $basePrice = min($request->price);
@@ -61,6 +63,7 @@ class ProductCrudController extends Controller
         $baseStock = array_sum($request->stock);
 
         $product = Product::create([
+            'user_id' => $request->user()->id,
             'category_id' => $validated['category_id'],
             'name' => $validated['name'],
             'slug' => $slug,
@@ -77,13 +80,13 @@ class ProductCrudController extends Controller
                 $product->units()->create([
                     'unit' => $unit,
                     'stock' => $request->stock[$key],
-                    'price' => $request->price[$key]
+                    'price' => $request->price[$key],
                 ]);
             }
         }
 
         return redirect()->route('admin.productos.index')
-                       ->with('success', 'Producto creado correctamente');
+            ->with('success', 'Producto creado correctamente');
     }
 
     /**
@@ -92,6 +95,7 @@ class ProductCrudController extends Controller
     public function show(string $id)
     {
         $product = Product::findOrFail($id);
+
         return view('admin.products.show', compact('product'));
     }
 
@@ -102,6 +106,7 @@ class ProductCrudController extends Controller
     {
         $product = Product::findOrFail($id);
         $categories = Category::all();
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -150,13 +155,13 @@ class ProductCrudController extends Controller
 
             // Sync product units: delete old units and create new ones
             $product->units()->delete();
-            
+
             foreach ($request->unit as $key => $unit) {
                 if (isset($request->stock[$key]) && isset($request->price[$key])) {
                     $product->units()->create([
                         'unit' => $unit,
                         'stock' => $request->stock[$key],
-                        'price' => $request->price[$key]
+                        'price' => $request->price[$key],
                     ]);
                 }
             }
@@ -168,7 +173,7 @@ class ProductCrudController extends Controller
         });
 
         return redirect()->route('admin.productos.index')
-                       ->with('success', 'Producto actualizado correctamente');
+            ->with('success', 'Producto actualizado correctamente');
     }
 
     /**
@@ -177,15 +182,15 @@ class ProductCrudController extends Controller
     public function destroy(string $id)
     {
         $product = Product::findOrFail($id);
-        
-        // Eliminar imagen
-        if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
-        }
-        
+
+        Storage::disk('public')->delete(array_filter([
+            $product->image_path,
+            ...$product->images()->pluck('image_path'),
+        ]));
+
         $product->delete();
 
         return redirect()->route('admin.productos.index')
-                       ->with('success', 'Producto eliminado correctamente');
+            ->with('success', 'Producto eliminado correctamente');
     }
 }
