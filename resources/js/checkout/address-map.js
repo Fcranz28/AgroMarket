@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/escape';
 let map;
 let marker;
 let autocomplete;
@@ -221,15 +222,15 @@ function renderAddressCard(addr, isSelected = false) {
    div.innerHTML = `
          <div class="checkout-address-content">
              <div class="checkout-address-radio">
-                 <input type="radio" name="selected_address_id" value="${addrId}" ${isSelected ? 'checked' : ''}>
+                 <input type="radio" name="selected_address_id" value="${escapeHtml(addrId)}" ${isSelected ? 'checked' : ''}>
              </div>
              <div class="checkout-address-details">
-                 <span class="checkout-address-text">${addr.address}</span>
+                 <span class="checkout-address-text">${escapeHtml(addr.address)}</span>
                  ${addr.is_default ? '<span class="checkout-default-badge">Principal</span>' : ''}
              </div>
          </div>
          ${!isGuest ? `
-         <button type="button" class="checkout-btn-delete" onclick="event.stopPropagation(); deleteAddress(${addrId})">
+         <button type="button" class="checkout-btn-delete" onclick="event.stopPropagation(); deleteAddress(${escapeHtml(addrId)})">
              <i class="fas fa-trash"></i>
          </button>` : ''}
      `;

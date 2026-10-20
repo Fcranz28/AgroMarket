@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 document.addEventListener('DOMContentLoaded', function() {
     // Manejo de la navegación en la barra lateral
     const navButtons = document.querySelectorAll('.nav-btn');
@@ -72,21 +73,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="order-header">
                         <div class="order-date">
                             <span class="label">Fecha:</span>
-                            <span>${order.date}</span>
+                            <span>${escapeHtml(order.date)}</span>
                         </div>
                         <div class="order-number">
                             <span class="label">Pedido:</span>
-                            <span>#${order.number}</span>
+                            <span>#${escapeHtml(order.number)}</span>
                         </div>
                         <div class="order-status">
-                            <span class="status-badge ${order.status}">${order.statusText}</span>
+                            <span class="status-badge ${escapeHtml(order.status)}">${escapeHtml(order.statusText)}</span>
                         </div>
                     </div>
                     <div class="order-products">
-                        <img src="${order.product.image}" alt="${order.product.name}">
+                        <img src="${escapeHtml(order.product.image)}" alt="${escapeHtml(order.product.name)}">
                         <div class="product-details">
-                            <h4>${order.product.name}</h4>
-                            <p>Cantidad: ${order.product.quantity}</p>
+                            <h4>${escapeHtml(order.product.name)}</h4>
+                            <p>Cantidad: ${escapeHtml(order.product.quantity)}</p>
                             <p class="price">S/. ${order.product.price.toFixed(2)}</p>
                         </div>
                     </div>

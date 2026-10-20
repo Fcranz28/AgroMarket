@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/escape';
 // Admin Verification AJAX functionality
 document.addEventListener('DOMContentLoaded', function () {
    const dniForm = document.getElementById('dniForm');
@@ -68,11 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="result-label">Nombre Completo</label>
-                            <div class="result-value">${data.first_name} ${data.first_last_name} ${data.second_last_name}</div>
+                            <div class="result-value">${escapeHtml(data.first_name)} ${escapeHtml(data.first_last_name)} ${escapeHtml(data.second_last_name)}</div>
                         </div>
                         <div class="col-sm-6">
                             <label class="result-label">DNI</label>
-                            <div class="result-value">${data.document_number}</div>
+                            <div class="result-value">${escapeHtml(data.document_number)}</div>
                         </div>
                         <div class="col-sm-6">
                             <label class="result-label">Estado</label>
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="alert alert-danger d-flex align-items-center mb-4 animate-fade-in" role="alert">
                 <i class="fas fa-exclamation-circle me-3 fa-lg"></i>
                 <div>
-                    <strong>Error en la consulta:</strong> ${message}
+                    <strong>Error en la consulta:</strong> ${escapeHtml(message)}
                 </div>
             </div>
         `;

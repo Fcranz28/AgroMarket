@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 // Autocomplete search functionality
 document.addEventListener('DOMContentLoaded', () => {
    const searchInput = document.getElementById('searchInput');
@@ -45,10 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
          const price = Number(product.price || 0).toFixed(2);
 
          return `
-                <a href="/producto/${product.slug}" class="suggestion-item">
-                    <img src="${image}" alt="${product.name}">
+                <a href="/producto/${escapeHtml(product.slug)}" class="suggestion-item">
+                    <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)}">
                     <div class="suggestion-info">
-                        <div class="suggestion-name">${product.name}</div>
+                        <div class="suggestion-name">${escapeHtml(product.name)}</div>
                         <div class="suggestion-price">S/. ${price}</div>
                     </div>
                 </a>

@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 document.addEventListener('DOMContentLoaded', () => {
    const resultsGrid = document.getElementById('searchResultsGrid');
    const resultsCount = document.getElementById('resultsCount');
@@ -74,16 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
          const price = Number(product.price || 0).toFixed(2);
 
          return `
-                <article class="product-card" data-product-id="${product.id}">
-                    <a href="/producto/${product.slug}">
-                        <img src="${image}" alt="${product.name}" loading="lazy">
+                <article class="product-card" data-product-id="${escapeHtml(product.id)}">
+                    <a href="/producto/${escapeHtml(product.slug)}">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)}" loading="lazy">
                     </a>
                     <div class="product-info">
-                        <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
-                            <h3>${product.name}</h3>
+                        <a href="/producto/${escapeHtml(product.slug)}" style="text-decoration: none; color: inherit;">
+                            <h3>${escapeHtml(product.name)}</h3>
                         </a>
                         <p class="price">S/. ${price}</p>
-                        <button class="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
+                        <button class="add-to-cart" data-id="${escapeHtml(product.id)}">Agregar al carrito</button>
                     </div>
                 </article>
             `;

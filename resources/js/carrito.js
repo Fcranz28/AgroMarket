@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 let carrito = [];
 let sidebarVisible = false;
 let _productosCache = null;
@@ -116,13 +117,13 @@ function updateCartSidebar() {
         itemElement.className = 'cart-item';
         itemElement.dataset.productId = item.id;
         itemElement.innerHTML = `
-                <img src="${image}" alt="${item.name}">
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}">
                 <div class="cart-item-details">
-                    <h4>${item.name}</h4>
+                    <h4>${escapeHtml(item.name)}</h4>
                     <p>S/. ${Number(item.price || 0).toFixed(2)} /${item.unit || ''}</p>
                     <div class="quantity-controls">
                         <button class="qty-btn qty-decrease" data-action="decrease"><i class="fas fa-minus"></i></button>
-                        <span class="qty-display">${item.cantidad}</span>
+                        <span class="qty-display">${escapeHtml(item.cantidad)}</span>
                         <button class="qty-btn qty-increase" data-action="increase"><i class="fas fa-plus"></i></button>
                     </div>
                     <button class="remove-btn" data-action="remove" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
