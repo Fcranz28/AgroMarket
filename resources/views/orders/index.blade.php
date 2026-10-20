@@ -93,7 +93,7 @@
                                     </a>
                                     
                                     @if($order->invoice)
-                                        <a href="{{ route('invoice.download', $order->invoice->id) }}" class="btn btn-outline">
+                                        <a href="{{ route('invoice.download', $order->invoice) }}" class="btn btn-outline">
                                             <i class="fas fa-file-invoice"></i> Descargar Factura
                                         </a>
                                     @endif
@@ -161,6 +161,17 @@
                     <div class="form-group">
                         <label for="email">Correo Electrónico</label>
                         <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                        @error('email', 'updateProfile')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile_current_password">Contraseña actual <small>(solo si cambias tu correo)</small></label>
+                        <input type="password" id="profile_current_password" name="current_password" autocomplete="current-password">
+                        @error('current_password', 'updateProfile')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="form-group">
