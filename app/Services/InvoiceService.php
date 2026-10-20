@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Invoice;
-use App\Models\Order;
+use App\Modules\Orders\Models\Order;
 use App\Support\AmountInWords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

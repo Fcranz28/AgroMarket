@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductImage;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Models\OrderItem;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {

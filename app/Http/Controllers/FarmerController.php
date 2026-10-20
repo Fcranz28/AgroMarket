@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 

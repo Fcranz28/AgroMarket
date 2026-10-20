@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Catalog\Models\Review;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Models\OrderItem;
 use App\Services\PaymentGateway;
 
 use function Pest\Laravel\mock;

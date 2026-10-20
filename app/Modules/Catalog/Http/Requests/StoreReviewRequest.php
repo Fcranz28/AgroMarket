@@ -2,7 +2,7 @@
 
 namespace App\Modules\Catalog\Http\Requests;
 
-use App\Models\OrderItem;
+use App\Modules\Catalog\Contracts\PurchaseHistory;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\Review;
 use Illuminate\Foundation\Http\FormRequest;
@@ -68,11 +68,7 @@ class StoreReviewRequest extends FormRequest
                     return;
                 }
 
-                $hasBought = OrderItem::where('product_id', $product->id)
-                    ->whereHas('order', fn ($query) => $query->where('user_id', $user->id)->where('payment_status', 'paid'))
-                    ->exists();
-
-                if (! $hasBought) {
+                if (! app(PurchaseHistory::class)->hasPaidPurchase($user, $product)) {
                     $validator->errors()->add('rating', 'Solo puedes reseñar productos que hayas comprado.');
 
                     return;

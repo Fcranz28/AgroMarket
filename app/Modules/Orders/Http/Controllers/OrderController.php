@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Orders\Http\Controllers;
 
-use App\Http\Requests\UpdateOrderStatusRequest;
-use App\Models\Order;
+use App\Http\Controllers\Controller;
+use App\Modules\Orders\Http\Requests\UpdateOrderStatusRequest;
+use App\Modules\Orders\Models\Order;
 use App\Modules\Catalog\Services\StockService;
 use App\Services\PaymentGateway;
 use Illuminate\Http\JsonResponse;

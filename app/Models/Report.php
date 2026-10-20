@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model

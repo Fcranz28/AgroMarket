@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Models\OrderItem;
 use App\Services\InvoiceService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
