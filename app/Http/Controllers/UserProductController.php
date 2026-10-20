@@ -110,16 +110,14 @@ class UserProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from the catalog.
+     *
+     * Products are soft deleted and keep their images because past orders, invoices and
+     * reports still show them.
      */
     public function destroy(Product $producto): RedirectResponse
     {
         $this->ensureOwnership($producto);
-
-        Storage::disk('public')->delete(array_filter([
-            $producto->image_path,
-            ...$producto->images()->pluck('image_path'),
-        ]));
 
         $producto->delete();
 

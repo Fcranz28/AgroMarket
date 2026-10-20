@@ -6,11 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
     /** @use HasFactory<\Database\Factories\OrderFactory> */
     use HasFactory;
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    public const STATUS_DELIVERED = 'delivered';
+
+    /**
+     * @var list<string>
+     */
+    public const STATUSES = ['pending', 'processing', 'shipped', self::STATUS_DELIVERED, self::STATUS_CANCELLED];
+
+    /**
+     * Orders in these statuses can no longer change.
+     *
+     * @var list<string>
+     */
+    public const FINAL_STATUSES = [self::STATUS_DELIVERED, self::STATUS_CANCELLED];
 
     protected $fillable = [
         'user_id',
@@ -47,12 +64,31 @@ class Order extends Model
     /**
      * Get the invoice for the order
      */
-    /**
-     * Get the invoice for the order
-     */
-    public function invoice()
+    public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
+    }
+
+    /**
+     * Whether every item of the order belongs to the given farmer.
+     */
+    public function isFullySoldBy(User $farmer): bool
+    {
+        return $this->items()->exists()
+            && ! $this->items()->whereDoesntHave('product', fn ($query) => $query->where('user_id', $farmer->id))->exists();
+    }
+
+    /**
+     * Whether the given farmer sells at least one item of the order.
+     */
+    public function hasItemsSoldBy(User $farmer): bool
+    {
+        return $this->items()->whereHas('product', fn ($query) => $query->where('user_id', $farmer->id))->exists();
+    }
+
+    public function isFinal(): bool
+    {
+        return in_array($this->status, self::FINAL_STATUSES, true);
     }
 
     /**

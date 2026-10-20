@@ -2,35 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReviewRequest;
 use App\Models\Product;
 use App\Models\Review;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Product $product)
+    public function store(StoreReviewRequest $request, Product $product): RedirectResponse
     {
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|max:2048', // 2MB Max
-        ]);
-
-        $data = [
-            'user_id' => Auth::id(),
+        Review::create([
+            'user_id' => $request->user()->id,
             'product_id' => $product->id,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
-        ];
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('reviews', 'public');
-            $data['image_path'] = $path;
-        }
-
-        Review::create($data);
+            'rating' => $request->validated('rating'),
+            'comment' => $request->validated('comment'),
+            'image_path' => $request->file('image')?->store('reviews', 'public'),
+        ]);
 
         return back()->with('success', 'Reseña enviada correctamente.');
     }
