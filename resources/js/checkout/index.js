@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/escape';
 // Display cart summary with tax calculation
 function displayCartSummary() {
     const cart = JSON.parse(localStorage.getItem('carrito') || '[]');
@@ -32,10 +33,10 @@ function displayCartSummary() {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'checkout-cart-item';
         itemDiv.innerHTML = `
-                <img src="${image}" alt="${item.name}">
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(item.name)}">
                 <div class="checkout-cart-item-details">
-                    <div class="checkout-cart-item-name">${item.name}</div>
-                    <div class="checkout-cart-item-quantity">Cant: ${item.cantidad}</div>
+                    <div class="checkout-cart-item-name">${escapeHtml(item.name)}</div>
+                    <div class="checkout-cart-item-quantity">Cant: ${escapeHtml(item.cantidad)}</div>
                 </div>
                 <div class="checkout-cart-item-price">S/. ${itemTotal.toFixed(2)}</div>
             `;

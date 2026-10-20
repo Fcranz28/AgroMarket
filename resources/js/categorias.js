@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 document.addEventListener('DOMContentLoaded', () => {
     // Seleccionamos los elementos de la vista
     const productsGrid = document.querySelector('.products-grid');
@@ -95,20 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const categoryName = product.category_name || product.category || 'Productos';
 
             return `
-            <article class="product-card" data-product-id="${product.id}">
-                <a href="/producto/${product.slug}">
+            <article class="product-card" data-product-id="${escapeHtml(product.id)}">
+                <a href="/producto/${escapeHtml(product.slug)}">
                     <div class="product-image-container">
-                        <img src="${image}" alt="${product.name}" class="product-image" loading="lazy">
+                        <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)}" class="product-image" loading="lazy">
                     </div>
                 </a>
                 <div class="product-info">
-                    <p class="product-category">${categoryName}</p>
-                    <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
-                        <h3 class="product-title">${product.name}</h3>
+                    <p class="product-category">${escapeHtml(categoryName)}</p>
+                    <a href="/producto/${escapeHtml(product.slug)}" style="text-decoration: none; color: inherit;">
+                        <h3 class="product-title">${escapeHtml(product.name)}</h3>
                     </a>
                     <div class="product-footer">
                         <p class="product-price">S/. ${price}</p>
-                        <button class="btn-add-cart" data-id="${product.id}"></button>
+                        <button class="btn-add-cart" data-id="${escapeHtml(product.id)}"></button>
                     </div>
                 </div>
             </article>`;

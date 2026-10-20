@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/escape';
 let map;
 let marker;
 let autocomplete;
@@ -31,7 +32,7 @@ function loadAddresses() {
                         <h3>Dirección</h3>
                         ${addr.is_default ? '<span class="default-badge">Principal</span>' : ''}
                     </div>
-                    <p class="address-text">${addr.address}</p>
+                    <p class="address-text">${escapeHtml(addr.address)}</p>
                     <div class="address-actions">
                         <button class="btn-link delete" onclick="deleteAddress(${addr.id})">
                             <i class="fas fa-trash"></i> Eliminar

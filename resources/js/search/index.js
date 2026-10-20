@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/escape';
 // Search functionality
 document.addEventListener('DOMContentLoaded', function () {
         const searchResultsGrid = document.getElementById('searchResultsGrid');
@@ -84,14 +85,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         return `
                 <div class="search-product-card">
                     <div class="search-product-image-container">
-                        <img src="${imageSrc}" alt="${product.name}" class="search-product-image" onerror="this.src='/img/placeholder.png'">
+                        <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(product.name)}" class="search-product-image" onerror="this.src='/img/placeholder.png'">
                     </div>
                     <div class="search-product-info">
                         ${product.category_name ? `<p class="search-product-category">PRODUCTOS</p>` : ''}
-                        <h3 class="search-product-title">${product.name}</h3>
+                        <h3 class="search-product-title">${escapeHtml(product.name)}</h3>
                         <div class="search-product-footer">
                             <div class="search-product-price">S/. ${parseFloat(product.price).toFixed(2)}</div>
-                            <a href="${productUrl}" class="search-btn-add-cart" title="Ver Producto"></a>
+                            <a href="${escapeHtml(productUrl)}" class="search-btn-add-cart" title="Ver Producto"></a>
                         </div>
                     </div>
                 </div>

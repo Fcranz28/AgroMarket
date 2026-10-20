@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/escape';
 // Dashboard Products Form Scripts (Create/Edit)
 document.addEventListener('DOMContentLoaded', function () {
    // Dynamic Stock Logic
@@ -57,15 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
          const div = document.createElement('div');
          div.className = 'stock-item';
          div.innerHTML = `
-            <div class="stock-label">${unit.text}</div>
+            <div class="stock-label">${escapeHtml(unit.text)}</div>
             <div class="stock-input-group">
                <div style="flex: 1;">
                   <label style="font-size: 0.75rem; color: #718096; margin-bottom: 0.25rem; display: block">Stock</label>
-                  <input type="number" class="product-form-control" name="stock[]" placeholder="Cantidad" value="${stockValue}" required data-unit="${unit.value}">
+                  <input type="number" class="product-form-control" name="stock[]" placeholder="Cantidad" value="${escapeHtml(stockValue)}" required data-unit="${escapeHtml(unit.value)}">
                </div>
                <div style="flex: 1;">
                   <label style="font-size: 0.75rem; color: #718096; margin-bottom: 0.25rem; display: block;">Precio (S/.)</label>
-                  <input type="number" step="0.01" class="product-form-control" name="price[]" placeholder="0.00" value="${priceValue}" required data-unit="${unit.value}">
+                  <input type="number" step="0.01" class="product-form-control" name="price[]" placeholder="0.00" value="${escapeHtml(priceValue)}" required data-unit="${escapeHtml(unit.value)}">
                </div>
             </div>
          `;

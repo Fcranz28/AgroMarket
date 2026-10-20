@@ -1,3 +1,4 @@
+import { escapeHtml } from './utils/escape';
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const body = document.body;
@@ -103,22 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div class="product-card">
                 <div class="product-image-container">
-                    <a href="/producto/${product.slug}">
-                        <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                    <a href="/producto/${escapeHtml(product.slug)}">
+                        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name)}" class="product-image">
                     </a>
                 </div>
                 <div class="product-info">
-                    <a href="/producto/${product.slug}" style="text-decoration: none; color: inherit;">
-                        <h3 class="product-name">${product.name}</h3>
+                    <a href="/producto/${escapeHtml(product.slug)}" style="text-decoration: none; color: inherit;">
+                        <h3 class="product-name">${escapeHtml(product.name)}</h3>
                     </a>
-                    <p class="product-price">S/. ${price} / ${product.unit}</p>
+                    <p class="product-price">S/. ${price} / ${escapeHtml(product.unit)}</p>
                     
                     <button class="add-to-cart-btn" 
-                            data-id="${product.id}"
-                            data-name="${product.name}"
+                            data-id="${escapeHtml(product.id)}"
+                            data-name="${escapeHtml(product.name)}"
                             data-price="${price}"
-                            data-image="${imageUrl}"
-                            data-unit="${product.unit}">
+                            data-image="${escapeHtml(imageUrl)}"
+                            data-unit="${escapeHtml(product.unit)}">
                         Agregar al Carrito
                     </button>
                 </div>
