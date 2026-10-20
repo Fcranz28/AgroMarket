@@ -80,7 +80,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reportes', [App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
 
     // Onboarding Routes
-    Route::prefix('onboarding')->name('onboarding.')->group(function () {
+    Route::prefix('onboarding')->name('onboarding.')->middleware('onboarding.pending')->group(function () {
         Route::get('/', [App\Http\Controllers\OnboardingController::class, 'welcome'])->name('welcome');
         Route::post('/role', [App\Http\Controllers\OnboardingController::class, 'selectRole'])->name('role');
         Route::get('/intereses', [App\Http\Controllers\OnboardingController::class, 'userPreferences'])->name('user');

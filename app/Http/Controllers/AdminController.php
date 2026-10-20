@@ -111,10 +111,14 @@ class AdminController extends Controller
         return back()->with('apiResult', $result);
     }
 
-    public function verifyFarmer(User $user, $status)
+    public function verifyFarmer(User $user, string $status): RedirectResponse
     {
-        if (! in_array($status, [User::STATUS_APPROVED, User::STATUS_REJECTED])) {
+        if (! in_array($status, [User::STATUS_APPROVED, User::STATUS_REJECTED], true)) {
             return back()->with('error', 'Estado inválido.');
+        }
+
+        if (! $user->isFarmer()) {
+            return back()->with('error', 'Solo se pueden verificar cuentas de agricultor.');
         }
 
         $user->update(['verification_status' => $status]);
@@ -122,11 +126,15 @@ class AdminController extends Controller
         return redirect()->route('admin.users')->with('success', 'Estado del agricultor actualizado correctamente.');
     }
 
-    public function toggleBan(User $user)
+    public function toggleBan(Request $request, User $user): RedirectResponse
     {
+        if ($user->is($request->user()) || $user->isAdmin()) {
+            return back()->with('error', 'No puedes suspender a un administrador.');
+        }
+
         $user->update(['is_banned' => ! $user->is_banned]);
         $status = $user->is_banned ? 'suspendido' : 'activado';
 
-        return back()->with('success', "Usuario $status correctamente.");
+        return back()->with('success', "Usuario {$status} correctamente.");
     }
 }
