@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-    <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"></a>
-    <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP"></a>
+    <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel"></a>
+    <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP"></a>
     <a href="https://stripe.com"><img src="https://img.shields.io/badge/Stripe-Payments-008CDD?style=for-the-badge&logo=stripe&logoColor=white" alt="Stripe"></a>
 </p>
 
@@ -33,7 +33,7 @@
 
 ## 🛠️ Stack Tecnológico
 
-- **Backend**: Laravel 11 (PHP 8.2+)
+- **Backend**: Laravel 12 (PHP 8.2+, extensiones `mbstring`, `pdo_mysql`, `gd`; `pdo_sqlite` para los tests)
 - **Frontend**: Blade Templates, Vanilla JS, CSS3 (Diseño Responsivo)
 - **Base de Datos**: MySQL / MariaDB
 - **Pagos**: Stripe API
@@ -64,7 +64,15 @@ Sigue estos pasos para levantar el proyecto en tu entorno local:
     ```bash
     cp .env.example .env
     ```
-    Actualiza el archivo `.env` con tus credenciales de base de datos y claves de API (Stripe, etc.).
+    Actualiza el archivo `.env` con tus credenciales de base de datos y estas claves:
+
+    | Variable | Uso |
+    |---|---|
+    | `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET` | Pagos y webhook firmado de Stripe |
+    | `FIREBASE_PROJECT_ID` | Verificación de tokens del login con Google/Facebook (sin esta variable el login social se rechaza) |
+    | `DECOLECTA_TOKEN` | Consulta de DNI (RENIEC) al verificar agricultores |
+    | `GOOGLE_MAPS_API_KEY` | Mapa de direcciones en el checkout |
+    | `APIS_PERU_*`, `COMPANY_*`, `INVOICE_SERIE_*` | Datos de facturación electrónica |
 
 5.  **Generar clave de aplicación**
     ```bash
@@ -74,6 +82,13 @@ Sigue estos pasos para levantar el proyecto en tu entorno local:
 6.  **Ejecutar migraciones y seeders**
     ```bash
     php artisan migrate --seed
+    php artisan storage:link
+    ```
+    El seeder crea `admin@agromarket.com` con una contraseña aleatoria que se muestra en la consola.
+
+    Si actualizas una instalación existente, mueve los documentos de verificación y facturas antiguos al disco privado:
+    ```bash
+    php artisan storage:move-sensitive
     ```
 
 7.  **Iniciar el servidor local**
@@ -92,8 +107,8 @@ Sigue estos pasos para levantar el proyecto en tu entorno local:
 5.  Abre un **Pull Request** describiendo tus cambios.
 
 ### Guía de Estilo
-- Seguimos los estándares PSR-12 para código PHP.
-- Asegúrate de que tu código pase todas las pruebas existentes.
+- El código PHP se formatea con Laravel Pint (`vendor/bin/pint`).
+- Asegúrate de que tu código pase todas las pruebas (`php artisan test`).
 
 ## 📄 Licencia
 

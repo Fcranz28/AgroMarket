@@ -176,6 +176,6 @@
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places&callback=initMap" async defer></script>
-    @vite(['resources/js/checkout/index.js', 'resources/js/checkout/address-map.js', 'resources/css/checkout/addresses.css'])
+    @vite(['resources/js/checkout/index.js', 'resources/js/stripe-checkout.js', 'resources/js/checkout/address-map.js', 'resources/css/checkout/addresses.css'])
 @endpush
 @endsection

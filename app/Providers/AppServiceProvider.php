@@ -2,24 +2,16 @@
 
 namespace App\Providers;
 
-use App\Models\Product;
-use App\Policies\ProductPolicy;
 use App\Services\FirebaseTokenVerifier;
 use App\Services\PaymentGateway;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
+     * Register any application services.
      */
-    protected $policies = [
-        Product::class => ProductPolicy::class,
-    ];
-
     public function register(): void
     {
         $this->app->singleton(FirebaseTokenVerifier::class, fn () => new FirebaseTokenVerifier(
@@ -38,9 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->environment('production')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
-
-        Gate::policy(Product::class, ProductPolicy::class);
     }
 }

@@ -15,6 +15,8 @@ export default defineConfig({
                 'resources/css/checkout/addresses.css',
                 'resources/css/profile/addresses.css',
                 'resources/js/login.js',
+                'resources/js/firebase-auth.js',
+                'resources/js/stripe-checkout.js',
                 'resources/js/contacto.js',
                 'resources/js/categorias.js',
                 'resources/js/onboarding/farmer.js',

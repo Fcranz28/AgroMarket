@@ -5,7 +5,7 @@
 @endpush
 
 @push('scripts')
-    @vite(['resources/js/login.js'])
+    @vite(['resources/js/login.js', 'resources/js/firebase-auth.js'])
 @endpush
 
 @section('content')
