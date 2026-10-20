@@ -1,12 +1,18 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Invoicing\Models;
 
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use App\Modules\Invoicing\Database\Factories\InvoiceFactory;
+use App\Modules\Invoicing\Policies\InvoicePolicy;
 use App\Modules\Orders\Models\Order;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[UseFactory(InvoiceFactory::class)]
+#[UsePolicy(InvoicePolicy::class)]
 class Invoice extends Model
 {
     use HasFactory, HasUuids;

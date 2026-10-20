@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Policies;
+namespace App\Modules\Invoicing\Policies;
 
-use App\Models\Invoice;
+use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Identity\Models\User;
 use Illuminate\Auth\Access\Response;
 

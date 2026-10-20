@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Invoice;
 use App\Modules\Identity\Models\User;
+use App\Modules\Invoicing\Models\Invoice;
 
 it('throttles account registration', function () {
     foreach (range(1, 5) as $attempt) {

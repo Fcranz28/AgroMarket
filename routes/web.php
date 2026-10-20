@@ -5,7 +5,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -20,17 +19,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
 
-// Descarga de comprobantes para compras como invitado (enlace firmado)
-Route::get('/factura/{invoice}/descargar-invitado', [InvoiceController::class, 'guestDownload'])
-    ->middleware('signed')
-    ->name('invoice.guest-download');
-
 // RUTAS PARA USUARIOS LOGUEADOS
 Route::middleware(['auth'])->group(function () {
-    // Invoice Routes
-    Route::get('/factura/{invoice}/descargar', [InvoiceController::class, 'download'])->name('invoice.download');
-    Route::get('/factura/{invoice}', [InvoiceController::class, 'show'])->name('invoice.show');
-
     // Reports
     Route::post('/reportes', [ReportController::class, 'store'])->name('reports.store');
 

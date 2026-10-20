@@ -1,15 +1,23 @@
 <?php
 
-namespace Database\Factories;
+namespace App\Modules\Invoicing\Database\Factories;
 
+use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Invoice>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Invoicing\Models\Invoice>
  */
 class InvoiceFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<Invoice>
+     */
+    protected $model = Invoice::class;
+
     /**
      * Define the model's default state.
      *
