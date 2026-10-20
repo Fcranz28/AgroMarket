@@ -5,7 +5,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductUnit;
 use App\Models\Review;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use App\Services\PaymentGateway;
 
 use function Pest\Laravel\mock;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model

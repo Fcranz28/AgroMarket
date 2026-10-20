@@ -1,8 +1,8 @@
 <?php
 
-use App\Exceptions\InvalidFirebaseTokenException;
-use App\Models\User;
-use App\Services\FirebaseTokenVerifier;
+use App\Modules\Identity\Exceptions\InvalidFirebaseTokenException;
+use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\FirebaseTokenVerifier;
 
 use function Pest\Laravel\mock;
 

@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Modules\Identity\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class SelectRoleRequest extends FormRequest
+class FirebaseAuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return ! $this->user()->isAdmin();
+        return true;
     }
 
     /**
@@ -24,7 +22,8 @@ class SelectRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_FARMER])],
+            'idToken' => 'required|string|max:4096',
+            'isRegistering' => 'sometimes|boolean',
         ];
     }
 
@@ -36,8 +35,10 @@ class SelectRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'role.required' => 'Selecciona cómo deseas usar la plataforma.',
-            'role.in' => 'El tipo de cuenta seleccionado no es válido.',
+            'idToken.required' => 'Falta el token de autenticación.',
+            'idToken.string' => 'El token de autenticación no es válido.',
+            'idToken.max' => 'El token de autenticación no es válido.',
+            'isRegistering.boolean' => 'El indicador de registro no es válido.',
         ];
     }
 }

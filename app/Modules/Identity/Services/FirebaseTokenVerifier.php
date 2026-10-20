@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Modules\Identity\Services;
 
-use App\Exceptions\InvalidFirebaseTokenException;
+use App\Modules\Identity\Exceptions\InvalidFirebaseTokenException;
 use Kreait\Firebase\JWT\IdTokenVerifier;
 use Throwable;
 

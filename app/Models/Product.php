@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

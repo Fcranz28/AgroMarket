@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Identity\Http\Controllers;
 
-use App\Models\Address;
+use App\Http\Controllers\Controller;
+use App\Modules\Identity\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;

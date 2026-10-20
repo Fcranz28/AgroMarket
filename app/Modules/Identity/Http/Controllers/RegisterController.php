@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers; // <-- Revisa si esta es la carpeta
+namespace App\Modules\Identity\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Modules\Identity\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
-// Para manejar errores
 
 class RegisterController extends Controller
 {

@@ -6,7 +6,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {

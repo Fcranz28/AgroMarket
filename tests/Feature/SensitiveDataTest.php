@@ -3,7 +3,7 @@
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;

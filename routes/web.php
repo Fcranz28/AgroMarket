@@ -1,56 +1,42 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\ProductCrudController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\RegisterController;
-// Importamos los controladores de Auth que nos faltaban
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserProductController;
-use Illuminate\Support\Facades\Route; // <-- Lo añadimos para el login
+use Illuminate\Support\Facades\Route;
+
+/*
+ * Rutas que todavía no pertenecen a un módulo. Cada módulo de app/Modules registra las
+ * suyas en app/Modules/<Módulo>/routes/web.php.
+ */
 
 // Páginas públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
-Route::get('/buscar', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+Route::get('/buscar', [SearchController::class, 'index'])->name('search');
 
 // Checkout & Payment (Guest Access Allowed)
-Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/payment/create-intent', [App\Http\Controllers\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent')->middleware('throttle:20,1');
-Route::post('/payment/process', [App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.process')->middleware('throttle:10,1');
-
-// Firebase Authentication
-Route::post('/auth/firebase', [App\Http\Controllers\FirebaseAuthController::class, 'authenticate'])
-    ->middleware('throttle:10,1')
-    ->name('auth.firebase');
-
-// --- RUTAS DE AUTENTICACIÓN ARREGLADAS ---
-
-// Registro
-Route::get('/register', [RegisterController::class, 'create'])->name('register'); // Muestra el form
-Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1'); // Procesa el form
-
-// Login (Asumiendo que también crearás LoginController)
-// Por ahora, solo mostramos la vista, pero necesitarás un 'store'
-Route::view('/login', 'auth.login')->name('login');
-Route::post('/login', [LoginController::class, 'store']);
-
-// Logout
-Route::post('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect()->route('home');
-})->name('logout');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent')->middleware('throttle:20,1');
+Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process')->middleware('throttle:10,1');
 
 // Descarga de comprobantes para compras como invitado (enlace firmado)
-Route::get('/factura/{invoice}/descargar-invitado', [App\Http\Controllers\InvoiceController::class, 'guestDownload'])
+Route::get('/factura/{invoice}/descargar-invitado', [InvoiceController::class, 'guestDownload'])
     ->middleware('signed')
     ->name('invoice.guest-download');
 
@@ -60,37 +46,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pedidos/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     // Invoice Routes
-    Route::get('/factura/{invoice}/descargar', [App\Http\Controllers\InvoiceController::class, 'download'])->name('invoice.download');
-    Route::get('/factura/{invoice}', [App\Http\Controllers\InvoiceController::class, 'show'])->name('invoice.show');
-
-    // Profile Routes
-    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update');
-
-    // Address Routes
-    Route::resource('addresses', App\Http\Controllers\AddressController::class)->only(['index', 'store', 'destroy']);
+    Route::get('/factura/{invoice}/descargar', [InvoiceController::class, 'download'])->name('invoice.download');
+    Route::get('/factura/{invoice}', [InvoiceController::class, 'show'])->name('invoice.show');
 
     // Reviews
-    Route::post('/productos/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/productos/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
     // Reports
-    Route::post('/reportes', [App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
-
-    // Onboarding Routes
-    Route::prefix('onboarding')->name('onboarding.')->middleware('onboarding.pending')->group(function () {
-        Route::get('/', [App\Http\Controllers\OnboardingController::class, 'welcome'])->name('welcome');
-        Route::post('/role', [App\Http\Controllers\OnboardingController::class, 'selectRole'])->name('role');
-        Route::get('/intereses', [App\Http\Controllers\OnboardingController::class, 'userPreferences'])->name('user');
-        Route::post('/intereses', [App\Http\Controllers\OnboardingController::class, 'savePreferences'])->name('preferences');
-        Route::get('/verificacion', [App\Http\Controllers\OnboardingController::class, 'farmerVerification'])->name('farmer');
-        Route::post('/verificacion', [App\Http\Controllers\OnboardingController::class, 'saveVerification'])->name('verification');
-    });
-
-    // Rutas de Agricultor
+    Route::post('/reportes', [ReportController::class, 'store'])->name('reports.store');
 
     // Rutas de Agricultor
     Route::middleware(['role:farmer'])->prefix('agricultor')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\FarmerController::class, 'index'])->name('farmer.dashboard');
+        Route::get('/dashboard', [FarmerController::class, 'index'])->name('farmer.dashboard');
 
         // Farmer Orders (as seller)
         Route::get('/pedidos', [OrderController::class, 'farmerOrders'])->name('farmer.orders');
@@ -105,30 +72,20 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas de Administrador
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
-        Route::get('/usuarios', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
-        Route::get('/usuarios/{user}/verificar', [App\Http\Controllers\AdminController::class, 'verifyView'])->name('verify.view');
-        Route::get('/usuarios/{user}/documentos/{document}', App\Http\Controllers\Admin\VerificationDocumentController::class)
-            ->whereIn('document', ['face_photo', 'dni_front', 'dni_back'])
-            ->name('verification.document');
-        Route::post('/usuarios/consultar-dni', [App\Http\Controllers\AdminController::class, 'checkDni'])->name('check.dni');
-        Route::post('/usuarios/{user}/verificar/{status}', [App\Http\Controllers\AdminController::class, 'verifyFarmer'])->name('verify');
-        Route::post('/usuarios/{user}/ban', [App\Http\Controllers\AdminController::class, 'toggleBan'])->name('ban');
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
         // Admin Product CRUD (if separate from farmer's)
         Route::resource('productos', ProductCrudController::class);
 
         // Admin Reports
-        Route::get('/reportes', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.index');
-        Route::get('/reportes/{report}', [App\Http\Controllers\Admin\AdminReportController::class, 'show'])->name('reports.show');
-        Route::patch('/reportes/{report}/status', [App\Http\Controllers\Admin\AdminReportController::class, 'updateStatus'])->name('reports.status');
+        Route::get('/reportes', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/reportes/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::patch('/reportes/{report}/status', [AdminReportController::class, 'updateStatus'])->name('reports.status');
     });
 });
 
 // Stripe Webhook (outside auth middleware)
-Route::post('/stripe/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])
     ->name('stripe.webhook');
 
 Route::get('/producto/{slug}', [ProductController::class, 'show'])->name('products.show');
-
-// ¡YA NO ESTÁ LA LLAVE "}" EXTRA AQUÍ!

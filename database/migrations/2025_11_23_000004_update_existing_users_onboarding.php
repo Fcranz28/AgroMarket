@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration

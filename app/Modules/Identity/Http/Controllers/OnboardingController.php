@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Identity\Http\Controllers;
 
-use App\Http\Requests\FarmerVerificationRequest;
-use App\Http\Requests\SelectRoleRequest;
+use App\Http\Controllers\Controller;
+use App\Modules\Identity\Http\Requests\FarmerVerificationRequest;
+use App\Modules\Identity\Http\Requests\SelectRoleRequest;
 use App\Models\Category;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
