@@ -14,7 +14,7 @@ use OpenApi\Attributes as OA;
     title: 'AgroMarket API',
     description: "Endpoints JSON de AgroMarket.\n\nLos endpoints marcados con candado usan la **sesión web** de Laravel (cookie de sesión) y, si no son GET, el token **CSRF** en la cabecera `X-CSRF-TOKEN` (está en `<meta name=\"csrf-token\">` de cada página). Los precios están en soles (PEN) e **incluyen IGV**.",
 )]
-#[OA\Server(url: L5_SWAGGER_CONST_HOST, description: 'Servidor de la aplicación')]
+#[OA\Server(url: '/', description: 'Este mismo servidor')]
 #[OA\Tag(name: 'Catálogo', description: 'Productos y búsqueda (públicos)')]
 #[OA\Tag(name: 'Pagos', description: 'Checkout con Stripe (también para invitados)')]
 #[OA\Tag(name: 'Autenticación', description: 'Login social con Firebase')]

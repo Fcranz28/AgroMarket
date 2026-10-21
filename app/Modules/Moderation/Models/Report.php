@@ -6,6 +6,7 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Report extends Model
 {
@@ -24,17 +25,26 @@ class Report extends Model
         'evidence' => 'array',
     ];
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function product()
+    /**
+     * @return BelongsTo<Product, $this>
+     */
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
 
-    public function order()
+    /**
+     * @return BelongsTo<Order, $this>
+     */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }

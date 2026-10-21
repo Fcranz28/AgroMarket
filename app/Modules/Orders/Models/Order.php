@@ -54,6 +54,8 @@ class Order extends Model
 
     /**
      * Get the user that owns the order
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -62,6 +64,8 @@ class Order extends Model
 
     /**
      * Get the items for the order
+     *
+     * @return HasMany<OrderItem, $this>
      */
     public function items(): HasMany
     {

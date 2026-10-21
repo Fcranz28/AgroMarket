@@ -2,8 +2,8 @@
 
 namespace App\Modules\Invoicing\Policies;
 
-use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Identity\Models\User;
+use App\Modules\Invoicing\Models\Invoice;
 use Illuminate\Auth\Access\Response;
 
 class InvoicePolicy

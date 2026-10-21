@@ -43,11 +43,11 @@ class InvoiceController extends Controller
     {
         abort_if($order->user_id !== null, 403);
 
-        $invoice = $order->invoice;
+        $invoice = Invoice::firstWhere('order_id', $order->id);
         $isReady = $invoice && ! $invoice->isPending();
 
         return response()->view('invoices.guest', [
-            'downloadUrl' => $isReady ? URL::temporarySignedRoute('invoice.guest-download', now()->addDay(), $invoice) : null,
+            'downloadUrl' => $isReady ? URL::temporarySignedRoute('invoice.guest-download', now()->addDay(), ['invoice' => $invoice]) : null,
         ], $isReady ? 200 : 202);
     }
 

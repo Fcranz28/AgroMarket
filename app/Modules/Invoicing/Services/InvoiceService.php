@@ -3,8 +3,8 @@
 namespace App\Modules\Invoicing\Services;
 
 use App\Modules\Invoicing\Models\Invoice;
-use App\Modules\Orders\Models\Order;
 use App\Modules\Invoicing\Support\AmountInWords;
+use App\Modules\Orders\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -14,10 +14,6 @@ class InvoiceService
     private const FACTURA = '01';
 
     private const BOLETA = '03';
-
-    private string $apiUrl;
-
-    private string $apiToken;
 
     private string $companyRuc;
 
@@ -29,8 +25,6 @@ class InvoiceService
 
     public function __construct()
     {
-        $this->apiUrl = config('invoicing.apis_peru.endpoint', 'https://facturacion.apisperu.com/api/v1/invoice/send');
-        $this->apiToken = config('invoicing.apis_peru.token');
         $this->companyRuc = config('invoicing.company.ruc');
         $this->companyRazonSocial = config('invoicing.company.razon_social');
         $this->serieFactura = config('invoicing.series.factura', 'F001');
@@ -126,7 +120,7 @@ class InvoiceService
 
         $nextNumber = $lastInvoice ? (intval($lastInvoice->correlativo) + 1) : 1;
 
-        return str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        return str_pad((string) $nextNumber, 6, '0', STR_PAD_LEFT);
     }
 
     /**

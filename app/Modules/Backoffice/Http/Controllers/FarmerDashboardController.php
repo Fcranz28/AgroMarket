@@ -3,6 +3,7 @@
 namespace App\Modules\Backoffice\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Models\Product;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
@@ -24,11 +25,11 @@ class FarmerDashboardController extends Controller
                 ->where('payment_status', 'paid')
                 ->where('status', '!=', Order::STATUS_CANCELLED));
 
-        $products = $user->products()->count();
+        $products = Product::ownedBy($user)->count();
         $sales = (clone $soldItems)->distinct()->count('order_id');
         $revenue = (float) (clone $soldItems)->selectRaw('COALESCE(SUM(price * quantity), 0) as revenue')->value('revenue');
 
-        $recentProducts = $user->products()->latest()->take(5)->get();
+        $recentProducts = Product::ownedBy($user)->latest()->take(5)->get();
 
         return view('farmer.dashboard', compact('products', 'sales', 'revenue', 'recentProducts'));
     }

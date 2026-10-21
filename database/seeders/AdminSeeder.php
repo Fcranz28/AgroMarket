@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
         $admin = User::firstOrNew(['email' => 'admin@agromarket.com']);
 
         if ($admin->exists) {
-            $this->command?->info('El usuario administrador ya existe; no se modificó.');
+            $this->command->info('El usuario administrador ya existe; no se modificó.');
 
             return;
         }
@@ -31,7 +31,7 @@ class AdminSeeder extends Seeder
             'email_verified_at' => now(),
         ])->save();
 
-        $this->command?->info('Usuario administrador listo: admin@agromarket.com');
-        $this->command?->warn("Contraseña generada (cámbiala al iniciar sesión): {$password}");
+        $this->command->info('Usuario administrador listo: admin@agromarket.com');
+        $this->command->warn("Contraseña generada (cámbiala al iniciar sesión): {$password}");
     }
 }

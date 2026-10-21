@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Pint, Larastan y tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, gd, bcmath, intl
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias de PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Instalar dependencias de Node
+        run: npm ci
+
+      - name: Preparar el entorno
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Estilo (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Análisis estático (Larastan)
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Compilar assets
+        run: npm run build
+
+      - name: Tests (Pest)
+        run: vendor/bin/pest

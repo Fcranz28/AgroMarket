@@ -145,7 +145,7 @@ it('creates a product with its units and images', function () {
         'image' => [UploadedFile::fake()->image('quinua.jpg'), UploadedFile::fake()->image('quinua2.jpg')],
     ])->assertRedirect(route('dashboard.productos.index'));
 
-    $product = $farmer->products()->sole();
+    $product = Product::ownedBy($farmer)->sole();
 
     expect($product->units)->toHaveCount(2)
         ->and($product->images)->toHaveCount(2)
@@ -167,7 +167,7 @@ it('rejects negative stock and invalid prices', function () {
         'image' => [UploadedFile::fake()->image('maiz.jpg')],
     ])->assertSessionHasErrors(['stock.0', 'price.0']);
 
-    expect($farmer->products()->count())->toBe(0);
+    expect(Product::ownedBy($farmer)->count())->toBe(0);
 });
 
 it('rejects units without stock or price', function () {
