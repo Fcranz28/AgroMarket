@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Backoffice\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Models\Order;
 
-class AdminController extends Controller
+class AdminDashboardController extends Controller
 {
     public function index()
     {

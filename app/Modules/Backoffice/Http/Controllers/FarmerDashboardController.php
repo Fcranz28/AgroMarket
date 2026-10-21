@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Backoffice\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class FarmerController extends Controller
+class FarmerDashboardController extends Controller
 {
     public function index(): View
     {

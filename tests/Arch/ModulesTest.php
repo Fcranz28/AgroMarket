@@ -37,6 +37,35 @@ arch('orders does not depend on the modules built on top of it')
         'App\Modules\Backoffice',
     ]);
 
+arch('moderation does not depend on its sibling modules')
+    ->expect('App\Modules\Moderation')
+    ->not->toUse([
+        'App\Modules\Payments',
+        'App\Modules\Invoicing',
+        'App\Modules\Backoffice',
+    ]);
+
 arch('nothing depends on the backoffice')
     ->expect('App\Modules\Backoffice')
     ->toOnlyBeUsedIn('App\Modules\Backoffice');
+
+arch('every module provider extends the module base provider')
+    ->expect([
+        'App\Modules\Identity\IdentityServiceProvider',
+        'App\Modules\Catalog\CatalogServiceProvider',
+        'App\Modules\Orders\OrdersServiceProvider',
+        'App\Modules\Payments\PaymentsServiceProvider',
+        'App\Modules\Invoicing\InvoicingServiceProvider',
+        'App\Modules\Moderation\ModerationServiceProvider',
+        'App\Modules\Backoffice\BackofficeServiceProvider',
+    ])
+    ->toExtend('App\Modules\ModuleServiceProvider');
+
+test('domain code lives in modules, not in the legacy folders', function (string $folder) {
+    $directory = __DIR__."/../../app/{$folder}";
+    $phpFiles = is_dir($directory)
+        ? iterator_to_array(new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory)), '/\.php$/'))
+        : [];
+
+    expect($phpFiles)->toBeEmpty();
+})->with(['Models', 'Services', 'Policies', 'Support', 'Exceptions', 'Http/Requests']);

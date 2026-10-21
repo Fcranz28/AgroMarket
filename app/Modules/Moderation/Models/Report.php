@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Moderation\Models;
 
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
