@@ -109,10 +109,62 @@ Sigue estos pasos para levantar el proyecto en tu entorno local:
     php artisan storage:move-sensitive
     ```
 
-7.  **Iniciar el servidor local**
+7.  **Iniciar el entorno local**
     ```bash
-    php artisan serve
+    composer dev
     ```
+    Levanta el servidor, un worker de colas, los logs y Vite. Si solo usas `php artisan serve`, las facturas y los reembolsos quedan en cola hasta que corras un worker (ver abajo).
+
+## ⏱️ Workers de colas
+
+Lo lento o lo que depende de servicios externos no se hace dentro del request, se procesa en segundo plano:
+
+| Cola | Qué procesa | Reintentos |
+|---|---|---|
+| `payments` | Reembolsos en Stripe (`RefundPayment`) y eventos del webhook (`HandleStripeEvent`) | 5, de 10 s a 30 min |
+| `invoices` | Comprobantes electrónicos de cada pedido (`GenerateInvoiceForOrder`) | 3, de 10 s a 5 min |
+| `default` | Cualquier otro job | — |
+
+El driver es `database` (`QUEUE_CONNECTION=database`, tablas `jobs` y `failed_jobs`). El worker atiende las colas **en orden de prioridad**:
+
+```bash
+php artisan queue:work --queue=payments,invoices,default --tries=3 --max-time=3600
+```
+
+**En cada despliegue** reinicia los workers para que carguen el código nuevo:
+
+```bash
+php artisan queue:restart
+```
+
+**Scheduler**: los jobs fallidos se conservan 7 días y luego se borran solos (`routes/console.php`). Para eso debe correr `php artisan schedule:run` cada minuto.
+
+### Según el servidor
+
+- **VPS Linux**: usa Supervisor para mantener los workers vivos. Para atender más tráfico, sube `numprocs`. Agrega también el cron del scheduler: `* * * * * cd /ruta/agromarket && php artisan schedule:run >> /dev/null 2>&1`.
+  ```ini
+  [program:agromarket-worker]
+  command=php /ruta/agromarket/artisan queue:work --queue=payments,invoices,default --tries=3 --max-time=3600
+  process_name=%(program_name)s_%(process_num)02d
+  numprocs=2
+  autostart=true
+  autorestart=true
+  stopasgroup=true
+  killasgroup=true
+  user=www-data
+  stopwaitsecs=3600
+  redirect_stderr=true
+  stdout_logfile=/ruta/agromarket/storage/logs/worker.log
+  ```
+- **Hosting compartido** (sin procesos permanentes): un cron cada minuto que vacía la cola y corre el scheduler:
+  ```bash
+  * * * * * cd /ruta/agromarket && php artisan queue:work --queue=payments,invoices,default --stop-when-empty --max-time=55 && php artisan schedule:run
+  ```
+- **PaaS** (Forge, Laravel Cloud, Railway…): crea un proceso *worker* con el comando `queue:work` de arriba y activa el scheduler desde el panel.
+
+**Revisar fallos**: `php artisan queue:failed` lista los jobs que agotaron sus reintentos y `php artisan queue:retry all` los vuelve a encolar. Un reembolso que falló en todos sus intentos deja el pedido en `payment_status = refund_failed`.
+
+Para escalar más adelante, cambia a Redis (`QUEUE_CONNECTION=redis`) y Laravel Horizon. El código no depende del driver.
 
 ## 📚 Documentación de la API (Swagger)
 
