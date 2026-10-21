@@ -1,177 +1,123 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Verificación de Agricultor')
+@php
+    $documents = [
+        'face_photo' => 'Foto de rostro (selfie)',
+        'dni_front' => 'DNI (frontal)',
+        'dni_back' => 'DNI (reverso)',
+    ];
+
+    // Resultado de la consulta cuando el formulario se envió sin JavaScript
+    $initialResult = session('apiResult');
+@endphp
+
+@section('title', 'Verificación de agricultor')
+@section('header', 'Verificación de agricultor')
 
 @section('content')
-<div class="container-fluid verify-farmer-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Verificación de Agricultor</h2>
-        <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Volver
-        </a>
-    </div>
+    <a href="{{ route('admin.users') }}" class="text-sm font-medium text-brand hover:underline">← Volver a usuarios</a>
 
-    <div class="row">
-        <!-- Left Column: Farmer Information & Evidence -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-primary">Información del Agricultor</h5>
-                </div>
-                <div class="card-body">
-                    <div class="user-info-section">
-                        <div class="avatar-circle">
-                            <span class="initials">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h4 class="mb-0 fw-bold">{{ $user->name }}</h4>
-                            <p class="text-muted mb-0">{{ $user->email }}</p>
-                            <span class="badge bg-warning text-dark mt-2">Verificación Pendiente</span>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="fw-bold text-muted mb-2">Teléfono</label>
-                        <p class="fs-5">{{ $user->phone ?? 'No registrado' }}</p>
-                    </div>
-
-                    <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">Evidencias Presentadas</h6>
-                    
-                    <div class="mb-3">
-                        <label class="fw-bold text-muted mb-2">Foto de Rostro (Selfie)</label>
-                        <div class="evidence-img-container">
-                            @if($user->face_photo)
-                                <img src="{{ route('admin.verification.document', [$user, 'face_photo']) }}" class="img-fluid rounded evidence-img" alt="Selfie">
-                            @else
-                                <div class="alert alert-secondary">No hay foto disponible</div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold text-muted mb-2">DNI (Frontal)</label>
-                            <div class="evidence-img-container">
-                                @if($user->dni_front)
-                                    <img src="{{ route('admin.verification.document', [$user, 'dni_front']) }}" class="img-fluid rounded evidence-img" alt="DNI Frontal">
-                                @else
-                                    <div class="alert alert-secondary">No hay foto disponible</div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="fw-bold text-muted mb-2">DNI (Reverso)</label>
-                            <div class="evidence-img-container">
-                                @if($user->dni_back)
-                                    <img src="{{ route('admin.verification.document', [$user, 'dni_back']) }}" class="img-fluid rounded evidence-img" alt="DNI Reverso">
-                                @else
-                                    <div class="alert alert-secondary">No hay foto disponible</div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+    <div class="grid gap-6 xl:grid-cols-2">
+        <x-ui.card class="flex flex-col gap-5">
+            <div class="flex items-center gap-4">
+                <span class="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-white">{{ mb_strtoupper(mb_substr($user->name, 0, 2)) }}</span>
+                <div class="min-w-0">
+                    <h2 class="truncate text-xl font-semibold text-ink">{{ $user->name }}</h2>
+                    <p class="truncate text-sm text-muted">{{ $user->email }} · {{ $user->phone ?? 'Sin teléfono' }}</p>
+                    <x-ui.badge color="warning" class="mt-1">{{ $user->verification_status->label() }}</x-ui.badge>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column: RENIEC Verification -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-primary">Validación con RENIEC</h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info mb-4">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Ingresa el DNI para validar los datos con el servicio de RENIEC.
-                    </div>
-
-                    <form id="dniForm" method="POST" class="mb-4">
-                        @csrf
-                        <input type="hidden" name="user_id" value="{{ $user->id }}">
-                        <div class="mb-3">
-                            <label for="dni_input" class="form-label fw-bold text-muted small text-uppercase">Número de DNI</label>
-                            <div class="input-group input-group-lg">
-                                <span class="input-group-text bg-white border-end-0 text-muted">
-                                    <i class="fas fa-id-card"></i>
-                                </span>
-                                <input type="text" class="form-control border-start-0 ps-0" id="dni_input" name="dni" value="{{ old('dni', $user->dni) }}" placeholder="Ingrese los 8 dígitos" required maxlength="8" pattern="[0-9]{8}">
-                                <button class="btn btn-primary px-4" type="submit" id="consultarBtn">
-                                    <i class="fas fa-search me-2"></i>Consultar
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div id="apiResultContainer">
-                        @if(session('apiResult'))
-                            @if(session('apiResult')['success'])
-                                <div class="api-result-card mb-4">
-                                    <div class="result-header">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <span class="fw-bold text-success">Datos Encontrados</span>
-                                    </div>
-                                    <div class="result-body">
-                                        <div class="row g-3">
-                                            <div class="col-12">
-                                                <label class="result-label">Nombre Completo</label>
-                                                <div class="result-value">{{ session('apiResult')['data']['first_name'] }} {{ session('apiResult')['data']['first_last_name'] }} {{ session('apiResult')['data']['second_last_name'] }}</div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <label class="result-label">DNI</label>
-                                                <div class="result-value">{{ session('apiResult')['data']['document_number'] }}</div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <label class="result-label">Estado</label>
-                                                <div class="result-value text-success">
-                                                    <i class="fas fa-check-circle me-1 small"></i> Validado
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
-                                    <i class="fas fa-exclamation-circle me-3 fa-lg"></i>
-                                    <div>
-                                        <strong>Error en la consulta:</strong> {{ session('apiResult')['message'] }}
-                                    </div>
-                                </div>
-                            @endif
+            <h3 class="border-b border-line pb-2 font-semibold text-ink">Evidencias presentadas</h3>
+            <div class="grid gap-4 sm:grid-cols-2">
+                @foreach ($documents as $document => $label)
+                    <figure @class(['flex flex-col gap-2', 'sm:col-span-2' => $document === 'face_photo'])>
+                        <figcaption class="text-sm font-medium text-muted">{{ $label }}</figcaption>
+                        @if ($user->{$document})
+                            <a href="{{ route('admin.verification.document', [$user, $document]) }}" target="_blank" class="block overflow-hidden rounded-xl border border-line">
+                                <img src="{{ route('admin.verification.document', [$user, $document]) }}" alt="{{ $label }}" class="max-h-72 w-full object-contain">
+                            </a>
+                        @else
+                            <p class="rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">Sin imagen</p>
                         @endif
-                    </div>
-
-                    <hr class="my-4 border-light">
-
-                    <h5 class="fw-bold mb-3 text-primary">Acciones de Verificación</h5>
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            <form action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'approved']) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
-                                    <i class="fas fa-check-circle me-2"></i>Aprobar
-                                </button>
-                            </form>
-                        </div>
-                        <div class="col-md-6">
-                            <form action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'rejected']) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-outline-danger w-100 py-3 fw-bold">
-                                    <i class="fas fa-times-circle me-2"></i>Rechazar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                    </figure>
+                @endforeach
             </div>
+        </x-ui.card>
+
+        <div class="flex flex-col gap-6">
+            <x-ui.card
+                class="flex flex-col gap-4"
+                x-data="{
+                    dni: @js(old('dni', $user->dni)),
+                    loading: false,
+                    result: @js($initialResult),
+                    async check() {
+                        if (! /^\d{8}$/.test(this.dni)) {
+                            this.result = { success: false, message: 'Ingresa un DNI válido de 8 dígitos.' };
+                            return;
+                        }
+                        this.loading = true;
+                        try {
+                            const response = await fetch(@js(route('admin.check.dni')), {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                                body: JSON.stringify({ dni: this.dni, user_id: {{ $user->id }} }),
+                            });
+                            this.result = await response.json();
+                        } catch (error) {
+                            this.result = { success: false, message: 'Error de conexión. Inténtalo nuevamente.' };
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                }"
+            >
+                <h3 class="font-semibold text-ink">Validación con RENIEC</h3>
+                <x-ui.alert type="info">Consulta el DNI para comparar los datos oficiales con las evidencias.</x-ui.alert>
+
+                <form method="POST" action="{{ route('admin.check.dni') }}" x-on:submit.prevent="check" class="flex gap-2">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                    <label for="dni_input" class="sr-only">Número de DNI</label>
+                    <input id="dni_input" name="dni" x-model="dni" inputmode="numeric" maxlength="8" pattern="[0-9]{8}" placeholder="8 dígitos" required class="min-w-0 flex-1 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm text-ink focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none">
+                    <x-ui.button type="submit" x-bind:disabled="loading"><i class="fas" x-bind:class="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i> Consultar</x-ui.button>
+                </form>
+
+                <template x-if="result && result.success">
+                    <dl class="grid gap-3 rounded-xl border border-success/30 bg-success/10 p-4 text-sm sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <dt class="text-muted">Nombre completo</dt>
+                            <dd class="font-semibold text-ink" x-text="[result.data.first_name, result.data.first_last_name, result.data.second_last_name].join(' ')"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-muted">DNI</dt>
+                            <dd class="font-semibold text-ink" x-text="result.data.document_number"></dd>
+                        </div>
+                        <div>
+                            <dt class="text-muted">Estado</dt>
+                            <dd class="font-semibold text-success"><i class="fas fa-check-circle"></i> Validado</dd>
+                        </div>
+                    </dl>
+                </template>
+                <template x-if="result && ! result.success">
+                    <x-ui.alert type="error"><strong>Error en la consulta:</strong> <span x-text="result.message"></span></x-ui.alert>
+                </template>
+            </x-ui.card>
+
+            <x-ui.card class="flex flex-col gap-4">
+                <h3 class="font-semibold text-ink">Decisión</h3>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <form method="POST" action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'approved']) }}">
+                        @csrf
+                        <x-ui.button type="submit" size="lg" class="w-full"><i class="fas fa-check-circle"></i> Aprobar</x-ui.button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.verify', ['user' => $user->id, 'status' => 'rejected']) }}" x-data x-on:submit.prevent="Swal.fire({ title: '¿Rechazar la solicitud?', text: 'El agricultor recibirá un correo con la decisión.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Rechazar', cancelButtonText: 'Cancelar', confirmButtonColor: '#c53030' }).then((result) => result.isConfirmed && $el.submit())">
+                        @csrf
+                        <x-ui.button type="submit" variant="danger" size="lg" class="w-full"><i class="fas fa-times-circle"></i> Rechazar</x-ui.button>
+                    </form>
+                </div>
+            </x-ui.card>
         </div>
     </div>
-</div>
-
-{{-- Styles loaded via dashboard.css --}}
 @endsection
-
-@push('scripts')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/js/admin/verify.js'])
-@endpush

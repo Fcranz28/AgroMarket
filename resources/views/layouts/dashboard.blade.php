@@ -3,136 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') - AgroMarket</title>
+    <title>@yield('title', 'Panel') - AgroMarket</title>
+    <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @include('partials.theme-script')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/css/dashboard.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     @stack('styles')
 </head>
-<body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <a href="{{ route('home') }}" class="sidebar-logo">
-                    <img src="{{ asset('img/Logo_Claro.png') }}" alt="AgroMarket" class="logo-claro">
-                    <img src="{{ asset('img/Logo_Oscuro.png') }}" alt="AgroMarket" class="logo-oscuro">
-                </a>
+@php
+    $user = auth()->user();
+
+    $menu = $user->isAdmin()
+        ? [
+            ['route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'icon' => 'fa-chart-line', 'label' => 'Resumen'],
+            ['route' => 'admin.users', 'active' => 'admin.users*', 'icon' => 'fa-users', 'label' => 'Usuarios'],
+            ['route' => 'admin.productos.index', 'active' => 'admin.productos.*', 'icon' => 'fa-box', 'label' => 'Productos'],
+            ['route' => 'admin.reports.index', 'active' => 'admin.reports.*', 'icon' => 'fa-exclamation-circle', 'label' => 'Reportes'],
+        ]
+        : [
+            ['route' => 'farmer.dashboard', 'active' => 'farmer.dashboard', 'icon' => 'fa-home', 'label' => 'Resumen'],
+            ['route' => 'dashboard.productos.index', 'active' => 'dashboard.productos.*', 'icon' => 'fa-box', 'label' => 'Mis productos'],
+            ['route' => 'farmer.orders', 'active' => 'farmer.orders*', 'icon' => 'fa-shopping-bag', 'label' => 'Pedidos'],
+        ];
+@endphp
+<body
+    class="min-h-screen bg-canvas font-sans text-ink antialiased"
+    x-data="{ menuOpen: false }"
+    x-on:keydown.escape.window="menuOpen = false"
+    x-on:notify.window="Swal.fire({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, icon: $event.detail.type, title: $event.detail.message })"
+>
+    <div x-cloak x-show="menuOpen" x-transition.opacity x-on:click="menuOpen = false" class="fixed inset-0 z-40 bg-black/40 lg:hidden"></div>
+
+    <aside
+        x-bind:class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-line bg-surface transition-transform duration-200 lg:translate-x-0"
+        aria-label="Menú del panel"
+    >
+        <a href="{{ route('home') }}" class="flex h-16 items-center border-b border-line px-6">
+            <img src="{{ asset('img/Logo_Claro.png') }}" alt="AgroMarket" class="h-9 w-auto dark:hidden">
+            <img src="{{ asset('img/Logo_Oscuro.png') }}" alt="AgroMarket" class="hidden h-9 w-auto dark:block">
+        </a>
+
+        <nav class="flex flex-1 flex-col gap-1 p-4">
+            @foreach ($menu as $item)
+                <a
+                    href="{{ route($item['route']) }}"
+                    @class([
+                        'flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition',
+                        'bg-brand text-white shadow-soft' => request()->routeIs($item['active']),
+                        'text-ink hover:bg-brand-soft hover:text-brand' => ! request()->routeIs($item['active']),
+                    ])
+                ><i class="fas {{ $item['icon'] }} w-4 text-center"></i> {{ $item['label'] }}</a>
+            @endforeach
+
+            <a href="{{ route('home') }}" class="mt-auto flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-muted transition hover:bg-brand-soft hover:text-brand"><i class="fas fa-store w-4 text-center"></i> Ir a la tienda</a>
+        </nav>
+    </aside>
+
+    <div class="flex min-h-screen flex-col lg:pl-64">
+        <header class="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-navbar px-4 backdrop-blur-md sm:px-6">
+            <button type="button" x-on:click="menuOpen = true" class="rounded-lg p-2 text-ink hover:bg-brand-soft lg:hidden" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+            <h1 class="truncate text-lg font-semibold text-ink">@yield('header', 'Panel')</h1>
+
+            <div class="ml-auto flex items-center gap-2 sm:gap-3">
+                @include('partials.theme-toggle')
+
+                <span class="hidden items-center gap-2 text-sm sm:flex">
+                    <span class="flex size-8 items-center justify-center rounded-full bg-brand font-semibold text-white">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+                    <span class="max-w-40 truncate text-ink">{{ $user->name }}</span>
+                </span>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="rounded-lg p-2 text-muted transition hover:bg-danger/10 hover:text-danger" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fas fa-sign-out-alt"></i></button>
+                </form>
             </div>
-            
-            <ul class="sidebar-menu">
-                @if(auth()->user()->isAdmin())
-                    <li>
-                        <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-chart-line"></i> Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                            <i class="fas fa-users"></i> Usuarios
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.reports.index') }}" class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
-                            <i class="fas fa-exclamation-circle"></i> Reportes
-                        </a>
-                    </li>
-                @elseif(auth()->user()->isFarmer())
-                    <li>
-                        <a href="{{ route('farmer.dashboard') }}" class="{{ request()->routeIs('farmer.dashboard') ? 'active' : '' }}">
-                            <i class="fas fa-home"></i> Resumen
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('dashboard.productos.index') }}" class="{{ request()->routeIs('dashboard.productos.*') ? 'active' : '' }}">
-                            <i class="fas fa-box"></i> Mis Productos
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('farmer.orders') }}" class="{{ request()->routeIs('farmer.orders') ? 'active' : '' }}">
-                            <i class="fas fa-shopping-bag"></i> Pedidos
-                        </a>
-                    </li>
-                @endif
-                
-                <li>
-                    <a href="{{ route('home') }}">
-                        <i class="fas fa-store"></i> Ir a la Tienda
-                    </a>
-                </li>
-            </ul>
-        </aside>
+        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <button type="button" id="mobileMenuToggle" class="mobile-menu-btn" aria-label="Toggle menu">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h2>@yield('header', 'Dashboard')</h2>
-                </div>
-                <div class="header-right">
-                    <!-- Theme Toggle -->
-                    <button type="button" id="dashboardThemeToggle" class="theme-toggle" aria-label="Cambiar tema">
-                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="5"></circle>
-                            <line x1="12" y1="1" x2="12" y2="3"></line>
-                            <line x1="12" y1="21" x2="12" y2="23"></line>
-                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                            <line x1="1" y1="12" x2="3" y2="12"></line>
-                            <line x1="21" y1="12" x2="23" y2="12"></line>
-                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                        </svg>
-                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                    </button>
+        <main class="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            @if (session('success'))
+                <x-ui.alert type="success" dismissible>{{ session('success') }}</x-ui.alert>
+            @endif
+            @if (session('error'))
+                <x-ui.alert type="error" dismissible>{{ session('error') }}</x-ui.alert>
+            @endif
 
-                    <!-- User Profile -->
-                    <div class="user-profile">
-                        <div class="user-avatar">
-                            {{ substr(auth()->user()->name, 0, 1) }}
-                        </div>
-                        <span>{{ auth()->user()->name }}</span>
-                    </div>
-
-                    <!-- Logout -->
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" title="Cerrar sesión">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </form>
-                </div>
-            </header>
-
-            <!-- Content Body -->
-            <div class="content-body">
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
+            @yield('content')
         </main>
     </div>
 
-
-    @vite(['resources/js/layouts/dashboard.js'])
-
+    @livewireScriptConfig
     @stack('scripts')
-
 </body>
 </html>

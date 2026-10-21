@@ -20,7 +20,7 @@ class FarmerProductController extends Controller
      */
     public function index(): View
     {
-        $products = Product::ownedBy(auth()->user())->latest()->get();
+        $products = Product::ownedBy(auth()->user())->with('category')->latest()->paginate(15);
 
         return view('dashboard.products.index', compact('products'));
     }
@@ -68,7 +68,7 @@ class FarmerProductController extends Controller
     {
         $this->authorize('view', $producto);
 
-        return view('dashboard.products.show', ['product' => $producto]);
+        return view('dashboard.products.show', ['product' => $producto->load(['units', 'images', 'category'])]);
     }
 
     /**
@@ -80,7 +80,7 @@ class FarmerProductController extends Controller
 
         $categories = Category::all();
 
-        return view('dashboard.products.edit', compact('producto', 'categories'));
+        return view('dashboard.products.edit', ['producto' => $producto->load(['units', 'images']), 'categories' => $categories]);
     }
 
     /**

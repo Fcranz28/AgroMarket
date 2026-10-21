@@ -19,7 +19,7 @@ class ProductCrudController extends Controller
      */
     public function index(): View
     {
-        $products = Product::with('category')->get();
+        $products = Product::with(['category', 'user:id,name'])->latest()->paginate(20);
 
         return view('admin.products.index', compact('products'));
     }
@@ -62,7 +62,7 @@ class ProductCrudController extends Controller
      */
     public function show(Product $producto): View
     {
-        return view('admin.products.show', ['product' => $producto]);
+        return view('admin.products.show', ['product' => $producto->load(['units', 'images', 'category', 'user:id,name'])]);
     }
 
     /**
@@ -72,7 +72,7 @@ class ProductCrudController extends Controller
     {
         $categories = Category::all();
 
-        return view('admin.products.edit', ['product' => $producto, 'categories' => $categories]);
+        return view('admin.products.edit', ['product' => $producto->load('units'), 'categories' => $categories]);
     }
 
     /**
