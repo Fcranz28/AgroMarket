@@ -1,11 +1,12 @@
-@props(['name', 'label' => null, 'type' => 'text', 'hint' => null])
+@props(['name', 'label' => null, 'type' => 'text', 'hint' => null, 'bag' => 'default'])
 
 @php
     $id = $attributes->get('id', $name);
-    $hasError = $errors->has($name);
+    $errorBag = $errors->getBag($bag);
+    $hasError = $errorBag->has($name);
 @endphp
 
-<div class="flex flex-col gap-1.5">
+<div {{ $attributes->only('class')->class('flex flex-col gap-1.5') }}>
     @if ($label)
         <label for="{{ $id }}" class="text-sm font-medium text-ink">{{ $label }}</label>
     @endif
@@ -16,7 +17,7 @@
         id="{{ $id }}"
         @if ($type !== 'password') value="{{ old($name, $attributes->get('value')) }}" @endif
         @if ($hasError) aria-invalid="true" aria-describedby="{{ $id }}-error" @endif
-        {{ $attributes->except(['id', 'value'])->class([
+        {{ $attributes->except(['id', 'value', 'class'])->class([
             'w-full rounded-xl border bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/70 transition focus:outline-none focus:ring-2',
             'border-line focus:border-brand focus:ring-brand/25' => ! $hasError,
             'border-danger focus:ring-danger/25' => $hasError,
@@ -24,7 +25,7 @@
     >
 
     @if ($hasError)
-        <p id="{{ $id }}-error" class="text-xs text-danger">{{ $errors->first($name) }}</p>
+        <p id="{{ $id }}-error" class="text-xs text-danger">{{ $errorBag->first($name) }}</p>
     @elseif ($hint)
         <p class="text-xs text-muted">{{ $hint }}</p>
     @endif

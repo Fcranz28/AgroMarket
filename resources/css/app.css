@@ -11,6 +11,7 @@
 
 @source '../views';
 @source '../../app/Modules';
+@source '../js';
 
 /* Modo oscuro con el mismo selector que ya usa el sitio: <html data-theme="dark"> */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -76,14 +77,8 @@
 /* Estilos anteriores (se eliminan a medida que cada vista pasa a Tailwind) */
 @import './style.css' layer(legacy);
 @import './style2.css' layer(legacy);
-@import './login.css' layer(legacy);
-@import './contacto.css' layer(legacy);
-@import './nosotros.css' layer(legacy);
 @import './pedidos.css' layer(legacy);
 @import './CRUD.css' layer(legacy);
-@import './onboarding/farmer.css' layer(legacy);
 @import './orders/index.css' layer(legacy);
 @import './orders/show.css' layer(legacy);
 @import './products/show.css' layer(legacy);
-@import './about.css' layer(legacy);
-@import './onboarding/welcome.css' layer(legacy);

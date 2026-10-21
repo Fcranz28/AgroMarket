@@ -7,18 +7,10 @@
         side-title="Zona protegida"
         side-text="Esta acción cambia la seguridad de tu cuenta."
     >
-        <form method="POST" action="{{ route('password.confirm') }}">
+        <form method="POST" action="{{ route('password.confirm') }}" class="flex flex-col gap-4">
             @csrf
-
-            <div class="input-group">
-                <input id="password" type="password" name="password" required autofocus autocomplete="current-password" />
-                <label for="password">Contraseña</label>
-            </div>
-            @error('password')
-                <div class="input-error">{{ $message }}</div>
-            @enderror
-
-            <button type="submit" class="btn">Confirmar</button>
+            <x-ui.input name="password" type="password" label="Contraseña" required autofocus autocomplete="current-password" />
+            <x-ui.button type="submit" size="lg" class="w-full">Confirmar</x-ui.button>
         </form>
     </x-auth-card>
 @endsection

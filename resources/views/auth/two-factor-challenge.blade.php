@@ -7,26 +7,11 @@
         side-title="¿Perdiste tu teléfono?"
         side-text="Usa uno de tus códigos de recuperación en el segundo campo."
     >
-        <form method="POST" action="{{ route('two-factor.login') }}">
+        <form method="POST" action="{{ route('two-factor.login') }}" class="flex flex-col gap-4">
             @csrf
-
-            <div class="input-group">
-                <input id="code" type="text" name="code" inputmode="numeric" autocomplete="one-time-code" autofocus />
-                <label for="code">Código</label>
-            </div>
-            @error('code')
-                <div class="input-error">{{ $message }}</div>
-            @enderror
-
-            <div class="input-group">
-                <input id="recovery_code" type="text" name="recovery_code" autocomplete="off" />
-                <label for="recovery_code">Código de recuperación (opcional)</label>
-            </div>
-            @error('recovery_code')
-                <div class="input-error">{{ $message }}</div>
-            @enderror
-
-            <button type="submit" class="btn">Verificar</button>
+            <x-ui.input name="code" label="Código" inputmode="numeric" autocomplete="one-time-code" autofocus />
+            <x-ui.input name="recovery_code" label="Código de recuperación (opcional)" autocomplete="off" />
+            <x-ui.button type="submit" size="lg" class="w-full">Verificar</x-ui.button>
         </form>
     </x-auth-card>
 @endsection

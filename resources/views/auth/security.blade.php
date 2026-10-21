@@ -22,47 +22,52 @@
         side-link-label="Volver a mi cuenta"
     >
         @if (isset($statusMessages[session('status')]))
-            <div class="input-success" role="status">{{ $statusMessages[session('status')] }}</div>
+            <x-ui.alert type="success">{{ $statusMessages[session('status')] }}</x-ui.alert>
         @endif
+
+        <div class="flex items-center justify-center gap-2 text-sm">
+            Estado:
+            @if ($isConfirmed)
+                <x-ui.badge color="success">Activada</x-ui.badge>
+            @elseif ($isEnabled)
+                <x-ui.badge color="warning">Pendiente de confirmar</x-ui.badge>
+            @else
+                <x-ui.badge color="neutral">Desactivada</x-ui.badge>
+            @endif
+        </div>
 
         @if (! $isEnabled)
             <form method="POST" action="{{ route('two-factor.enable') }}">
                 @csrf
-                <button type="submit" class="btn">Activar</button>
+                <x-ui.button type="submit" size="lg" class="w-full">Activar</x-ui.button>
             </form>
         @elseif (! $isConfirmed)
-            <div class="two-factor-qr">{!! $user->twoFactorQrCodeSvg() !!}</div>
+            <div class="mx-auto rounded-xl bg-white p-3">{!! $user->twoFactorQrCodeSvg() !!}</div>
 
-            <form method="POST" action="{{ route('two-factor.confirm') }}">
+            <form method="POST" action="{{ route('two-factor.confirm') }}" class="flex flex-col gap-4">
                 @csrf
-                <div class="input-group">
-                    <input id="code" type="text" name="code" inputmode="numeric" autocomplete="one-time-code" required />
-                    <label for="code">Código de la app</label>
-                </div>
-                @error('code', 'confirmTwoFactorAuthentication')
-                    <div class="input-error">{{ $message }}</div>
-                @enderror
-                <button type="submit" class="btn">Confirmar</button>
+                <x-ui.input name="code" label="Código de la app" bag="confirmTwoFactorAuthentication" inputmode="numeric" autocomplete="one-time-code" required />
+                <x-ui.button type="submit" size="lg" class="w-full">Confirmar</x-ui.button>
             </form>
         @else
-            <span>Guarda estos códigos de recuperación en un lugar seguro. Cada uno sirve una sola vez si pierdes tu teléfono.</span>
-            <code>
+            <p class="text-sm text-muted">Guarda estos códigos de recuperación en un lugar seguro. Cada uno sirve una sola vez si pierdes tu teléfono.</p>
+            <ul class="grid grid-cols-2 gap-2 rounded-xl bg-canvas p-4 font-mono text-sm text-ink">
                 @foreach ($user->recoveryCodes() as $recoveryCode)
-                    {{ $recoveryCode }}<br>
+                    <li>{{ $recoveryCode }}</li>
                 @endforeach
-            </code>
+            </ul>
 
-            <form method="POST" action="{{ route('two-factor.regenerate-recovery-codes') }}">
+            <form method="POST" action="{{ route('two-factor.regenerate-recovery-codes') }}" class="text-center">
                 @csrf
-                <button type="submit" class="link-button">Generar nuevos códigos</button>
+                <button type="submit" class="text-sm font-medium text-brand hover:underline">Generar nuevos códigos</button>
             </form>
         @endif
 
         @if ($isEnabled)
-            <form method="POST" action="{{ route('two-factor.disable') }}">
+            <form method="POST" action="{{ route('two-factor.disable') }}" class="text-center">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="link-button">Desactivar verificación en dos pasos</button>
+                <button type="submit" class="text-sm font-medium text-danger hover:underline">Desactivar verificación en dos pasos</button>
             </form>
         @endif
     </x-auth-card>

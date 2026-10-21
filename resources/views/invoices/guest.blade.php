@@ -8,39 +8,20 @@
 @endif
 
 @section('content')
-<div class="farmer-pending-container">
-    <div class="farmer-pending-card">
-        <div class="farmer-pending-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-
-        @if ($downloadUrl)
-            <h1 class="farmer-pending-title">¡Gracias por tu compra!</h1>
-
-            <p class="farmer-pending-message">Tu pago fue confirmado y tu comprobante está listo.</p>
-
-            <a href="{{ $downloadUrl }}" class="btn-invoice-download" style="display: inline-block; background-color: #e74c3c; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                Descargar comprobante
-            </a>
-        @else
-            <h1 class="farmer-pending-title">Estamos generando tu comprobante</h1>
-
-            <div class="farmer-pending-badge">
-                <span class="farmer-pending-dot"></span>
+    @if ($downloadUrl)
+        <x-ui.status-card title="¡Gracias por tu compra!" icon="check" tone="success">
+            <p class="text-muted">Tu pago fue confirmado y tu comprobante está listo.</p>
+            <x-ui.button size="lg" :href="$downloadUrl">Descargar comprobante</x-ui.button>
+            <a href="{{ route('home') }}" class="text-sm font-medium text-brand hover:underline">Volver a la tienda</a>
+        </x-ui.status-card>
+    @else
+        <x-ui.status-card title="Estamos generando tu comprobante">
+            <x-ui.badge color="warning" class="gap-2">
+                <span class="size-2 animate-pulse rounded-full bg-current"></span>
                 En proceso
-            </div>
-
-            <p class="farmer-pending-message">
-                Tu pago fue confirmado. En unos segundos aparecerá el botón para descargar tu comprobante;
-                puedes dejar esta página abierta.
-            </p>
-        @endif
-
-        <p class="farmer-pending-message">
-            <a href="{{ route('home') }}">Volver a la tienda</a>
-        </p>
-    </div>
-</div>
+            </x-ui.badge>
+            <p class="text-muted">Tu pago fue confirmado. En unos segundos aparecerá el botón para descargar tu comprobante; puedes dejar esta página abierta.</p>
+            <a href="{{ route('home') }}" class="text-sm font-medium text-brand hover:underline">Volver a la tienda</a>
+        </x-ui.status-card>
+    @endif
 @endsection
