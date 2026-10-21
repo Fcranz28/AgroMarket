@@ -23,7 +23,7 @@ export async function initializeStripeCheckout() {
       stripe = await loadStripe(stripeKey);
 
       // Get cart data
-      const cart = getCartFromStorage();
+      const cart = window.checkoutCart ?? [];
       if (!cart || cart.length === 0) {
          alert('El carrito está vacío');
          window.location.href = '/productos';
@@ -140,7 +140,7 @@ async function handleSubmit(e) {
 
       if (paymentIntent.status === 'succeeded') {
          // Process payment on backend
-         const cart = getCartFromStorage();
+         const cart = window.checkoutCart ?? [];
          const response = await fetch('/payment/process', {
             method: 'POST',
             headers: {
@@ -166,9 +166,6 @@ async function handleSubmit(e) {
             throw new Error(data.error || 'Error al procesar el pago');
          }
 
-         // Clear cart
-         localStorage.removeItem('carrito');
-
          // Guests receive a signed link to their receipt, which is issued in the background:
          // the link shows a waiting page until it is ready.
          if (data.invoice_url) {
@@ -188,19 +185,6 @@ async function handleSubmit(e) {
       submitButton.disabled = false;
       spinner.style.display = 'none';
       buttonText.textContent = 'Pagar ahora';
-   }
-}
-
-/**
- * Get cart from localStorage
- */
-function getCartFromStorage() {
-   try {
-      const cart = localStorage.getItem('carrito');
-      return cart ? JSON.parse(cart) : [];
-   } catch (e) {
-      console.error('Error reading cart:', e);
-      return [];
    }
 }
 

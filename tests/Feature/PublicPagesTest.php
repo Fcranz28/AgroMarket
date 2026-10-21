@@ -16,7 +16,6 @@ it('renders the public pages', function (string $uri) {
     'search' => '/buscar',
     'login' => '/login',
     'register' => '/register',
-    'checkout' => '/checkout',
 ]);
 
 it('renders a product detail page', function () {

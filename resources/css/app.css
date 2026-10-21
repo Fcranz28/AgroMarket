@@ -79,15 +79,12 @@
 @import './login.css' layer(legacy);
 @import './contacto.css' layer(legacy);
 @import './nosotros.css' layer(legacy);
-@import './categorias.css' layer(legacy);
 @import './pedidos.css' layer(legacy);
 @import './CRUD.css' layer(legacy);
 @import './onboarding/farmer.css' layer(legacy);
-@import './layouts/app.css' layer(legacy);
 @import './checkout/index.css' layer(legacy);
 @import './orders/index.css' layer(legacy);
 @import './orders/show.css' layer(legacy);
 @import './products/show.css' layer(legacy);
-@import './search/index.css' layer(legacy);
 @import './about.css' layer(legacy);
 @import './onboarding/welcome.css' layer(legacy);

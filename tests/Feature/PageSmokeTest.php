@@ -20,7 +20,9 @@ it('renders the buyer pages', function () {
     $order = Order::factory()->for($buyer)->create();
     OrderItem::factory()->for($order)->create();
 
-    $this->actingAs($buyer);
+    $this->actingAs($buyer)->withSession(['cart' => [
+        "{$order->items->first()->product_id}:" => ['product_id' => $order->items->first()->product_id, 'unit_id' => null, 'quantity' => 1],
+    ]]);
 
     $this->get(route('orders.index'))->assertSuccessful();
     $this->get(route('orders.show', $order))->assertSuccessful();

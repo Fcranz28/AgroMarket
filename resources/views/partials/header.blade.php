@@ -28,32 +28,11 @@
         </div>
 
         <div class="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-3 xl:flex-none">
-            <div class="relative min-w-0 flex-1 md:max-w-md xl:w-96 xl:flex-none">
-                <form action="{{ route('search') }}" method="GET" id="searchForm" role="search" class="flex items-center rounded-pill border border-line bg-canvas py-1 pr-1 pl-1 transition focus-within:border-brand">
-                    <label for="searchCategory" class="sr-only">Categoría</label>
-                    <select name="category" id="searchCategory" class="hidden max-w-24 cursor-pointer truncate border-r border-line bg-transparent px-2 py-1.5 text-xs text-ink outline-none min-[400px]:block sm:max-w-40 sm:text-sm">
-                        <option value="all">Todas las Categorías</option>
-                        @foreach ($navCategories as $category)
-                            <option value="{{ $category->slug }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                    <label for="searchInput" class="sr-only">Buscar productos</label>
-                    <input type="text" name="q" id="searchInput" placeholder="Buscar productos..." autocomplete="off" class="min-w-0 flex-1 bg-transparent px-3 py-1.5 text-base text-ink outline-none placeholder:text-muted sm:text-sm">
-                    <button type="submit" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white transition hover:bg-brand-strong" aria-label="Buscar">
-                        <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    </button>
-                </form>
+            <livewire:catalog.search-box />
 
-                {{-- autocomplete.js rellena .suggestions-list y alterna display --}}
-                <div id="searchSuggestions" class="absolute inset-x-0 top-[calc(100%+6px)] z-[1000] max-h-96 overflow-y-auto rounded-xl border border-line bg-surface shadow-lifted" style="display: none;">
-                    <div class="suggestions-list py-2"></div>
-                </div>
-            </div>
-
-            {{-- carrito.js usa #openCart y .cart-count --}}
-            <button type="button" id="openCart" class="relative hidden p-1 text-ink transition hover:text-brand md:inline-flex" aria-label="Abrir carrito">
+            <button type="button" x-data x-on:click="$dispatch('open-cart')" class="relative hidden p-1 text-ink transition hover:text-brand md:inline-flex" aria-label="Abrir carrito">
                 <svg class="size-6 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                <span class="cart-count absolute -top-1 -right-1 flex size-[18px] items-center justify-center rounded-full bg-brand text-[0.7rem] font-bold text-white">0</span>
+                <livewire:orders.cart-count />
             </button>
 
             @guest

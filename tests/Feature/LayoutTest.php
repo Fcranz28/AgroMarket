@@ -15,7 +15,7 @@ it('shows the navigation, search and login links to guests', function () {
 
     $this->get(route('home'))
         ->assertSuccessful()
-        ->assertSee('id="searchForm"', false)
+        ->assertSee('action="'.route('search').'"', false)
         ->assertSee('value="'.$category->slug.'"', false)
         ->assertSee(route('login'))
         ->assertSee(route('register'))
@@ -24,13 +24,11 @@ it('shows the navigation, search and login links to guests', function () {
         ->assertDontSee('Agregar nuevo producto');
 });
 
-it('keeps the hooks the cart and autocomplete scripts rely on', function () {
+it('renders the cart and search Livewire components on every page', function () {
     $this->get(route('home'))
-        ->assertSee('id="openCart"', false)
-        ->assertSee('cart-button-mobile', false)
-        ->assertSee('id="cartSidebar"', false)
-        ->assertSee('id="searchSuggestions"', false)
-        ->assertSee('id="searchInput"', false);
+        ->assertSeeLivewire('orders.cart-sidebar')
+        ->assertSeeLivewire('orders.cart-count')
+        ->assertSeeLivewire('catalog.search-box');
 });
 
 it('shows the user menu to authenticated buyers', function () {

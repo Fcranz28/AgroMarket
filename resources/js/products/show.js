@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Add to Cart Logic ---
     addToCartBtn.addEventListener('click', () => {
         const selectedUnit = selectedUnitInput.value;
-        const selectedPrice = parseFloat(selectedPriceInput.value);
         const quantity = parseInt(quantityInput.value);
 
         if (!selectedUnit) {
@@ -101,18 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const productToAdd = {
-            ...product,
-            unit: selectedUnit,
-            unit_id: selectedUnitId,
-            price: selectedPrice, // Use the selected unit price
-            cantidad: quantity
-        };
-
-        const event = new CustomEvent('add-to-cart-detail', {
-            detail: { product: productToAdd, quantity: quantity }
-        });
-        document.dispatchEvent(event);
+        // El carrito (componente Livewire del layout) escucha este evento
+        window.Livewire.dispatch('add-to-cart', { productId: product.id, unitId: selectedUnitId, quantity });
     });
     // --- Review Image Upload Logic ---
     const reviewDropZone = document.getElementById('reviewDropZone');
