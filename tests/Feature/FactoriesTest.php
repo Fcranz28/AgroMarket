@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Invoice;
 use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Identity\Models\User;
+use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\OrderItem;
 
 it('creates users with role states', function () {

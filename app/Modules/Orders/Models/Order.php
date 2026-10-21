@@ -2,16 +2,18 @@
 
 namespace App\Modules\Orders\Models;
 
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
-use App\Modules\Orders\Database\Factories\OrderFactory;
-use App\Models\Invoice;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Database\Factories\OrderFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * The invoice relation is registered by the Invoicing module with
+ * Order::resolveRelationUsing(), so Orders does not depend on it.
+ */
 #[UseFactory(OrderFactory::class)]
 class Order extends Model
 {
@@ -64,14 +66,6 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
-    }
-
-    /**
-     * Get the invoice for the order
-     */
-    public function invoice(): HasOne
-    {
-        return $this->hasOne(Invoice::class);
     }
 
     /**

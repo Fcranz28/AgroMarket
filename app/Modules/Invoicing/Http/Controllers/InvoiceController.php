@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Invoicing\Http\Controllers;
 
-use App\Models\Invoice;
+use App\Http\Controllers\Controller;
+use App\Modules\Invoicing\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;

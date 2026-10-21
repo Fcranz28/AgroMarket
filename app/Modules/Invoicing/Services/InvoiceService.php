@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Modules\Invoicing\Services;
 
-use App\Models\Invoice;
+use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
-use App\Support\AmountInWords;
+use App\Modules\Invoicing\Support\AmountInWords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;

@@ -6,4 +6,5 @@ return [
     App\Modules\Catalog\CatalogServiceProvider::class,
     App\Modules\Orders\OrdersServiceProvider::class,
     App\Modules\Payments\PaymentsServiceProvider::class,
+    App\Modules\Invoicing\InvoicingServiceProvider::class,
 ];

@@ -1,6 +1,6 @@
 <?php
 
-use App\Support\AmountInWords;
+use App\Modules\Invoicing\Support\AmountInWords;
 
 it('converts integers to spanish words', function (int $number, string $words) {
     expect(AmountInWords::integer($number))->toBe($words);
