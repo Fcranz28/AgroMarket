@@ -2,9 +2,12 @@
 
 namespace App\Modules\Identity\Models;
 
+use App\Modules\Identity\Policies\AddressPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[UsePolicy(AddressPolicy::class)]
 class Address extends Model
 {
     protected $fillable = [

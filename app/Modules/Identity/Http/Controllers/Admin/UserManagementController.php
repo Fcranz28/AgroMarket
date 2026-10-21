@@ -10,6 +10,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
@@ -126,8 +127,10 @@ class UserManagementController extends Controller
             return back()->with('error', 'Estado inválido.');
         }
 
-        if (! $user->isFarmer()) {
-            return back()->with('error', 'Solo se pueden verificar cuentas de agricultor.');
+        $permission = Gate::inspect('verify', $user);
+
+        if ($permission->denied()) {
+            return back()->with('error', $permission->message());
         }
 
         $user->update(['verification_status' => $status]);
@@ -135,10 +138,12 @@ class UserManagementController extends Controller
         return redirect()->route('admin.users')->with('success', 'Estado del agricultor actualizado correctamente.');
     }
 
-    public function toggleBan(Request $request, User $user): RedirectResponse
+    public function toggleBan(User $user): RedirectResponse
     {
-        if ($user->is($request->user()) || $user->isAdmin()) {
-            return back()->with('error', 'No puedes suspender a un administrador.');
+        $permission = Gate::inspect('ban', $user);
+
+        if ($permission->denied()) {
+            return back()->with('error', $permission->message());
         }
 
         $user->update(['is_banned' => ! $user->is_banned]);

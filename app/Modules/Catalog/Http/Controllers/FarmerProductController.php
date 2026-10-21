@@ -30,7 +30,7 @@ class FarmerProductController extends Controller
      */
     public function create(): View|RedirectResponse
     {
-        if (! auth()->user()->isVerified() && ! auth()->user()->isAdmin()) {
+        if (auth()->user()->cannot('create', Product::class)) {
             return redirect()->route('farmer.dashboard')->with('error', 'Debes ser un agricultor verificado para publicar productos.');
         }
 
@@ -66,7 +66,7 @@ class FarmerProductController extends Controller
      */
     public function show(Product $producto): View
     {
-        $this->ensureOwnership($producto);
+        $this->authorize('view', $producto);
 
         return view('dashboard.products.show', ['product' => $producto]);
     }
@@ -76,7 +76,7 @@ class FarmerProductController extends Controller
      */
     public function edit(Product $producto): View
     {
-        $this->ensureOwnership($producto);
+        $this->authorize('update', $producto);
 
         $categories = Category::all();
 
@@ -88,7 +88,7 @@ class FarmerProductController extends Controller
      */
     public function update(FarmerProductRequest $request, Product $producto): RedirectResponse
     {
-        $this->ensureOwnership($producto);
+        $this->authorize('update', $producto);
 
         DB::transaction(function () use ($request, $producto) {
             $imagesToDelete = $producto->images()->whereIn('id', $request->validated('delete_images', []))->get();
@@ -119,7 +119,7 @@ class FarmerProductController extends Controller
      */
     public function destroy(Product $producto): RedirectResponse
     {
-        $this->ensureOwnership($producto);
+        $this->authorize('delete', $producto);
 
         $producto->delete();
 
@@ -141,10 +141,5 @@ class FarmerProductController extends Controller
         if (! $product->image_path) {
             $product->update(['image_path' => $product->images()->value('image_path')]);
         }
-    }
-
-    private function ensureOwnership(Product $product): void
-    {
-        abort_if($product->user_id !== auth()->id(), 403, 'No tienes permiso para gestionar este producto.');
     }
 }

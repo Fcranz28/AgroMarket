@@ -6,7 +6,9 @@ use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Database\Factories\OrderFactory;
 use App\Modules\Orders\Enums\OrderStatus;
 use App\Modules\Orders\Enums\PaymentStatus;
+use App\Modules\Orders\Policies\OrderPolicy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property PaymentStatus $payment_status
  */
 #[UseFactory(OrderFactory::class)]
+#[UsePolicy(OrderPolicy::class)]
 class Order extends Model
 {
     /** @use HasFactory<\App\Modules\Orders\Database\Factories\OrderFactory> */
