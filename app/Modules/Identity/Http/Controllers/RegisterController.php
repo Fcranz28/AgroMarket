@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,7 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => User::ROLE_USER, // Default
+            'role' => UserRole::User, // Default
             'onboarding_completed' => false,
         ]);
 

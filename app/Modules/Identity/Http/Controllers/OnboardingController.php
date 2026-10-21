@@ -3,9 +3,10 @@
 namespace App\Modules\Identity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Identity\Enums\UserRole;
+use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Http\Requests\FarmerVerificationRequest;
 use App\Modules\Identity\Http\Requests\SelectRoleRequest;
-use App\Modules\Identity\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,14 +20,14 @@ class OnboardingController extends Controller
 
     public function selectRole(SelectRoleRequest $request): RedirectResponse
     {
-        $role = $request->validated('role');
+        $role = UserRole::from($request->validated('role'));
 
         $request->user()->forceFill([
             'role' => $role,
-            'verification_status' => User::STATUS_NONE,
+            'verification_status' => VerificationStatus::None,
         ])->save();
 
-        return $role === User::ROLE_FARMER
+        return $role === UserRole::Farmer
             ? redirect()->route('onboarding.farmer')
             : redirect()->route('onboarding.user');
     }
@@ -69,7 +70,7 @@ class OnboardingController extends Controller
             'face_photo' => $request->file('face_photo')->store('verification/faces', 'local'),
             'dni_front' => $request->file('dni_front')->store('verification/dni', 'local'),
             'dni_back' => $request->file('dni_back')->store('verification/dni', 'local'),
-            'verification_status' => User::STATUS_PENDING,
+            'verification_status' => VerificationStatus::Pending,
             'onboarding_completed' => true,
         ]);
 

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Payments\Jobs;
 
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Payments\Services\PaymentGateway;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -44,12 +45,12 @@ class RefundPayment implements ShouldBeUnique, ShouldQueue
     {
         $gateway->refund($this->paymentIntentId);
 
-        $this->order()?->update(['payment_status' => 'refunded']);
+        $this->order()?->update(['payment_status' => PaymentStatus::Refunded]);
     }
 
     public function failed(Throwable $exception): void
     {
-        $this->order()?->update(['payment_status' => 'refund_failed']);
+        $this->order()?->update(['payment_status' => PaymentStatus::RefundFailed]);
 
         Log::critical('Automatic refund failed after retries', [
             'payment_intent' => $this->paymentIntentId,

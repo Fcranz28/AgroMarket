@@ -4,10 +4,14 @@ namespace App\Modules\Moderation\Models;
 
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
+use App\Modules\Moderation\Enums\ReportStatus;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property ReportStatus $status
+ */
 class Report extends Model
 {
     protected $fillable = [
@@ -23,6 +27,7 @@ class Report extends Model
 
     protected $casts = [
         'evidence' => 'array',
+        'status' => ReportStatus::class,
     ];
 
     /**

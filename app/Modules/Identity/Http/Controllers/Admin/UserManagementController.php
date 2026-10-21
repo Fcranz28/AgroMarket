@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Http\Requests\CheckDniRequest;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\Client\ConnectionException;
@@ -119,7 +120,9 @@ class UserManagementController extends Controller
 
     public function verifyFarmer(User $user, string $status): RedirectResponse
     {
-        if (! in_array($status, [User::STATUS_APPROVED, User::STATUS_REJECTED], true)) {
+        $status = VerificationStatus::tryFrom($status);
+
+        if (! in_array($status, [VerificationStatus::Approved, VerificationStatus::Rejected], true)) {
             return back()->with('error', 'Estado inválido.');
         }
 

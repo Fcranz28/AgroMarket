@@ -53,7 +53,7 @@
         @if($orders->count() > 0)
             <div class="farmer-orders-grid">
                 @foreach($orders as $order)
-                    <div class="farmer-order-card" data-status="{{ $order->status }}">
+                    <div class="farmer-order-card" data-status="{{ $order->status->value }}">
                         <div class="farmer-order-header">
                             <div class="farmer-order-info">
                                 <h3>Pedido #{{ $order->id }}</h3>
@@ -62,8 +62,8 @@
                                     {{ $order->created_at->format('d M Y, H:i') }}
                                 </span>
                             </div>
-                            <span class="farmer-status-badge status-{{ $order->status }}">
-                                @switch($order->status)
+                            <span class="farmer-status-badge status-{{ $order->status->value }}">
+                                @switch($order->status->value)
                                     @case('pending')
                                         Pendiente
                                         @break
@@ -77,7 +77,7 @@
                                         Entregado
                                         @break
                                     @default
-                                        {{ $order->status }}
+                                        {{ $order->status->label() }}
                                 @endswitch
                             </span>
                         </div>
@@ -120,8 +120,8 @@
                                 <a href="{{ route('farmer.orders.show', $order) }}" class="farmer-btn farmer-btn-outline">
                                     <i class="fas fa-eye"></i> Ver Detalles
                                 </a>
-                                @if(in_array($order->status, ['pending', 'processing']))
-                                    <button class="farmer-btn farmer-btn-primary" onclick="updateOrderStatus('{{ $order->uuid }}', '{{ $order->status }}')">
+                                @if(in_array($order->status->value, ['pending', 'processing'], true))
+                                    <button class="farmer-btn farmer-btn-primary" onclick="updateOrderStatus('{{ $order->uuid }}', '{{ $order->status->value }}')">
                                         <i class="fas fa-truck"></i> Actualizar Estado
                                     </button>
                                 @endif

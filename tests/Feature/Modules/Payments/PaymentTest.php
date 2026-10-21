@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
 use App\Modules\Payments\Services\PaymentGateway;
@@ -180,5 +181,5 @@ it('accepts correctly signed webhooks', function () {
         'CONTENT_TYPE' => 'application/json',
     ], $payload)->assertSuccessful();
 
-    expect($order->fresh()->payment_status)->toBe('paid');
+    expect($order->fresh()->payment_status)->toBe(PaymentStatus::Paid);
 });

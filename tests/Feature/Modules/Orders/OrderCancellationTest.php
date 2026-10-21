@@ -2,6 +2,8 @@
 
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Events\OrderCancelled;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
@@ -34,7 +36,7 @@ it('queues the refund on the payments queue', function () {
         ->assertJsonFragment(['message' => 'Pedido cancelado. El reembolso se está procesando.']);
 
     Queue::assertPushedOn('payments', RefundPayment::class, fn (RefundPayment $job) => $job->orderId === $this->order->id);
-    expect($this->order->fresh()->status)->toBe('cancelled');
+    expect($this->order->fresh()->status)->toBe(OrderStatus::Cancelled);
 });
 
 it('marks the order as refund_failed when every retry fails', function () {
@@ -42,7 +44,7 @@ it('marks the order as refund_failed when every retry fails', function () {
 
     $job->failed(new RuntimeException('Stripe caído'));
 
-    expect($this->order->fresh()->payment_status)->toBe('refund_failed')
+    expect($this->order->fresh()->payment_status)->toBe(PaymentStatus::RefundFailed)
         ->and($job->tries)->toBe(5)
         ->and($job->uniqueId())->toBe($this->order->stripe_payment_intent_id);
 });

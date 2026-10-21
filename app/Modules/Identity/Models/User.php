@@ -3,31 +3,24 @@
 namespace App\Modules\Identity\Models;
 
 use App\Modules\Identity\Database\Factories\UserFactory;
+use App\Modules\Identity\Enums\UserRole;
+use App\Modules\Identity\Enums\VerificationStatus;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property UserRole $role
+ * @property VerificationStatus $verification_status
+ */
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable
 {
     /** @use HasFactory<\App\Modules\Identity\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
-    const ROLE_USER = 'user';
-
-    const ROLE_FARMER = 'farmer';
-
-    const ROLE_ADMIN = 'admin';
-
-    const STATUS_NONE = 'none';
-
-    const STATUS_PENDING = 'pending';
-
-    const STATUS_APPROVED = 'approved';
-
-    const STATUS_REJECTED = 'rejected';
 
     /**
      * The attributes that are mass assignable.
@@ -71,6 +64,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_banned' => 'boolean',
+            'role' => UserRole::class,
+            'verification_status' => VerificationStatus::class,
         ];
     }
 
@@ -85,31 +80,35 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
-    // Helpers
     public function isFarmer(): bool
     {
-        return $this->role === self::ROLE_FARMER;
+        return $this->role === UserRole::Farmer;
     }
 
     public function isAdmin(): bool
     {
-        return $this->role === self::ROLE_ADMIN;
+        return $this->role === UserRole::Admin;
     }
 
     public function isVerified(): bool
     {
-        return $this->verification_status === self::STATUS_APPROVED;
+        return $this->verification_status === VerificationStatus::Approved;
     }
 
-    // Scopes
-    public function scopeFarmers($query)
+    /**
+     * @param  Builder<User>  $query
+     */
+    public function scopeFarmers(Builder $query): void
     {
-        return $query->where('role', self::ROLE_FARMER);
+        $query->where('role', UserRole::Farmer);
     }
 
-    public function scopePendingVerification($query)
+    /**
+     * @param  Builder<User>  $query
+     */
+    public function scopePendingVerification(Builder $query): void
     {
-        return $query->where('verification_status', self::STATUS_PENDING);
+        $query->where('verification_status', VerificationStatus::Pending);
     }
 
     // Accessors

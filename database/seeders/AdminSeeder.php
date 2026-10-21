@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -26,7 +27,7 @@ class AdminSeeder extends Seeder
         $admin->forceFill([
             'name' => 'Administrador',
             'password' => $password,
-            'role' => User::ROLE_ADMIN,
+            'role' => UserRole::Admin,
             'onboarding_completed' => true,
             'email_verified_at' => now(),
         ])->save();

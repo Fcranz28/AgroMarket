@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Exceptions\InvalidFirebaseTokenException;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\FirebaseTokenVerifier;
@@ -67,7 +68,7 @@ it('registers a new user with a verified token', function () {
 
     $user = User::where('email', 'nuevo@example.com')->firstOrFail();
 
-    expect($user->role)->toBe(User::ROLE_USER)
+    expect($user->role)->toBe(UserRole::User)
         ->and($user->email_verified_at)->not->toBeNull()
         ->and($user->onboarding_completed)->toBeFalsy();
     $this->assertAuthenticatedAs($user);

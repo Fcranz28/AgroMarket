@@ -3,8 +3,10 @@
 namespace App\Modules\Moderation\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Moderation\Enums\ReportStatus;
 use App\Modules\Moderation\Models\Report;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use OpenApi\Attributes as OA;
 
 class AdminReportController extends Controller
@@ -68,7 +70,7 @@ class AdminReportController extends Controller
     public function updateStatus(Request $request, Report $report)
     {
         $request->validate([
-            'status' => 'required|in:pending,reviewed,resolved,dismissed',
+            'status' => ['required', Rule::enum(ReportStatus::class)],
             'admin_notes' => 'nullable|string',
         ]);
 

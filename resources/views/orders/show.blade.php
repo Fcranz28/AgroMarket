@@ -10,8 +10,8 @@
             <h1>Pedido #{{ $order->id }}</h1>
             <p class="order-date">Realizado el {{ $order->created_at->format('d/m/Y H:i') }}</p>
         </div>
-        <span class="status-badge status-{{ $order->status }}">
-            {{ ucfirst($order->status) }}
+        <span class="status-badge status-{{ $order->status->value }}">
+            {{ $order->status->label() }}
         </span>
     </div>
 
@@ -82,7 +82,7 @@
             <div class="summary-card">
                 <h3>Estado de Pago</h3>
                 <div class="payment-status">
-                    @if($order->payment_status === 'paid')
+                    @if($order->payment_status->value === 'paid')
                         <i class="fas fa-check-circle" style="color: #4caf50;"></i>
                         <span>Pagado</span>
                     @else

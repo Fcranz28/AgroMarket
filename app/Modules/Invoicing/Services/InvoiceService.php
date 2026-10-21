@@ -2,6 +2,7 @@
 
 namespace App\Modules\Invoicing\Services;
 
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Invoicing\Support\AmountInWords;
 use App\Modules\Orders\Models\Order;
@@ -56,7 +57,7 @@ class InvoiceService
                 'subtotal' => $order->total / 1.18, // Subtotal sin IGV
                 'igv' => $order->total - ($order->total / 1.18), // IGV 18%
                 'total' => $order->total,
-                'status' => 'processing',
+                'status' => InvoiceStatus::Processing,
             ]);
 
             DB::commit();
@@ -82,7 +83,7 @@ class InvoiceService
             // If invoice was created, mark as error
             if (isset($invoice)) {
                 $invoice->update([
-                    'status' => 'error',
+                    'status' => InvoiceStatus::Error,
                     'error_message' => $e->getMessage(),
                 ]);
             }
@@ -237,7 +238,7 @@ class InvoiceService
         Storage::disk('local')->put($invoice->jsonPath(), json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         $invoice->update([
-            'status' => 'success',
+            'status' => InvoiceStatus::Success,
             'api_response' => ['message' => 'JSON generado localmente'],
             'pdf_url' => null,
             'xml_url' => null,

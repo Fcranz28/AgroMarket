@@ -2,6 +2,7 @@
 
 namespace App\Modules\Invoicing\Database\Factories;
 
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -37,7 +38,7 @@ class InvoiceFactory extends Factory
             'subtotal' => round($total / 1.18, 2),
             'igv' => round($total - $total / 1.18, 2),
             'total' => $total,
-            'status' => 'success',
+            'status' => InvoiceStatus::Success,
         ];
     }
 }

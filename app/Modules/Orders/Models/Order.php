@@ -4,6 +4,8 @@ namespace App\Modules\Orders\Models;
 
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Database\Factories\OrderFactory;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * The invoice relation is registered by the Invoicing module with
  * Order::resolveRelationUsing(), so Orders does not depend on it.
+ *
+ * @property OrderStatus $status
+ * @property PaymentStatus $payment_status
  */
 #[UseFactory(OrderFactory::class)]
 class Order extends Model
@@ -20,21 +25,18 @@ class Order extends Model
     /** @use HasFactory<\App\Modules\Orders\Database\Factories\OrderFactory> */
     use HasFactory;
 
-    public const STATUS_CANCELLED = 'cancelled';
-
-    public const STATUS_DELIVERED = 'delivered';
-
     /**
-     * @var list<string>
-     */
-    public const STATUSES = ['pending', 'processing', 'shipped', self::STATUS_DELIVERED, self::STATUS_CANCELLED];
-
-    /**
-     * Orders in these statuses can no longer change.
+     * Get the attributes that should be cast.
      *
-     * @var list<string>
+     * @return array<string, string>
      */
-    public const FINAL_STATUSES = [self::STATUS_DELIVERED, self::STATUS_CANCELLED];
+    protected function casts(): array
+    {
+        return [
+            'status' => OrderStatus::class,
+            'payment_status' => PaymentStatus::class,
+        ];
+    }
 
     protected $fillable = [
         'user_id',
@@ -91,7 +93,7 @@ class Order extends Model
 
     public function isFinal(): bool
     {
-        return in_array($this->status, self::FINAL_STATUSES, true);
+        return $this->status->isFinal();
     }
 
     /**

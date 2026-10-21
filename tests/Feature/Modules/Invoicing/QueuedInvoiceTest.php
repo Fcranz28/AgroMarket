@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Listeners\GenerateInvoiceForOrder;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Actions\PlaceOrderAction;
@@ -67,7 +68,7 @@ it('issues the invoice when the queued listener runs', function () {
 
     expect($order->fresh()->invoice)
         ->not->toBeNull()
-        ->status->toBe('success');
+        ->status->toBe(InvoiceStatus::Success);
 });
 
 it('never issues a second invoice when the job is retried', function () {
