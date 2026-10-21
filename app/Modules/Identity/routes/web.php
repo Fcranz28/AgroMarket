@@ -4,39 +4,32 @@ use App\Modules\Identity\Http\Controllers\AddressController;
 use App\Modules\Identity\Http\Controllers\Admin\UserManagementController;
 use App\Modules\Identity\Http\Controllers\Admin\VerificationDocumentController;
 use App\Modules\Identity\Http\Controllers\FirebaseAuthController;
-use App\Modules\Identity\Http\Controllers\LoginController;
 use App\Modules\Identity\Http\Controllers\OnboardingController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
 use App\Modules\Identity\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
 
-// Registro y login
-Route::get('/register', [RegisterController::class, 'create'])->name('register');
-Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1');
+/*
+ * Login, logout, recuperación de contraseña, verificación de correo, cambio de contraseña
+ * y verificación en dos pasos los registra Laravel Fortify (config/fortify.php).
+ */
 
-Route::view('/login', 'auth.login')->name('login');
-Route::post('/login', [LoginController::class, 'store']);
+// Registro (con límite de intentos) y login social
+Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
+Route::post('/register', [RegisterController::class, 'store'])->middleware(['guest', 'throttle:5,1']);
 
 Route::post('/auth/firebase', [FirebaseAuthController::class, 'authenticate'])
     ->middleware('throttle:10,1')
     ->name('auth.firebase');
 
-Route::post('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-
-    return redirect()->route('home');
-})->name('logout');
-
 Route::middleware('auth')->group(function () {
-    // Perfil y direcciones
+    // Perfil, direcciones y seguridad de la cuenta
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     Route::resource('addresses', AddressController::class)->only(['index', 'store', 'destroy']);
+    Route::view('/cuenta/seguridad', 'auth.security')->middleware('password.confirm')->name('security');
 
-    // Onboarding
-    Route::prefix('onboarding')->name('onboarding.')->middleware('onboarding.pending')->group(function () {
+    // Onboarding (requiere el correo verificado)
+    Route::prefix('onboarding')->name('onboarding.')->middleware(['verified', 'onboarding.pending'])->group(function () {
         Route::get('/', [OnboardingController::class, 'welcome'])->name('welcome');
         Route::post('/role', [OnboardingController::class, 'selectRole'])->name('role');
         Route::get('/intereses', [OnboardingController::class, 'userPreferences'])->name('user');

@@ -229,22 +229,32 @@
         <section class="content-section" id="security-section">
             <div class="section-header">
                 <h1>Seguridad</h1>
-                <p>Actualiza tu contraseña</p>
+                <p>Actualiza tu contraseña o activa la verificación en dos pasos</p>
             </div>
 
-            <form class="security-form" method="POST" action="{{ route('password.update') }}">
+            @if (session('status') === 'password-updated')
+                <div class="alert alert-success" role="status">Tu contraseña se actualizó correctamente.</div>
+            @endif
+
+            <form class="security-form" method="POST" action="{{ route('user-password.update') }}">
                 @csrf
                 @method('PUT')
                 
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for rel="current_password">Contraseña Actual</label>
-                        <input type="password" id="current_password" name="current_password" required>
+                        <label for="current_password">Contraseña Actual</label>
+                        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                        @error('current_password', 'updatePassword')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label for="new_password">Nueva Contraseña</label>
-                        <input type="password" id="new_password" name="password" required minlength="8">
+                        <input type="password" id="new_password" name="password" required minlength="8" autocomplete="new-password">
+                        @error('password', 'updatePassword')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -258,6 +268,10 @@
                     Actualizar Contraseña
                 </button>
             </form>
+
+            <p class="security-2fa-link">
+                <a href="{{ route('security') }}"><i class="fas fa-shield-alt"></i> Verificación en dos pasos</a>
+            </p>
         </section>
     </main>
 </div>

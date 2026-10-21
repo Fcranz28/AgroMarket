@@ -6,6 +6,7 @@ use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Policies\UserPolicy;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 /**
  * @property UserRole $role
@@ -20,10 +22,10 @@ use Illuminate\Notifications\Notifiable;
  */
 #[UseFactory(UserFactory::class)]
 #[UsePolicy(UserPolicy::class)]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\App\Modules\Identity\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -54,6 +56,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**

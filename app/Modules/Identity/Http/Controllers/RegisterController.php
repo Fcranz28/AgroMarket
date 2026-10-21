@@ -5,6 +5,7 @@ namespace App\Modules\Identity\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -40,10 +41,11 @@ class RegisterController extends Controller
             'onboarding_completed' => false,
         ]);
 
-        // 3. Iniciar sesión
+        // 3. Enviar el correo de verificación e iniciar sesión
+        event(new Registered($user));
         Auth::login($user);
 
-        // 4. Redirigir al onboarding
+        // 4. Redirigir al onboarding (pide verificar el correo antes de continuar)
         return redirect()->route('onboarding.welcome');
     }
 }

@@ -34,7 +34,7 @@
                     <div class="input-error">{{ $message }}</div>
                 @enderror
                 
-                <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                <a href="{{ route('password.request') }}" class="forgot-password">¿Olvidaste tu contraseña?</a>
                 
                 <div style="margin: 1rem 0; text-align: left; font-size: 0.875rem;">
                     <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>

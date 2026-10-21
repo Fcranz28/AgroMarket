@@ -6,6 +6,7 @@ use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 beforeEach(function () {
     $this->withoutVite();
@@ -21,6 +22,14 @@ it('completes the whole farmer flow from registration to product creation', func
     ])->assertRedirect(route('onboarding.welcome'));
 
     $farmer = User::where('email', 'rosa@example.com')->sole();
+
+    // The onboarding waits until the e-mail is verified with the link we sent.
+    $this->get(route('onboarding.welcome'))->assertRedirect(route('verification.notice'));
+    $this->get(URL::temporarySignedRoute('verification.verify', now()->addHour(), [
+        'id' => $farmer->id,
+        'hash' => sha1($farmer->email),
+    ]));
+    expect($farmer->fresh()->hasVerifiedEmail())->toBeTrue();
 
     $this->post(route('onboarding.role'), ['role' => 'farmer'])->assertRedirect(route('onboarding.farmer'));
     expect($farmer->fresh()->isFarmer())->toBeTrue();

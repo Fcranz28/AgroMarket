@@ -25,8 +25,8 @@ class EnsureOnboarding
             }
 
             if (! $user->onboarding_completed) {
-                // Allow access to onboarding routes and logout
-                if ($request->routeIs('onboarding.*') || $request->routeIs('logout')) {
+                // Allow the onboarding itself and the account routes it may need
+                if ($request->routeIs('onboarding.*', 'logout', 'verification.*', 'password.*', 'two-factor.*')) {
                     return $next($request);
                 }
 

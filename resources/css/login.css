@@ -437,3 +437,30 @@
         width: 100%;
     }
 }
+/* Mensajes de estado (enlace de recuperación enviado, contraseña actualizada...) */
+.input-success {
+    color: #2f855a;
+    background: rgba(72, 187, 120, 0.12);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-container .link-button {
+    background: none;
+    border: none;
+    color: var(--text-color-light, #777);
+    cursor: pointer;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    margin-top: 1rem;
+}
+
+.form-container code {
+    display: block;
+    font-family: monospace;
+    font-size: 0.875rem;
+    text-align: left;
+}
