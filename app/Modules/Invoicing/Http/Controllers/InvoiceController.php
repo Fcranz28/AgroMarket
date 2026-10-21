@@ -4,6 +4,7 @@ namespace App\Modules\Invoicing\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Invoicing\Enums\InvoiceStatus;
+use App\Modules\Invoicing\Http\Resources\InvoiceResource;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -102,9 +103,6 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', $invoice);
 
-        return response()->json([
-            'invoice' => $invoice,
-            'order' => $invoice->order,
-        ]);
+        return response()->json(new InvoiceResource($invoice->loadMissing('order')));
     }
 }

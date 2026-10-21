@@ -3,6 +3,7 @@
 namespace App\Modules\Catalog\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Http\Resources\CatalogProductResource;
 use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request; // <-- 1. Importa Request
@@ -68,7 +69,7 @@ class ProductApiController extends Controller
             ->get();
 
         return response()->json([
-            'products' => $products,
+            'products' => CatalogProductResource::collection($products),
         ]);
     }
 }

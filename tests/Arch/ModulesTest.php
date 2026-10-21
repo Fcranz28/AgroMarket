@@ -7,6 +7,18 @@
  *   Backoffice reads from every module and nothing depends on it.
  */
 
+arch('shared kernel does not depend on any module')
+    ->expect('App\Modules\Shared')
+    ->not->toUse([
+        'App\Modules\Identity',
+        'App\Modules\Catalog',
+        'App\Modules\Orders',
+        'App\Modules\Payments',
+        'App\Modules\Invoicing',
+        'App\Modules\Moderation',
+        'App\Modules\Backoffice',
+    ]);
+
 arch('identity does not depend on other modules')
     ->expect('App\Modules\Identity')
     ->not->toUse([

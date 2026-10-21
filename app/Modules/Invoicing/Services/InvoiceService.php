@@ -6,6 +6,7 @@ use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Invoicing\Support\AmountInWords;
 use App\Modules\Orders\Models\Order;
+use App\Modules\Shared\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -54,9 +55,9 @@ class InvoiceService
                 'serie' => $serie,
                 'correlativo' => $correlativo,
                 'numero_completo' => "{$serie}-{$correlativo}",
-                'subtotal' => $order->total / 1.18, // Subtotal sin IGV
-                'igv' => $order->total - ($order->total / 1.18), // IGV 18%
-                'total' => $order->total,
+                'subtotal' => Money::fromDecimal($order->total)->withoutIgv()->toDecimal(),
+                'igv' => Money::fromDecimal($order->total)->igv()->toDecimal(),
+                'total' => Money::fromDecimal($order->total)->toDecimal(),
                 'status' => InvoiceStatus::Processing,
             ]);
 
@@ -134,29 +135,36 @@ class InvoiceService
 
         // Build details array
         $details = [];
+        $totalBase = Money::zero();
+        $totalIgv = Money::zero();
+
         foreach ($order->items as $item) {
             // Los precios publicados incluyen IGV: se desglosa la base a partir del total de la línea
-            $precioConIgv = (float) $item->price;
-            $totalItem = round($precioConIgv * $item->quantity, 2);
-            $subtotal = round($totalItem / 1.18, 2);
-            $igv = round($totalItem - $subtotal, 2);
-            $precioBase = $precioConIgv / 1.18;
+            $unitPrice = Money::fromDecimal($item->price);
+            $lineTotal = $unitPrice->multiply($item->quantity);
+            $lineBase = $lineTotal->withoutIgv();
+            $lineIgv = $lineTotal->igv();
+
+            $totalBase = $totalBase->add($lineBase);
+            $totalIgv = $totalIgv->add($lineIgv);
 
             $details[] = [
                 'codProducto' => 'PROD'.$item->product_id,
                 'unidad' => 'NIU', // Unidad de medida
                 'descripcion' => trim(($item->product->name ?? 'Producto').($item->unit ? " ({$item->unit})" : '')),
-                'cantidad' => floatval($item->quantity),
-                'mtoValorUnitario' => round($precioBase, 2),
-                'mtoValorVenta' => round($subtotal, 2),
-                'mtoBaseIgv' => round($subtotal, 2),
-                'porcentajeIgv' => 18,
-                'igv' => round($igv, 2),
+                'cantidad' => (float) $item->quantity,
+                'mtoValorUnitario' => $unitPrice->withoutIgv()->toFloat(),
+                'mtoValorVenta' => $lineBase->toFloat(),
+                'mtoBaseIgv' => $lineBase->toFloat(),
+                'porcentajeIgv' => Money::IGV_RATE_PERCENT,
+                'igv' => $lineIgv->toFloat(),
                 'tipAfeIgv' => '10', // Gravado - Operación Onerosa
-                'totalImpuestos' => round($igv, 2),
-                'mtoPrecioUnitario' => round($precioConIgv, 2),
+                'totalImpuestos' => $lineIgv->toFloat(),
+                'mtoPrecioUnitario' => $unitPrice->toFloat(),
             ];
         }
+
+        $totalWithIgv = $totalBase->add($totalIgv);
 
         // Get customer data
         $customerName = $order->user_id
@@ -174,19 +182,7 @@ class InvoiceService
             default => '1',
         };
 
-        // Calculate totals from details to ensure consistency
-        $totalOperGravadas = 0;
-        $totalIgv = 0;
-        $totalImpVenta = 0;
-
-        foreach ($details as $detail) {
-            $totalOperGravadas += $detail['mtoValorVenta'];
-            $totalIgv += $detail['igv'];
-            $totalImpVenta += ($detail['mtoValorVenta'] + $detail['igv']);
-        }
-
-        // Convert total to words (simplified version)
-        $totalWords = AmountInWords::soles($totalImpVenta);
+        $totalWords = AmountInWords::soles($totalWithIgv->toFloat());
 
         $payload = [
             'ublVersion' => '2.1',
@@ -212,12 +208,12 @@ class InvoiceService
                 'ruc' => $this->companyRuc,
                 'razonSocial' => $this->companyRazonSocial,
             ],
-            'mtoOperGravadas' => round($totalOperGravadas, 2),
-            'mtoIGV' => round($totalIgv, 2),
-            'totalImpuestos' => round($totalIgv, 2),
-            'valorVenta' => round($totalOperGravadas, 2),
-            'subTotal' => round($totalImpVenta, 2),
-            'mtoImpVenta' => round($totalImpVenta, 2),
+            'mtoOperGravadas' => $totalBase->toFloat(),
+            'mtoIGV' => $totalIgv->toFloat(),
+            'totalImpuestos' => $totalIgv->toFloat(),
+            'valorVenta' => $totalBase->toFloat(),
+            'subTotal' => $totalWithIgv->toFloat(),
+            'mtoImpVenta' => $totalWithIgv->toFloat(),
             'details' => $details,
             'legends' => [
                 [
