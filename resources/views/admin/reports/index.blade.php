@@ -45,8 +45,8 @@
                                     <span class="badge badge-reason">{{ $report->reason }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-status status-{{ $report->status }}">
-                                        {{ ucfirst($report->status) }}
+                                    <span class="badge badge-status status-{{ $report->status->value }}">
+                                        {{ $report->status->label() }}
                                     </span>
                                 </td>
                                 <td>{{ $report->created_at->format('d/m/Y H:i') }}</td>

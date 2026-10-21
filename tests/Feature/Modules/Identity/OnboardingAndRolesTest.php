@@ -1,6 +1,8 @@
 <?php
 
 use App\Modules\Catalog\Models\Category;
+use App\Modules\Identity\Enums\UserRole;
+use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -29,11 +31,11 @@ it('completes the whole farmer flow from registration to product creation', func
         'dni_back' => UploadedFile::fake()->image('back.jpg'),
     ])->assertRedirect(route('farmer.dashboard'));
 
-    expect($farmer->fresh()->verification_status)->toBe(User::STATUS_PENDING);
+    expect($farmer->fresh()->verification_status)->toBe(VerificationStatus::Pending);
     $this->get(route('farmer.dashboard'))->assertSuccessful()->assertViewIs('farmer.pending');
 
     $this->actingAs(User::factory()->admin()->create())
-        ->post(route('admin.verify', [$farmer, User::STATUS_APPROVED]))
+        ->post(route('admin.verify', [$farmer, VerificationStatus::Approved]))
         ->assertRedirect(route('admin.users'));
 
     $farmer->refresh();
@@ -54,7 +56,7 @@ it('lets a buyer finish the onboarding', function () {
     $this->post(route('onboarding.preferences'))->assertRedirect(route('home'));
 
     expect($user->fresh())
-        ->role->toBe(User::ROLE_USER)
+        ->role->toBe(UserRole::User)
         ->onboarding_completed->toBeTruthy();
 });
 
@@ -90,7 +92,7 @@ it('only verifies farmer accounts', function () {
     $buyer = User::factory()->create();
 
     $this->actingAs(User::factory()->admin()->create())
-        ->post(route('admin.verify', [$buyer, User::STATUS_APPROVED]));
+        ->post(route('admin.verify', [$buyer, VerificationStatus::Approved]));
 
     expect($buyer->fresh()->isVerified())->toBeFalse();
 });

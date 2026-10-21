@@ -3,6 +3,7 @@
 namespace App\Modules\Moderation\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Moderation\Enums\ReportStatus;
 use App\Modules\Moderation\Http\Requests\StoreReportRequest;
 use App\Modules\Moderation\Models\Report;
 use Illuminate\Http\JsonResponse;
@@ -54,7 +55,7 @@ class ReportController extends Controller
             'reason' => $request->validated('reason'),
             'description' => $request->validated('description'),
             'evidence' => $evidencePaths,
-            'status' => 'pending',
+            'status' => ReportStatus::Pending,
         ]);
 
         return response()->json([

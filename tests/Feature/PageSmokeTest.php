@@ -4,6 +4,7 @@ use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductImage;
 use App\Modules\Identity\Models\User;
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
@@ -120,6 +121,6 @@ it('generates invoices for orders above one thousand soles', function () {
     $invoice = app(App\Modules\Invoicing\Services\InvoiceService::class)->generateInvoice($order);
 
     expect($invoice)->toBeInstanceOf(Invoice::class)
-        ->and($invoice->status)->toBe('success')
+        ->and($invoice->status)->toBe(InvoiceStatus::Success)
         ->and($invoice->api_request['legends'][0]['value'])->toStartWith('SON MIL');
 });

@@ -52,12 +52,12 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge badge-role-{{ $user->role }}">
-                                        {{ ucfirst($user->role) }}
+                                    <span class="badge badge-role-{{ $user->role->value }}">
+                                        {{ $user->role->label() }}
                                     </span>
                                 </td>
                                 <td>
-                                    @if($user->role == 'farmer')
+                                    @if($user->isFarmer())
                                         <span class="badge {{ $user->reports_received_count > 0 ? 'badge-danger' : 'badge-secondary' }}" style="{{ $user->reports_received_count > 0 ? 'background-color: #fee2e2; color: #dc2626;' : '' }}">
                                             {{ $user->reports_received_count }}
                                         </span>
@@ -66,14 +66,14 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if($user->role == 'farmer')
-                                        <span class="badge badge-status-{{ $user->verification_status }}">
-                                            @if($user->verification_status == 'pending')
+                                    @if($user->isFarmer())
+                                        <span class="badge badge-status-{{ $user->verification_status->value }}">
+                                            @if($user->verification_status->value === 'pending')
                                                 <i class="fas fa-clock"></i>
-                                            @elseif($user->verification_status == 'approved')
+                                            @elseif($user->isVerified())
                                                 <i class="fas fa-check-circle"></i>
                                             @endif
-                                            {{ ucfirst($user->verification_status) }}
+                                            {{ $user->verification_status->label() }}
                                         </span>
                                     @else
                                         <span style="color: var(--text-light);">-</span>
@@ -95,14 +95,14 @@
                                 </td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        @if($user->role == 'farmer' && $user->verification_status == 'pending')
+                                        @if($user->isFarmer() && $user->verification_status->value === 'pending')
                                             {{-- Placeholder Verify Button --}}
                                             <a href="{{ route('admin.verify.view', $user->id) }}" class="btn-verify">
                                                 <i class="fas fa-user-check"></i> Verificar
                                             </a>
                                         @endif
                                         
-                                        @if($user->role != 'admin')
+                                        @if(! $user->isAdmin())
                                             <form action="{{ route('admin.ban', $user->id) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 <button type="submit" class="action-btn {{ $user->is_banned ? 'btn-icon-unlock' : 'btn-icon-ban' }}" title="{{ $user->is_banned ? 'Activar' : 'Suspender' }}">

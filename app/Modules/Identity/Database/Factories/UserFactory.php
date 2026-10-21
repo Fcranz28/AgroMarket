@@ -2,6 +2,8 @@
 
 namespace App\Modules\Identity\Database\Factories;
 
+use App\Modules\Identity\Enums\UserRole;
+use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -37,7 +39,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => User::ROLE_USER,
+            'role' => UserRole::User,
             'onboarding_completed' => true,
         ];
     }
@@ -58,7 +60,7 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => User::ROLE_ADMIN,
+            'role' => UserRole::Admin,
         ]);
     }
 
@@ -68,8 +70,8 @@ class UserFactory extends Factory
     public function farmer(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => User::ROLE_FARMER,
-            'verification_status' => User::STATUS_PENDING,
+            'role' => UserRole::Farmer,
+            'verification_status' => VerificationStatus::Pending,
         ]);
     }
 
@@ -79,7 +81,7 @@ class UserFactory extends Factory
     public function verified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'verification_status' => User::STATUS_APPROVED,
+            'verification_status' => VerificationStatus::Approved,
         ]);
     }
 

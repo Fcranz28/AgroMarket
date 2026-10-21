@@ -4,6 +4,8 @@ namespace App\Modules\Orders\Actions;
 
 use App\Modules\Catalog\Exceptions\InsufficientStockException;
 use App\Modules\Catalog\Services\StockService;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Events\OrderPlaced;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -33,9 +35,9 @@ class PlaceOrderAction
                 ...$customer,
                 'user_id' => $userId,
                 'total' => $totalCents / 100,
-                'status' => 'pending',
+                'status' => OrderStatus::Pending,
                 'stripe_payment_intent_id' => $paymentIntentId,
-                'payment_status' => 'paid',
+                'payment_status' => PaymentStatus::Paid,
             ]);
 
             $order->items()->createMany($lines->all());

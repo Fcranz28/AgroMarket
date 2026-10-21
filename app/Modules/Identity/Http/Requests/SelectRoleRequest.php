@@ -2,6 +2,7 @@
 
 namespace App\Modules\Identity\Http\Requests;
 
+use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,7 +25,7 @@ class SelectRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_FARMER])],
+            'role' => ['required', Rule::in([UserRole::User, UserRole::Farmer])],
         ];
     }
 

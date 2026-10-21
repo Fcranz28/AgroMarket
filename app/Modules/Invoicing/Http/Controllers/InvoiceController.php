@@ -3,6 +3,7 @@
 namespace App\Modules\Invoicing\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Models\Invoice;
 use App\Modules\Orders\Models\Order;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -62,7 +63,7 @@ class InvoiceController extends Controller
                 ->download("{$invoice->serie}-{$invoice->correlativo}.pdf");
         }
 
-        if ($invoice->status === 'error') {
+        if ($invoice->status === InvoiceStatus::Error) {
             return back()->with('error', 'El comprobante no pudo ser generado. Contáctanos para emitirlo nuevamente.');
         }
 

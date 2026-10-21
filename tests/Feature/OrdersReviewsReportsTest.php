@@ -4,6 +4,8 @@ use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Catalog\Models\Review;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
 use App\Modules\Payments\Services\PaymentGateway;
@@ -30,7 +32,7 @@ it('lets the farmer advance the status of an order with only their products', fu
         ->patchJson(route('farmer.orders.status', $this->order), ['status' => 'shipped'])
         ->assertSuccessful();
 
-    expect($this->order->fresh()->status)->toBe('shipped');
+    expect($this->order->fresh()->status)->toBe(OrderStatus::Shipped);
 });
 
 it('does not let a farmer change orders that include products of other farmers', function () {
@@ -40,7 +42,7 @@ it('does not let a farmer change orders that include products of other farmers',
         ->patchJson(route('farmer.orders.status', $this->order), ['status' => 'delivered'])
         ->assertForbidden();
 
-    expect($this->order->fresh()->status)->toBe('pending');
+    expect($this->order->fresh()->status)->toBe(OrderStatus::Pending);
 });
 
 it('does not change orders that are already closed', function () {
@@ -59,8 +61,8 @@ it('returns stock and refunds when an order is cancelled', function () {
         ->assertSuccessful();
 
     expect($this->order->fresh())
-        ->status->toBe('cancelled')
-        ->payment_status->toBe('refunded')
+        ->status->toBe(OrderStatus::Cancelled)
+        ->payment_status->toBe(PaymentStatus::Refunded)
         ->and($this->unit->fresh()->stock)->toBe(10)
         ->and($this->product->fresh()->stock)->toBe(10);
 });

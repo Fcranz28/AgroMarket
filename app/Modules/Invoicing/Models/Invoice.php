@@ -3,6 +3,7 @@
 namespace App\Modules\Invoicing\Models;
 
 use App\Modules\Invoicing\Database\Factories\InvoiceFactory;
+use App\Modules\Invoicing\Enums\InvoiceStatus;
 use App\Modules\Invoicing\Policies\InvoicePolicy;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -12,6 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property InvoiceStatus $status
+ */
 #[UseFactory(InvoiceFactory::class)]
 #[UsePolicy(InvoicePolicy::class)]
 class Invoice extends Model
@@ -57,6 +61,7 @@ class Invoice extends Model
         'subtotal' => 'decimal:2',
         'igv' => 'decimal:2',
         'total' => 'decimal:2',
+        'status' => InvoiceStatus::class,
     ];
 
     /**
@@ -94,7 +99,7 @@ class Invoice extends Model
      */
     public function isSuccess()
     {
-        return $this->status === 'success';
+        return $this->status === InvoiceStatus::Success;
     }
 
     /**
@@ -102,7 +107,7 @@ class Invoice extends Model
      */
     public function hasError()
     {
-        return $this->status === 'error';
+        return $this->status === InvoiceStatus::Error;
     }
 
     /**
@@ -110,6 +115,6 @@ class Invoice extends Model
      */
     public function isPending()
     {
-        return in_array($this->status, ['pending', 'processing']);
+        return $this->status->isPending();
     }
 }

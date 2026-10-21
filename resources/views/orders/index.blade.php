@@ -55,8 +55,8 @@
                                     <span class="order-id">ID de Seguimiento: #{{ $order->id }}</span>
                                     <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
                                 </div>
-                                <span class="status-badge status-{{ $order->status }}">
-                                    {{ ucfirst($order->status) }}
+                                <span class="status-badge status-{{ $order->status->value }}">
+                                    {{ $order->status->label() }}
                                 </span>
                             </div>
 
@@ -68,7 +68,7 @@
                                         <div class="item-details">
                                             <h4>{{ $item->product->name }}</h4>
                                             <p>Cantidad: {{ $item->quantity }}</p>
-                                            @if($order->status === 'delivered')
+                                            @if($order->status->value === 'delivered')
                                                 <button class="btn-report-item" onclick="openReportModal(@js($order->id), @js($item->product->id), @js($item->product->name))">
                                                     <i class="fas fa-exclamation-triangle"></i> Reportar
                                                 </button>
@@ -98,7 +98,7 @@
                                         </a>
                                     @endif
                                     
-                                    <button class="btn btn-outline" onclick="openTrackingModal('{{ $order->id }}', '{{ $order->status }}')">
+                                    <button class="btn btn-outline" onclick="openTrackingModal('{{ $order->id }}', '{{ $order->status->value }}')">
                                         <i class="fas fa-map-marker-alt"></i> Rastrear Pedido
                                     </button>
                                 </div>

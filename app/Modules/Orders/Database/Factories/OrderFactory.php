@@ -3,6 +3,8 @@
 namespace App\Modules\Orders\Database\Factories;
 
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Models\Order;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -29,11 +31,11 @@ class OrderFactory extends Factory
         return [
             'user_id' => User::factory(),
             'total' => fake()->randomFloat(2, 10, 500),
-            'status' => 'pending',
+            'status' => OrderStatus::Pending,
             'shipping_address' => fake()->address(),
             'phone' => fake()->numerify('9########'),
             'stripe_payment_intent_id' => 'pi_'.Str::random(24),
-            'payment_status' => 'paid',
+            'payment_status' => PaymentStatus::Paid,
             'guest_name' => fake()->firstName(),
             'guest_lastname' => fake()->lastName(),
             'guest_email' => fake()->safeEmail(),
@@ -58,7 +60,7 @@ class OrderFactory extends Factory
     public function unpaid(): static
     {
         return $this->state(fn (array $attributes) => [
-            'payment_status' => 'pending',
+            'payment_status' => PaymentStatus::Pending,
         ]);
     }
 }

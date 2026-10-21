@@ -4,6 +4,8 @@ namespace App\Modules\Orders\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Catalog\Services\StockService;
+use App\Modules\Orders\Enums\OrderStatus;
+use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Events\OrderCancelled;
 use App\Modules\Orders\Http\Requests\UpdateOrderStatusRequest;
 use App\Modules\Orders\Models\Order;
@@ -22,7 +24,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $orders = Order::where('user_id', $user->id)
-            ->where('payment_status', 'paid')
+            ->where('payment_status', PaymentStatus::Paid)
             ->with(['items.product', 'invoice'])
             ->latest()
             ->get();
@@ -51,7 +53,7 @@ class OrderController extends Controller
 
         $orders = Order::whereHas('items.product', fn ($query) => $query->where('user_id', $user->id))
             ->with(['items.product', 'user', 'invoice'])
-            ->where('payment_status', 'paid')
+            ->where('payment_status', PaymentStatus::Paid)
             ->latest()
             ->get();
 
@@ -89,9 +91,9 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Este pedido ya fue cerrado y no puede cambiar de estado.'], 422);
         }
 
-        $status = $request->validated('status');
+        $status = OrderStatus::from($request->validated('status'));
 
-        if ($status !== Order::STATUS_CANCELLED) {
+        if ($status !== OrderStatus::Cancelled) {
             $order->update(['status' => $status]);
 
             return response()->json(['success' => true, 'message' => 'Estado actualizado correctamente']);
@@ -104,10 +106,10 @@ class OrderController extends Controller
                 'quantity' => $item->quantity,
             ]));
 
-            $order->update(['status' => Order::STATUS_CANCELLED]);
+            $order->update(['status' => OrderStatus::Cancelled]);
         });
 
-        $wasPaid = $order->payment_status === 'paid';
+        $wasPaid = $order->payment_status === PaymentStatus::Paid;
 
         OrderCancelled::dispatch($order);
 
