@@ -1,23 +1,93 @@
-/* Tailwind CSS removed - causing conflicts with custom CSS */
-/* Using custom CSS framework instead */
+/*
+ * Tailwind v4 + los estilos anteriores mientras se migran las vistas.
+ *
+ * Orden de capas: el CSS anterior vive en "legacy", por encima del reset de Tailwind
+ * (base) para que las páginas existentes no cambien, y por debajo de las utilidades para
+ * que las clases de Tailwind siempre ganen en las vistas migradas.
+ */
+@layer theme, base, legacy, components, utilities;
 
-/* Estilos base */
-@import 'style.css';
-@import 'style2.css';
+@import 'tailwindcss';
 
-/* Estilos específicos de páginas */
-@import 'login.css';
-@import 'contacto.css';
-@import 'nosotros.css';
-@import 'categorias.css';
-@import 'pedidos.css';
-@import 'CRUD.css';
-@import 'onboarding/farmer.css';
-@import 'layouts/app.css';
-@import 'checkout/index.css';
-@import 'orders/index.css';
-@import 'orders/show.css';
-@import 'products/show.css';
-@import 'search/index.css';
-@import 'about.css';
-@import 'onboarding/welcome.css';
+@source '../views';
+@source '../../app/Modules';
+
+/* Modo oscuro con el mismo selector que ya usa el sitio: <html data-theme="dark"> */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme inline {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    --color-canvas: var(--am-canvas);
+    --color-surface: var(--am-surface);
+    --color-navbar: var(--am-navbar);
+    --color-ink: var(--am-ink);
+    --color-muted: var(--am-muted);
+    --color-line: var(--am-line);
+    --color-brand: var(--am-brand);
+    --color-brand-strong: var(--am-brand-strong);
+    --color-brand-soft: var(--am-brand-soft);
+    --color-danger: var(--am-danger);
+    --color-success: var(--am-success);
+
+    --radius-card: 1rem;
+    --radius-pill: 9999px;
+
+    --shadow-soft: 0 2px 4px rgb(122 165 55 / 0.08);
+    --shadow-card: 0 4px 12px rgb(122 165 55 / 0.12);
+    --shadow-lifted: 0 12px 24px rgb(122 165 55 / 0.18);
+}
+
+/* Paleta de AgroMarket (verde de campo) para modo claro y oscuro */
+@layer base {
+    :root {
+        --am-canvas: #f0f4e8;
+        --am-surface: #ffffff;
+        --am-navbar: rgb(254 253 251 / 0.95);
+        --am-ink: #2a3e1f;
+        --am-muted: #5a6f4a;
+        --am-line: #d8e3c8;
+        --am-brand: #7aa537;
+        --am-brand-strong: #6a9527;
+        --am-brand-soft: #e8f1d9;
+        --am-danger: #c53030;
+        --am-success: #2f855a;
+    }
+
+    :root[data-theme='dark'] {
+        --am-canvas: #1a1e16;
+        --am-surface: #2e3228;
+        --am-navbar: rgb(36 40 31 / 0.95);
+        --am-ink: #f1edd4;
+        --am-muted: #c8c4ab;
+        --am-line: #4a4e42;
+        --am-brand: #76a233;
+        --am-brand-strong: #8ab854;
+        --am-brand-soft: #343b28;
+        --am-danger: #fc8181;
+        --am-success: #68d391;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+/* Estilos anteriores (se eliminan a medida que cada vista pasa a Tailwind) */
+@import './style.css' layer(legacy);
+@import './style2.css' layer(legacy);
+@import './login.css' layer(legacy);
+@import './contacto.css' layer(legacy);
+@import './nosotros.css' layer(legacy);
+@import './categorias.css' layer(legacy);
+@import './pedidos.css' layer(legacy);
+@import './CRUD.css' layer(legacy);
+@import './onboarding/farmer.css' layer(legacy);
+@import './layouts/app.css' layer(legacy);
+@import './checkout/index.css' layer(legacy);
+@import './orders/index.css' layer(legacy);
+@import './orders/show.css' layer(legacy);
+@import './products/show.css' layer(legacy);
+@import './search/index.css' layer(legacy);
+@import './about.css' layer(legacy);
+@import './onboarding/welcome.css' layer(legacy);

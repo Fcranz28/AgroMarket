@@ -1,55 +1,7 @@
 import { escapeHtml } from './utils/escape';
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-    const bottomNavLinks = document.querySelectorAll('.bottom-nav-mobile a');
     const cartBtn = document.getElementById('openCart');
 
-    // Manejar el tema oscuro/claro
-    function updateTheme() {
-        if (!themeToggle) return;
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const isDarkTheme = currentTheme === 'dark';
-        const themeIcon = themeToggle.querySelector('.theme-icon');
-
-        if (!themeIcon) return;
-
-        if (isDarkTheme) {
-            themeIcon.innerHTML = '\u003cpath d=\"M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z\"/\u003e';
-        } else {
-            themeIcon.innerHTML = '\u003cpath d=\"M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z\"/\u003e';
-        }
-    }
-
-    // Cargar tema guardado
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        updateTheme();
-    } else if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        updateTheme();
-    }
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateTheme();
-        });
-    }
-
-    // Manejar la navegación móvil
-    bottomNavLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            bottomNavLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-        });
-    });
-
-    // Agregar evento al botón del carrito en la barra superior
     // Agregar evento al botón del carrito en la barra superior
     if (cartBtn) {
         cartBtn.addEventListener('click', () => {
@@ -246,46 +198,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FIN DE LA SOLUCIÓN ---
-
-    // Mobile User Dropdown
-    const mobileDropdownTrigger = document.querySelector('.mobile-dropdown-trigger');
-    const mobileDropdownMenu = document.querySelector('.mobile-dropdown-menu');
-
-    if (mobileDropdownTrigger && mobileDropdownMenu) {
-        mobileDropdownTrigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            mobileDropdownMenu.classList.toggle('show');
-
-            // Rotar la flecha
-            const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
-            if (arrow) {
-                arrow.style.transform = mobileDropdownMenu.classList.contains('show')
-                    ? 'rotate(180deg)'
-                    : 'rotate(0deg)';
-            }
-        });
-
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!mobileDropdownTrigger.contains(e.target) && !mobileDropdownMenu.contains(e.target)) {
-                mobileDropdownMenu.classList.remove('show');
-                const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
-                if (arrow) {
-                    arrow.style.transform = 'rotate(0deg)';
-                }
-            }
-        });
-
-        // Cerrar dropdown al seleccionar una opción
-        const dropdownLinks = mobileDropdownMenu.querySelectorAll('a, button[type="submit"]');
-        dropdownLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileDropdownMenu.classList.remove('show');
-                const arrow = mobileDropdownTrigger.querySelector('.dropdown-arrow');
-                if (arrow) {
-                    arrow.style.transform = 'rotate(0deg)';
-                }
-            });
-        });
-    }
 });
