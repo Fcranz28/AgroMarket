@@ -9,6 +9,8 @@ use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
 use App\Modules\Payments\Http\Requests\CreatePaymentIntentRequest;
 use App\Modules\Payments\Http\Requests\ProcessPaymentRequest;
+use App\Modules\Payments\Jobs\HandleStripeEvent;
+use App\Modules\Payments\Jobs\RefundPayment;
 use App\Modules\Payments\Services\PaymentGateway;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +22,6 @@ use OpenApi\Attributes as OA;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
-use Throwable;
 use UnexpectedValueException;
 
 class PaymentController extends Controller
@@ -161,9 +162,9 @@ class PaymentController extends Controller
                 Auth::id(),
             );
         } catch (InsufficientStockException $exception) {
-            $this->refund($paymentIntentId);
+            RefundPayment::dispatch($paymentIntentId);
 
-            return response()->json(['error' => $exception->getMessage().' Se reembolsó tu pago.'], 409);
+            return response()->json(['error' => $exception->getMessage().' Reembolsaremos tu pago automáticamente.'], 409);
         } catch (UniqueConstraintViolationException) {
             return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
         }
@@ -213,24 +214,8 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
-        $paymentIntent = $event->data->object;
-
-        match ($event->type) {
-            'payment_intent.succeeded' => Order::where('stripe_payment_intent_id', $paymentIntent->id)
-                ->update(['payment_status' => 'paid']),
-            'payment_intent.payment_failed' => Log::warning('Stripe payment failed', ['payment_intent' => $paymentIntent->id]),
-            default => null,
-        };
+        HandleStripeEvent::dispatch($event->type, (string) $event->data->object->id);
 
         return response()->json(['status' => 'success']);
-    }
-
-    private function refund(string $paymentIntentId): void
-    {
-        try {
-            $this->gateway->refund($paymentIntentId);
-        } catch (Throwable $exception) {
-            Log::critical('Automatic refund failed', ['payment_intent' => $paymentIntentId, 'error' => $exception->getMessage()]);
-        }
     }
 }

@@ -111,14 +111,10 @@ class OrderController extends Controller
 
         OrderCancelled::dispatch($order);
 
-        if ($wasPaid && $order->refresh()->payment_status !== 'refunded') {
-            return response()->json([
-                'success' => true,
-                'message' => 'Pedido cancelado. El reembolso no se pudo procesar automáticamente; el equipo lo revisará.',
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Pedido cancelado y reembolsado.']);
+        return response()->json([
+            'success' => true,
+            'message' => $wasPaid ? 'Pedido cancelado. El reembolso se está procesando.' : 'Pedido cancelado.',
+        ]);
     }
 
     /**
