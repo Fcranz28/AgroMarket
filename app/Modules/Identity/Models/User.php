@@ -5,6 +5,7 @@ namespace App\Modules\Identity\Models;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -74,10 +75,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Relations owned by other modules (products, reportsReceived) are registered by those
-     * modules with User::resolveRelationUsing(), so Identity does not depend on them.
+     * Relations owned by other modules (reportsReceived) are registered by those modules
+     * with User::resolveRelationUsing(), so Identity does not depend on them.
+     *
+     * @return HasMany<Address, $this>
      */
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }

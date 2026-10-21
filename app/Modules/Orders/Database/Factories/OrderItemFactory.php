@@ -2,9 +2,9 @@
 
 namespace App\Modules\Orders\Database\Factories;
 
-use App\Modules\Orders\Models\OrderItem;
-use App\Modules\Orders\Models\Order;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Models\OrderItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

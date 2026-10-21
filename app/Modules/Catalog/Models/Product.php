@@ -2,9 +2,9 @@
 
 namespace App\Modules\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use App\Modules\Catalog\Database\Factories\ProductFactory;
 use App\Modules\Identity\Models\User;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,11 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
-    /**
-     * Los atributos que se pueden asignar masivamente.
-     *
-     * @var array
-     */
 
     /**
      * Get the attributes that should be cast.
@@ -34,6 +29,11 @@ class Product extends Model
         ];
     }
 
+    /**
+     * Los atributos que se pueden asignar masivamente.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'slug',
@@ -46,16 +46,25 @@ class Product extends Model
         'user_id',
     ];
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<ProductImage, $this>
+     */
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class);
     }
 
+    /**
+     * @return HasMany<ProductUnit, $this>
+     */
     public function units(): HasMany
     {
         return $this->hasMany(ProductUnit::class);
@@ -64,13 +73,18 @@ class Product extends Model
     /**
      * Define la relación: Un Producto pertenece a una Categoría.
      * Esto le permite a Eloquent usar la 'category_id' que definiste.
+     *
+     * @return BelongsTo<Category, $this>
      */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function reviews()
+    /**
+     * @return HasMany<Review, $this>
+     */
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
@@ -95,6 +109,14 @@ class Product extends Model
             'price' => min(array_column($units, 'price')),
             'stock' => array_sum(array_column($units, 'stock')),
         ]);
+    }
+
+    /**
+     * Products published by the given farmer.
+     */
+    public function scopeOwnedBy(Builder $query, User $farmer): void
+    {
+        $query->where('user_id', $farmer->id);
     }
 
     /**

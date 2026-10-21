@@ -177,7 +177,7 @@ class PaymentController extends Controller
             'redirect' => Auth::check() ? route('orders.show', $order) : route('home'),
             'invoice_url' => Auth::check()
                 ? null
-                : URL::temporarySignedRoute('orders.guest-invoice', now()->addDays(7), $order),
+                : URL::temporarySignedRoute('orders.guest-invoice', now()->addDays(7), ['order' => $order]),
         ]);
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Modules\Catalog\Models;
 
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use App\Modules\Catalog\Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany; // <-- Asegúrate de importar esto
@@ -19,6 +19,8 @@ class Category extends Model
 
     /**
      * Define la relación: Una Categoría tiene muchos Productos.
+     *
+     * @return HasMany<Product, $this>
      */
     public function products(): HasMany
     {

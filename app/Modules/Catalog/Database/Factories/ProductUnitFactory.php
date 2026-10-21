@@ -2,8 +2,8 @@
 
 namespace App\Modules\Catalog\Database\Factories;
 
-use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductUnit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

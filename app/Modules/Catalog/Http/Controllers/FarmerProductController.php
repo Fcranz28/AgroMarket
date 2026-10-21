@@ -20,7 +20,7 @@ class FarmerProductController extends Controller
      */
     public function index(): View
     {
-        $products = auth()->user()->products()->latest()->get();
+        $products = Product::ownedBy(auth()->user())->latest()->get();
 
         return view('dashboard.products.index', compact('products'));
     }
@@ -45,8 +45,9 @@ class FarmerProductController extends Controller
     public function store(FarmerProductRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
-            $product = $request->user()->products()->create([
+            $product = Product::create([
                 ...$request->safe()->only(['name', 'description', 'category_id']),
+                'user_id' => $request->user()->id,
                 'slug' => Str::slug($request->validated('name')).'-'.Str::random(8),
                 'unit' => $request->units()[0]['unit'],
                 'price' => 0,

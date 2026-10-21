@@ -1,0 +1,18 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - routes
+        - database
+    tmpDir: storage/framework/cache/phpstan
+
+    ignoreErrors:
+        # Relations that one module adds to another module's model with
+        # Model::resolveRelationUsing() (see the module service providers), so the
+        # owning model does not depend on the module that defines them.
+        -
+            identifier: larastan.relationExistence
+            message: '#^Relation ''(invoice|reportsReceived)'' is not found in App\\Modules\\(Orders\\Models\\Order|Identity\\Models\\User) model\.$#'

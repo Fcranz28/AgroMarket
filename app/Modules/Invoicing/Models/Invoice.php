@@ -2,14 +2,15 @@
 
 namespace App\Modules\Invoicing\Models;
 
-use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use App\Modules\Invoicing\Database\Factories\InvoiceFactory;
 use App\Modules\Invoicing\Policies\InvoicePolicy;
 use App\Modules\Orders\Models\Order;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[UseFactory(InvoiceFactory::class)]
 #[UsePolicy(InvoicePolicy::class)]
@@ -60,8 +61,10 @@ class Invoice extends Model
 
     /**
      * Get the order that owns the invoice
+     *
+     * @return BelongsTo<Order, $this>
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }

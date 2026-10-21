@@ -17,7 +17,7 @@ class CartPricingService
      * without units. Repeated lines are merged.
      *
      * @param  array<int, array{id: int|string, unit_id?: int|string|null, cantidad: int|string}>  $cart
-     * @return array{lines: Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, quantity: int, price: string}>, total_cents: int, hash: string}
+     * @return array{lines: Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, price: string, quantity: int}>, total_cents: int, hash: string}
      *
      * @throws ValidationException
      */
@@ -29,24 +29,30 @@ class CartPricingService
             ->get()
             ->keyBy('id');
 
-        $lines = collect($cart)
-            ->map(fn (array $item) => [
-                ...$this->resolveUnit($products[(int) $item['id']], $item['unit_id'] ?? null),
-                'quantity' => (int) $item['cantidad'],
-            ])
-            ->groupBy(fn (array $line) => "{$line['product_id']}:{$line['product_unit_id']}")
-            ->map(fn (Collection $group) => [...$group->first(), 'quantity' => $group->sum('quantity')])
-            ->sortKeys()
-            ->values();
+        $merged = [];
 
-        $totalCents = $lines->sum(fn (array $line) => $this->toCents($line['price']) * $line['quantity']);
+        foreach ($cart as $item) {
+            $line = $this->resolveUnit($products[(int) $item['id']], $item['unit_id'] ?? null);
+            $key = "{$line['product_id']}:{$line['product_unit_id']}";
 
-        $hashSource = $lines->map(fn (array $line) => [$line['product_id'], $line['product_unit_id'], $line['quantity']]);
+            $merged[$key] ??= [...$line, 'quantity' => 0];
+            $merged[$key]['quantity'] += (int) $item['cantidad'];
+        }
+
+        ksort($merged);
+
+        $totalCents = 0;
+        $hashSource = [];
+
+        foreach ($merged as $line) {
+            $totalCents += $this->toCents($line['price']) * $line['quantity'];
+            $hashSource[] = [$line['product_id'], $line['product_unit_id'], $line['quantity']];
+        }
 
         return [
-            'lines' => $lines,
+            'lines' => collect(array_values($merged)),
             'total_cents' => $totalCents,
-            'hash' => hash('sha256', $hashSource->toJson()),
+            'hash' => hash('sha256', (string) json_encode($hashSource)),
         ];
     }
 

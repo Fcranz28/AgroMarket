@@ -18,7 +18,7 @@ class PlaceOrderAction
      * Take the stock and create a paid order with its items in a single transaction, then
      * announce it with OrderPlaced (after the commit, so queued listeners see the order).
      *
-     * @param  Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, quantity: int, price: string}>  $lines  priced by CartPricingService
+     * @param  Collection<int, array{product_id: int, product_unit_id: int|null, unit: string, price: string, quantity: int}>  $lines  priced by CartPricingService
      * @param  array{shipping_address: string, phone: string, guest_name: string, guest_lastname: string, guest_email: string, document_type: string, document_number: string}  $customer
      *
      * @throws InsufficientStockException when a line has no stock left
