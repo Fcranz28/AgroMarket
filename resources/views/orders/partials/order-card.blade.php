@@ -44,7 +44,7 @@
                 <x-ui.button variant="secondary" size="sm" :href="route('invoice.download', $order->invoice)"><i class="fas fa-file-invoice"></i> Comprobante</x-ui.button>
             @endif
             @unless ($order->status === OrderStatus::Cancelled)
-                <x-ui.button variant="secondary" size="sm" x-on:click="$dispatch('open-modal', { name: 'tracking', data: { status: @js($order->status->value), orderId: {{ $order->id }} } })"><i class="fas fa-map-marker-alt"></i> Rastrear</x-ui.button>
+                <x-ui.button variant="secondary" size="sm" x-on:click="$dispatch('open-modal', { name: 'tracking', data: { status: {{ Js::from($order->status->value) }}, orderId: {{ $order->id }} } })"><i class="fas fa-map-marker-alt"></i> Rastrear</x-ui.button>
             @endunless
         </div>
     </footer>

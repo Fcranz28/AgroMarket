@@ -14,6 +14,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Report extends Model
 {
+    /**
+     * Reasons a buyer can pick, with their label.
+     */
+    public const REASONS = [
+        'damaged' => 'Producto dañado',
+        'wrong_item' => 'Producto incorrecto',
+        'quality' => 'Mala calidad',
+        'expired' => 'Producto vencido',
+        'other' => 'Otro',
+    ];
+
     protected $fillable = [
         'user_id',
         'product_id',

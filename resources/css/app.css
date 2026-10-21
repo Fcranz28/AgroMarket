@@ -1,11 +1,4 @@
-/*
- * Tailwind v4 + los estilos anteriores mientras se migran las vistas.
- *
- * Orden de capas: el CSS anterior vive en "legacy", por encima del reset de Tailwind
- * (base) para que las páginas existentes no cambien, y por debajo de las utilidades para
- * que las clases de Tailwind siempre ganen en las vistas migradas.
- */
-@layer theme, base, legacy, components, utilities;
+/* Tailwind v4 con los tokens de diseño de AgroMarket (modo claro y oscuro). */
 
 @import 'tailwindcss';
 
@@ -74,11 +67,3 @@
     }
 }
 
-/* Estilos anteriores (se eliminan a medida que cada vista pasa a Tailwind) */
-@import './style.css' layer(legacy);
-@import './style2.css' layer(legacy);
-@import './pedidos.css' layer(legacy);
-@import './CRUD.css' layer(legacy);
-@import './orders/index.css' layer(legacy);
-@import './orders/show.css' layer(legacy);
-@import './products/show.css' layer(legacy);

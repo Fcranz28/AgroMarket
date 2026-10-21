@@ -1,159 +1,32 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Panel de Agricultor')
-@section('header', 'Mi Resumen')
+@php
+    use App\Modules\Shared\Money;
+@endphp
+
+@section('title', 'Panel de agricultor')
+@section('header', 'Mi resumen')
 
 @section('content')
-    <div class="farmer-dashboard-wrapper">
-        <!-- Stats Grid -->
-        <div class="farmer-stats-grid">
-            <!-- Card 1: Mis Productos -->
-            <div class="farmer-stat-card">
-                <div class="farmer-stat-content">
-                    <div class="farmer-stat-label">MIS PRODUCTOS</div>
-                    <div class="farmer-stat-value">{{ $products }}</div>
-                </div>
-                <div class="farmer-stat-icon icon-success">
-                    <i class="fas fa-box-open"></i>
-                </div>
-            </div>
-
-            <!-- Card 2: Ventas Totales -->
-            <div class="farmer-stat-card">
-                <div class="farmer-stat-content">
-                    <div class="farmer-stat-label">VENTAS TOTALES</div>
-                    <div class="farmer-stat-value">{{ $sales }}</div>
-                </div>
-                <div class="farmer-stat-icon icon-info">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-            </div>
-
-            <!-- Card 3: Ingresos Estimados -->
-            <div class="farmer-stat-card">
-                <div class="farmer-stat-content">
-                    <div class="farmer-stat-label">INGRESOS ESTIMADOS</div>
-                    <div class="farmer-stat-value">S/. {{ number_format($revenue, 2) }}</div>
-                </div>
-                <div class="farmer-stat-icon icon-warning">
-                    <i class="fas fa-wallet"></i>
-                </div>
-            </div>
-
-            <!-- Card 4: Valoración Promedio -->
-            <div class="farmer-stat-card">
-                <div class="farmer-stat-content">
-                    <div class="farmer-stat-label">VALORACIÓN PROMEDIO</div>
-                    <div class="farmer-stat-value">4.8</div>
-                </div>
-                <div class="farmer-stat-icon icon-danger">
-                    <i class="fas fa-star"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Grid -->
-        <div class="farmer-charts-grid">
-            <!-- Monthly Sales Bar Chart -->
-            <div class="farmer-chart-card">
-                <div class="farmer-chart-header">
-                    <div>
-                        <h3 class="farmer-chart-title">Ventas Mensuales</h3>
-                        <p class="farmer-chart-subtitle">Resumen de ventas del año</p>
-                    </div>
-                </div>
-                <div id="monthlySalesChart"></div>
-            </div>
-
-            <!-- Monthly Target Donut Chart -->
-            <div class="farmer-chart-card">
-                <div class="farmer-chart-header">
-                    <h3 class="farmer-chart-title">Objetivo Mensual</h3>
-                    <div style="cursor:pointer;"><i class="fas fa-ellipsis-h" style="color:var(--text-secondary);"></i></div>
-                </div>
-                <div id="monthlyTargetChart" class="farmer-chart-target-container"></div>
-                <div class="farmer-target-info">
-                    <div class="farmer-target-item">
-                        <p>Objetivo</p>
-                        <h4>S/. 20k</h4>
-                    </div>
-                    <div class="farmer-target-item">
-                        <p>Ingresos</p>
-                        <h4>S/. 16k</h4>
-                    </div>
-                    <div class="farmer-target-item">
-                        <p>Hoy</p>
-                        <h4>S/. 1.5k</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Products Section -->
-        <div class="farmer-recent-products">
-            <div class="section-header">
-                <h3>Mis Productos Recientes</h3>
-                <a href="{{ route('dashboard.productos.create') }}" class="btn-new-product">
-                    <i class="fas fa-plus"></i> Nuevo Producto
-                </a>
-            </div>
-
-            <div class="products-table-container">
-                @if($recentProducts->count() > 0)
-                    <table class="products-table">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentProducts as $product)
-                                <tr>
-                                    <td>
-                                        <div class="product-cell">
-                                            <div class="product-img-mini">
-                                                @if($product->image_path)
-                                                    <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}">
-                                                @else
-                                                    <i class="fas fa-box"></i>
-                                                @endif
-                                            </div>
-                                            <span>{{ $product->name }}</span>
-                                        </div>
-                                    </td>
-                                    <td>S/. {{ number_format($product->price, 2) }}</td>
-                                    <td>{{ $product->stock }} {{ $product->unit }}</td>
-                                    <td>
-                                        <span class="status-badge {{ $product->stock > 0 ? 'active' : 'inactive' }}">
-                                            {{ $product->stock > 0 ? 'Disponible' : 'Agotado' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('dashboard.productos.edit', $product) }}" class="action-btn edit" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <div class="empty-state-container">
-                        <i class="fas fa-box empty-state-icon"></i>
-                        <p>Gestiona tu inventario desde la sección "Mis Productos".</p>
-                        <a href="{{ route('dashboard.productos.index') }}" class="empty-state-link">Ir a Mis Productos &rarr;</a>
-                    </div>
-                @endif
-            </div>
-        </div>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-ui.stat-card label="Mis productos" :value="$products" icon="fa-box-open" />
+        <x-ui.stat-card label="Ventas" :value="$sales" icon="fa-shopping-cart" hint="Pedidos pagados con tus productos" />
+        <x-ui.stat-card label="Ingresos" :value="Money::fromDecimal($revenue)->format()" icon="fa-wallet" hint="IGV incluido" />
+        <x-ui.stat-card label="Valoración" :value="$averageRating ? number_format($averageRating, 1).' ★' : '—'" icon="fa-star" :hint="$averageRating ? 'Promedio de tus reseñas' : 'Aún sin reseñas'" />
     </div>
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-        @vite(['resources/js/farmer/dashboard.js'])
-    @endpush
+    <x-ui.card>
+        <h2 class="text-lg font-semibold text-ink">Ingresos por mes</h2>
+        <p class="mb-5 text-sm text-muted">Últimos 12 meses, pedidos pagados y no cancelados</p>
+        <x-ui.bar-chart :data="$monthlyRevenue" label="Ingresos por mes de los últimos 12 meses" />
+    </x-ui.card>
+
+    <x-ui.card :padding="false">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+            <h2 class="text-lg font-semibold text-ink">Productos recientes</h2>
+            <x-ui.button size="sm" :href="route('dashboard.productos.create')"><i class="fas fa-plus"></i> Nuevo producto</x-ui.button>
+        </div>
+
+        @include('dashboard.products.partials.table', ['products' => $recentProducts, 'editRoute' => 'dashboard.productos.edit', 'showRoute' => 'dashboard.productos.show', 'destroyRoute' => null])
+    </x-ui.card>
 @endsection
