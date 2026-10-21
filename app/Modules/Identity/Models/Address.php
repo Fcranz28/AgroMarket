@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[UsePolicy(AddressPolicy::class)]
 class Address extends Model
 {
+    /**
+     * Saved shipping addresses allowed per user.
+     */
+    public const MAX_PER_USER = 3;
+
     protected $fillable = [
         'user_id',
         'address',

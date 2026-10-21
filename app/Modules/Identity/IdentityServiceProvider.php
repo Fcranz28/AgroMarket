@@ -5,6 +5,7 @@ namespace App\Modules\Identity;
 use App\Modules\Identity\Actions\Fortify\ResetUserPassword;
 use App\Modules\Identity\Actions\Fortify\UpdateUserPassword;
 use App\Modules\Identity\Http\Responses\LoginResponse;
+use App\Modules\Identity\Livewire\AddressBook;
 use App\Modules\Identity\Models\User;
 use App\Modules\Identity\Services\FirebaseTokenVerifier;
 use App\Modules\ModuleServiceProvider;
@@ -18,9 +19,17 @@ use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\TwoFactorLoginResponse as TwoFactorLoginResponseContract;
 use Laravel\Fortify\Fortify;
+use Livewire\Component as LivewireComponent;
 
 class IdentityServiceProvider extends ModuleServiceProvider
 {
+    /**
+     * @var array<string, class-string<LivewireComponent>>
+     */
+    protected array $livewire = [
+        'identity.address-book' => AddressBook::class,
+    ];
+
     /**
      * Register the module services.
      */

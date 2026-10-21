@@ -22,14 +22,14 @@
     @stack('styles')
 </head>
 <body
-    class="bg-canvas font-sans text-ink antialiased"
+    class="flex min-h-screen flex-col bg-canvas font-sans text-ink antialiased"
     x-data
     x-on:notify.window="Swal.fire({ toast: true, position: 'top-end', timer: 2000, showConfirmButton: false, icon: $event.detail.type, title: $event.detail.message })"
 >
     @include('partials.header')
     @include('partials.mobile-nav')
 
-    <main class="content">
+    <main class="mx-auto w-full max-w-[1400px] flex-1 px-4 pt-32 pb-28 sm:px-5 md:pt-36 md:pb-10 xl:pt-28">
         @yield('content')
     </main>
 

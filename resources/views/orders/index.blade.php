@@ -1,555 +1,277 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="user-orders-container">
-    <!-- Sidebar Navigation -->
-    <aside class="account-sidebar">
-        <div class="user-profile-card">
-            <div class="user-avatar">
-                @if($user->avatar)
-                    <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}">
-                @else
-                    <i class="fas fa-user-circle"></i>
-                @endif
-            </div>
-            <h3>{{ $user->name }}</h3>
-            <p class="user-email">{{ $user->email }}</p>
-        </div>
+@php
+    use App\Modules\Orders\Enums\OrderStatus;
 
-        <nav class="account-nav">
-            <button class="nav-item active" data-section="orders">
-                <i class="fas fa-box"></i>
-                <span>Mis Pedidos</span>
-                <span class="badge">{{ $orders->count() }}</span>
-            </button>
-            <button class="nav-item" data-section="profile">
-                <i class="fas fa-user-edit"></i>
-                <span>Mi Perfil</span>
-            </button>
-            <button class="nav-item" data-section="addresses">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Direcciones</span>
-            </button>
-            <button class="nav-item" data-section="security">
-                <i class="fas fa-shield-alt"></i>
-                <span>Seguridad</span>
-            </button>
-        </nav>
-    </aside>
+    $tabs = [
+        'orders' => ['icon' => 'fa-box', 'label' => 'Mis pedidos'],
+        'profile' => ['icon' => 'fa-user-edit', 'label' => 'Mi perfil'],
+        'addresses' => ['icon' => 'fa-map-marker-alt', 'label' => 'Direcciones'],
+        'security' => ['icon' => 'fa-shield-alt', 'label' => 'Seguridad'],
+    ];
 
-    <!-- Main Content -->
-    <main class="account-content">
-        <!-- Orders Section -->
-        <section class="content-section active" id="orders-section">
-            <div class="section-header">
-                <h1>Mis Pedidos</h1>
-                <p>Historial completo de tus pedidos</p>
-            </div>
-
-            @if($orders->count() > 0)
-                <div class="orders-grid">
-                    @foreach($orders as $order)
-                        <div class="order-card">
-                            <div class="order-header">
-                                <div>
-                                    <span class="order-id">ID de Seguimiento: #{{ $order->id }}</span>
-                                    <span class="order-date">{{ $order->created_at->format('d M Y') }}</span>
-                                </div>
-                                <span class="status-badge status-{{ $order->status->value }}">
-                                    {{ $order->status->label() }}
-                                </span>
-                            </div>
-
-                            <div class="order-items">
-                                @foreach($order->items->take(3) as $item)
-                                    <div class="order-item">
-                                        <img src="{{ $item->product->image_path ? Storage::url($item->product->image_path) : asset('img/placeholder.png') }}" 
-                                             alt="{{ $item->product->name }}">
-                                        <div class="item-details">
-                                            <h4>{{ $item->product->name }}</h4>
-                                            <p>Cantidad: {{ $item->quantity }}</p>
-                                            @if($order->status->value === 'delivered')
-                                                <button class="btn-report-item" onclick="openReportModal(@js($order->id), @js($item->product->id), @js($item->product->name))">
-                                                    <i class="fas fa-exclamation-triangle"></i> Reportar
-                                                </button>
-                                            @endif
-                                        </div>
-                                        <span class="item-price">S/. {{ number_format($item->price, 2) }}</span>
-                                    </div>
-                                @endforeach
-                                @if($order->items->count() > 3)
-                                    <p class="more-items">+ {{ $order->items->count() - 3 }} producto(s) más</p>
-                                @endif
-                            </div>
-
-                            <div class="order-footer">
-                                <div class="order-total">
-                                    <span>Total:</span>
-                                    <strong>S/. {{ number_format($order->total, 2) }}</strong>
-                                </div>
-                                <div class="order-actions">
-                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-outline">
-                                        Ver Detalles
-                                    </a>
-                                    
-                                    @if($order->invoice)
-                                        <a href="{{ route('invoice.download', $order->invoice) }}" class="btn btn-outline">
-                                            <i class="fas fa-file-invoice"></i> Descargar Factura
-                                        </a>
-                                    @endif
-                                    
-                                    <button class="btn btn-outline" onclick="openTrackingModal('{{ $order->id }}', '{{ $order->status->value }}')">
-                                        <i class="fas fa-map-marker-alt"></i> Rastrear Pedido
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="empty-state">
-                    <i class="fas fa-shopping-bag"></i>
-                    <h3>No tienes pedidos aún</h3>
-                    <p>Explora nuestros productos y realiza tu primera compra</p>
-                    <a href="{{ route('products.index') }}" class="btn btn-primary">
-                        Ir a Productos
-                    </a>
-                </div>
-            @endif
-        </section>
-
-        <!-- Profile Section -->
-        <section class="content-section" id="profile-section">
-            <div class="section-header">
-                <h1>Mi Perfil</h1>
-                <p>Gestiona tu información personal</p>
-            </div>
-
-            <form class="profile-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                
-                <!-- Avatar Upload -->
-                <div class="avatar-upload-section">
-                    <div class="current-avatar">
-                        @if($user->avatar)
-                            @if(filter_var($user->avatar, FILTER_VALIDATE_URL))
-                                <img src="{{ $user->avatar }}" alt="{{ $user->name }}">
-                            @else
-                                <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}">
-                            @endif
-                        @else
-                            <i class="fas fa-user-circle"></i>
-                        @endif
-                    </div>
-                    <div>
-                        <label for="avatar" class="btn btn-outline btn-upload">
-                            <i class="fas fa-camera"></i>
-                            Cambiar Foto
-                        </label>
-                        <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;" onchange="previewAvatar(this)">
-                        <p class="help-text">JPG, PNG o GIF. Máximo 2MB</p>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name">Nombre Completo</label>
-                        <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Correo Electrónico</label>
-                        <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                        @error('email', 'updateProfile')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="profile_current_password">Contraseña actual <small>(solo si cambias tu correo)</small></label>
-                        <input type="password" id="profile_current_password" name="current_password" autocomplete="current-password">
-                        @error('current_password', 'updateProfile')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone">Teléfono</label>
-                        <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="dni">DNI</label>
-                        <input type="text" id="dni" name="dni" value="{{ old('dni', $user->dni ?? '') }}" maxlength="8">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Guardar Cambios
-                </button>
-            </form>
-        </section>
-
-        <!-- Addresses Section -->
-        <section class="content-section" id="addresses-section">
-            <div class="section-header">
-                <h1>Mis Direcciones</h1>
-                <p>Administra tus direcciones de envío</p>
-            </div>
-
-            <div id="addresses-grid" class="addresses-grid">
-                <!-- Addresses will be loaded here via JS -->
-            </div>
-
-            <!-- Address Modal -->
-            <div id="addressModal" class="map-modal">
-                <div class="map-modal-content">
-                    <div class="section-header">
-                        <h2>Agregar Nueva Dirección</h2>
-                        <button class="btn-link" onclick="closeAddressModal()" style="font-size: 1.5rem;">&times;</button>
-                    </div>
-                    
-                    <div class="map-search-box">
-                        <input type="text" id="map-search-input" placeholder="Buscar dirección...">
-                    </div>
-                    
-                    <div id="google-map" class="map-container"></div>
-                    
-                    <div class="map-actions">
-                        <button type="button" class="btn-cancel" onclick="closeAddressModal()">Cancelar</button>
-                        <button type="button" class="btn-confirm" onclick="saveAddress()">Guardar Dirección</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Security Section -->
-        <section class="content-section" id="security-section">
-            <div class="section-header">
-                <h1>Seguridad</h1>
-                <p>Actualiza tu contraseña o activa la verificación en dos pasos</p>
-            </div>
-
-            @if (session('status') === 'password-updated')
-                <div class="alert alert-success" role="status">Tu contraseña se actualizó correctamente.</div>
-            @endif
-
-            <form class="security-form" method="POST" action="{{ route('user-password.update') }}">
-                @csrf
-                @method('PUT')
-                
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label for="current_password">Contraseña Actual</label>
-                        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
-                        @error('current_password', 'updatePassword')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="new_password">Nueva Contraseña</label>
-                        <input type="password" id="new_password" name="password" required minlength="8" autocomplete="new-password">
-                        @error('password', 'updatePassword')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirm_password">Confirmar Contraseña</label>
-                        <input type="password" id="confirm_password" name="password_confirmation" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-lock"></i>
-                    Actualizar Contraseña
-                </button>
-            </form>
-
-            <p class="security-2fa-link">
-                <a href="{{ route('security') }}"><i class="fas fa-shield-alt"></i> Verificación en dos pasos</a>
-            </p>
-        </section>
-    </main>
-</div>
-
-<!-- Tracking Modal -->
-<div id="trackingModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeTrackingModal()">&times;</span>
-        <h2>Rastreo de Pedido</h2>
-        <div class="stepper-wrapper">
-            <div class="stepper-item" id="step-pending">
-                <div class="step-counter">1</div>
-                <div class="step-name">Pendiente</div>
-            </div>
-            <div class="stepper-item" id="step-processing">
-                <div class="step-counter">2</div>
-                <div class="step-name">En Proceso</div>
-            </div>
-            <div class="stepper-item" id="step-shipped">
-                <div class="step-counter">3</div>
-                <div class="step-name">Enviado</div>
-            </div>
-            <div class="stepper-item" id="step-delivered">
-                <div class="step-counter">4</div>
-                <div class="step-name">Entregado</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Report Modal -->
-<div id="reportModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeReportModal()">&times;</span>
-        <h2>Reportar Producto</h2>
-        <form id="reportForm" onsubmit="submitReport(event)">
-            @csrf
-            <input type="hidden" id="report_order_id" name="order_id">
-            <input type="hidden" id="report_product_id" name="product_id">
-            
-            <div class="form-group">
-                <label for="report_product_name">Producto</label>
-                <input type="text" id="report_product_name" name="product_name" readonly class="form-control-plaintext">
-            </div>
-
-            <div class="form-group">
-                <label for="report_reason">Motivo del Reporte</label>
-                <select id="report_reason" name="reason" required>
-                    <option value="">Seleccione un motivo</option>
-                    <option value="damaged">Producto dañado</option>
-                    <option value="wrong_item">Producto incorrecto</option>
-                    <option value="quality">Mala calidad</option>
-                    <option value="expired">Producto vencido</option>
-                    <option value="other">Otro</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="report_description">Descripción</label>
-                <textarea id="report_description" name="description" rows="4" placeholder="Describa el problema con detalle..." required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="report_evidence">Evidencias (Fotos)</label>
-                <div class="evidence-upload-container" onclick="document.getElementById('report_evidence').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Haz clic para subir fotos</p>
-                    <span class="upload-hint">Máximo 3 imágenes (JPG, PNG)</span>
-                </div>
-                <input type="file" id="report_evidence" name="evidence[]" accept="image/*" multiple style="display: none;" onchange="previewEvidence(this)">
-                <div id="evidence_preview" class="evidence-preview-grid"></div>
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="btn btn-outline" onclick="closeReportModal()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Enviar Reporte</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@push('styles')
-    @vite(['resources/css/profile/addresses.css'])
-@endpush
-
-@push('scripts')
-    <script>
-        window.initMap = function() {
-            console.log('Maps API loaded, waiting for module...');
-        }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places&callback=initMap" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/profile/addresses.js'])
-@endpush
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const navItems = document.querySelectorAll('.nav-item');
-        const sections = document.querySelectorAll('.content-section');
-
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const sectionId = item.dataset.section;
-                
-                // Update active nav item
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-
-                // Show corresponding section
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === sectionId + '-section') {
-                        section.classList.add('active');
-                    }
-                });
-            });
-        });
-    });
-
-
-
-    function previewAvatar(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const avatarContainer = document.querySelector('.current-avatar');
-                avatarContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function openTrackingModal(orderId, status) {
-        const modal = document.getElementById('trackingModal');
-        modal.style.display = 'flex';
-        
-        // Reset steps
-        const steps = ['pending', 'processing', 'shipped', 'delivered'];
-        steps.forEach(step => {
-            const el = document.getElementById('step-' + step);
-            if(el) el.classList.remove('active', 'completed');
-        });
-
-        // Activate steps based on status
-        let active = true;
-        steps.forEach(step => {
-            const el = document.getElementById('step-' + step);
-            if (el && active) {
-                if (step === status) {
-                    el.classList.add('active');
-                    active = false; 
-                } else {
-                    el.classList.add('completed');
-                }
-            }
-        });
-    }
-
-    function closeTrackingModal() {
-        document.getElementById('trackingModal').style.display = 'none';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const trackingModal = document.getElementById('trackingModal');
-        const reportModal = document.getElementById('reportModal');
-        if (event.target == trackingModal) {
-            trackingModal.style.display = 'none';
-        }
-        if (event.target == reportModal) {
-            reportModal.style.display = 'none';
-        }
-    }
-
-    // Store order items data for report modal
-    const orderItems = {
-        @foreach($orders as $order)
-            '{{ $order->id }}': [
-                @foreach($order->items as $item)
-                    { id: '{{ $item->product->id }}', name: '{{ $item->product->name }}' },
-                @endforeach
-            ],
-        @endforeach
+    // Al volver de un formulario con errores se abre su pestaña
+    $initialTab = match (true) {
+        $errors->updateProfile->isNotEmpty() || session()->has('success') => 'profile',
+        $errors->updatePassword->isNotEmpty() || session('status') === 'password-updated' => 'security',
+        array_key_exists((string) request('tab'), $tabs) => (string) request('tab'),
+        default => 'orders',
     };
 
-    function openReportModal(orderId, productId, productName) {
-        const modal = document.getElementById('reportModal');
-        document.getElementById('report_order_id').value = orderId;
-        document.getElementById('report_product_id').value = productId;
-        document.getElementById('report_product_name').value = productName;
-        
-        modal.style.display = 'flex';
-    }
+    $reportReasons = [
+        'damaged' => 'Producto dañado',
+        'wrong_item' => 'Producto incorrecto',
+        'quality' => 'Mala calidad',
+        'expired' => 'Producto vencido',
+        'other' => 'Otro',
+    ];
 
-    function closeReportModal() {
-        document.getElementById('reportModal').style.display = 'none';
-        document.getElementById('reportForm').reset();
-        document.getElementById('evidence_preview').innerHTML = '';
-    }
+    $avatarUrl = $user->avatar ? (filter_var($user->avatar, FILTER_VALIDATE_URL) ? $user->avatar : Storage::url($user->avatar)) : null;
+@endphp
 
-    function previewEvidence(input) {
-        const previewContainer = document.getElementById('evidence_preview');
-        previewContainer.innerHTML = '';
-        
-        if (input.files) {
-            if (input.files.length > 3) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Límite excedido',
-                    text: 'Solo puedes subir un máximo de 3 imágenes.',
-                    confirmButtonColor: '#4caf50'
-                });
-                input.value = '';
-                return;
-            }
+@section('content')
+    <div class="mx-auto grid max-w-6xl gap-6 pt-6 pb-12 lg:grid-cols-[260px_minmax(0,1fr)]" x-data="{ tab: @js($initialTab) }">
+        <aside class="flex flex-col gap-4">
+            <x-ui.card class="flex flex-col items-center gap-2 text-center">
+                <span class="flex size-20 items-center justify-center overflow-hidden rounded-full bg-brand-soft text-4xl text-brand">
+                    @if ($avatarUrl)
+                        <img src="{{ $avatarUrl }}" alt="{{ $user->name }}" class="size-full object-cover">
+                    @else
+                        <i class="fas fa-user"></i>
+                    @endif
+                </span>
+                <p class="font-semibold text-ink">{{ $user->name }}</p>
+                <p class="text-sm break-all text-muted">{{ $user->email }}</p>
+            </x-ui.card>
 
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'evidence-item';
-                    div.innerHTML = `<img src="${e.target.result}" alt="Evidence">`;
-                    previewContainer.appendChild(div);
-                }
-                reader.readAsDataURL(file);
-            });
-        }
-    }
+            <nav class="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:px-0" aria-label="Mi cuenta">
+                @foreach ($tabs as $key => $tab)
+                    <button
+                        type="button"
+                        x-on:click="tab = @js($key)"
+                        x-bind:class="tab === @js($key) ? 'bg-brand text-white shadow-soft' : 'bg-surface text-ink hover:bg-brand-soft hover:text-brand'"
+                        class="flex shrink-0 items-center gap-3 rounded-xl border border-line px-4 py-2.5 text-sm font-medium whitespace-nowrap transition"
+                    >
+                        <i class="fas {{ $tab['icon'] }} w-4"></i>
+                        {{ $tab['label'] }}
+                        @if ($key === 'orders')
+                            <span class="ml-auto rounded-pill bg-black/10 px-2 text-xs">{{ $orders->count() }}</span>
+                        @endif
+                    </button>
+                @endforeach
+            </nav>
+        </aside>
 
-    function submitReport(event) {
-        event.preventDefault();
-        
-        const form = document.getElementById('reportForm');
-        const formData = new FormData(form);
-        
-        // Show loading state
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerText;
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Enviando...';
+        <div class="min-w-0">
+            {{-- Pedidos --}}
+            <section x-show="tab === 'orders'" class="flex flex-col gap-4">
+                <header>
+                    <h1 class="text-2xl font-bold text-ink">Mis pedidos</h1>
+                    <p class="text-muted">Historial completo de tus pedidos</p>
+                </header>
 
-        fetch('{{ route("reports.store") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Reporte Enviado',
-                text: 'Gracias por tu reporte. Lo revisaremos a la brevedad.',
-                confirmButtonColor: '#4caf50'
-            }).then(() => {
-                closeReportModal();
-            });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un problema al enviar el reporte. Por favor intenta nuevamente.',
-                confirmButtonColor: '#dc3545'
-            });
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = originalText;
-        });
-    }
-</script>
+                @forelse ($orders as $order)
+                    @include('orders.partials.order-card', ['order' => $order])
+                @empty
+                    <x-ui.card class="flex flex-col items-center gap-3 py-14 text-center">
+                        <i class="fas fa-shopping-bag text-4xl text-brand"></i>
+                        <h2 class="text-lg font-semibold text-ink">No tienes pedidos aún</h2>
+                        <p class="text-sm text-muted">Explora nuestros productos y realiza tu primera compra.</p>
+                        <x-ui.button :href="route('products.index')">Ir a productos</x-ui.button>
+                    </x-ui.card>
+                @endforelse
+            </section>
+
+            {{-- Perfil --}}
+            <section x-cloak x-show="tab === 'profile'" class="flex flex-col gap-4">
+                <header>
+                    <h1 class="text-2xl font-bold text-ink">Mi perfil</h1>
+                    <p class="text-muted">Gestiona tu información personal</p>
+                </header>
+
+                @if (session('success'))
+                    <x-ui.alert type="success">{{ session('success') }}</x-ui.alert>
+                @endif
+
+                <x-ui.card>
+                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="flex flex-col gap-5" x-data="{ avatar: @js($avatarUrl) }">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="flex items-center gap-4">
+                            <span class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-soft text-3xl text-brand">
+                                <template x-if="avatar"><img x-bind:src="avatar" alt="" class="size-full object-cover"></template>
+                                <template x-if="! avatar"><i class="fas fa-user"></i></template>
+                            </span>
+                            <div>
+                                <label for="avatar" class="inline-flex cursor-pointer items-center gap-2 rounded-pill border border-line px-4 py-2 text-sm font-medium text-ink transition hover:border-brand hover:text-brand"><i class="fas fa-camera"></i> Cambiar foto</label>
+                                <input type="file" id="avatar" name="avatar" accept="image/*" class="sr-only" x-on:change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => avatar = e.target.result; reader.readAsDataURL(file); }">
+                                <p class="mt-1 text-xs text-muted">JPG, PNG o WebP. Máximo 2 MB.</p>
+                                @error('avatar', 'updateProfile') <p class="text-xs text-danger">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <x-ui.input name="name" label="Nombre completo" :value="$user->name" bag="updateProfile" required autocomplete="name" />
+                            <x-ui.input name="email" type="email" label="Correo electrónico" :value="$user->email" bag="updateProfile" required autocomplete="email" />
+                            <x-ui.input name="phone" type="tel" label="Teléfono" :value="$user->phone" bag="updateProfile" autocomplete="tel" />
+                            <x-ui.input name="dni" label="DNI" :value="$user->dni" bag="updateProfile" maxlength="8" inputmode="numeric" />
+                            <x-ui.input name="current_password" id="profile_current_password" type="password" label="Contraseña actual" hint="Solo si cambias tu correo." bag="updateProfile" autocomplete="current-password" class="sm:col-span-2" />
+                        </div>
+
+                        <x-ui.button type="submit" class="self-start"><i class="fas fa-save"></i> Guardar cambios</x-ui.button>
+                    </form>
+                </x-ui.card>
+            </section>
+
+            {{-- Direcciones --}}
+            <section x-cloak x-show="tab === 'addresses'" class="flex flex-col gap-4">
+                <header>
+                    <h1 class="text-2xl font-bold text-ink">Mis direcciones</h1>
+                    <p class="text-muted">Las usamos para completar tus envíos en el checkout</p>
+                </header>
+
+                <livewire:identity.address-book />
+            </section>
+
+            {{-- Seguridad --}}
+            <section x-cloak x-show="tab === 'security'" class="flex flex-col gap-4">
+                <header>
+                    <h1 class="text-2xl font-bold text-ink">Seguridad</h1>
+                    <p class="text-muted">Actualiza tu contraseña o activa la verificación en dos pasos</p>
+                </header>
+
+                @if (session('status') === 'password-updated')
+                    <x-ui.alert type="success">Tu contraseña se actualizó correctamente.</x-ui.alert>
+                @endif
+
+                <x-ui.card>
+                    <form method="POST" action="{{ route('user-password.update') }}" class="flex flex-col gap-4">
+                        @csrf
+                        @method('PUT')
+
+                        <x-ui.input name="current_password" type="password" label="Contraseña actual" bag="updatePassword" required autocomplete="current-password" />
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <x-ui.input name="password" id="new_password" type="password" label="Nueva contraseña" bag="updatePassword" required minlength="8" autocomplete="new-password" />
+                            <x-ui.input name="password_confirmation" id="confirm_password" type="password" label="Confirmar contraseña" bag="updatePassword" required autocomplete="new-password" />
+                        </div>
+
+                        <x-ui.button type="submit" class="self-start"><i class="fas fa-lock"></i> Actualizar contraseña</x-ui.button>
+                    </form>
+                </x-ui.card>
+
+                <a href="{{ route('security') }}" class="flex items-center gap-3 rounded-card border border-line bg-surface p-5 transition hover:border-brand">
+                    <span class="flex size-11 items-center justify-center rounded-full bg-brand-soft text-brand"><i class="fas fa-shield-alt"></i></span>
+                    <span class="flex-1">
+                        <span class="block font-semibold text-ink">Verificación en dos pasos</span>
+                        <span class="text-sm text-muted">Pide un código de tu app de autenticación al iniciar sesión.</span>
+                    </span>
+                    <i class="fas fa-chevron-right text-muted"></i>
+                </a>
+            </section>
+        </div>
+    </div>
+
+    {{-- Seguimiento del pedido --}}
+    <x-ui.modal name="tracking" title="Seguimiento del pedido">
+        @php($steps = OrderStatus::trackingSteps())
+        <p class="mb-6 text-sm text-muted">Pedido #<span x-text="data.orderId"></span></p>
+        <ol class="flex flex-col gap-0" x-data="{ steps: @js(array_map(fn ($step) => $step->value, $steps)) }">
+            @foreach ($steps as $index => $step)
+                <li class="flex gap-4" x-data="{ get position() { return steps.indexOf(data.status) }, get state() { return {{ $index }} < position ? 'done' : ({{ $index }} === position ? 'current' : 'next') } }">
+                    <div class="flex flex-col items-center">
+                        <span
+                            class="flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"
+                            x-bind:class="{ 'border-brand bg-brand text-white': state !== 'next', 'ring-4 ring-brand/25': state === 'current', 'border-line text-muted': state === 'next' }"
+                        >
+                            <template x-if="state === 'done'"><i class="fas fa-check"></i></template>
+                            <template x-if="state !== 'done'"><span>{{ $index + 1 }}</span></template>
+                        </span>
+                        @unless ($loop->last)
+                            <span class="h-8 w-0.5" x-bind:class="state === 'done' ? 'bg-brand' : 'bg-line'"></span>
+                        @endunless
+                    </div>
+                    <p class="pt-1.5 font-medium" x-bind:class="state === 'next' ? 'text-muted' : 'text-ink'">{{ $step->label() }}</p>
+                </li>
+            @endforeach
+        </ol>
+    </x-ui.modal>
+
+    {{-- Reporte de un producto entregado --}}
+    <x-ui.modal name="report" title="Reportar un producto">
+        <form
+            x-data="{
+                sending: false,
+                previews: [],
+                errors: {},
+                pick(event) {
+                    const files = [...event.target.files];
+                    if (files.length > 3) {
+                        event.target.value = '';
+                        this.previews = [];
+                        this.errors = { evidence: ['Puedes subir como máximo 3 imágenes.'] };
+                        return;
+                    }
+                    this.errors = {};
+                    this.previews = files.map((file) => URL.createObjectURL(file));
+                },
+                async submit() {
+                    this.sending = true;
+                    this.errors = {};
+                    try {
+                        const response = await fetch(@js(route('reports.store')), {
+                            method: 'POST',
+                            body: new FormData(this.$el),
+                            headers: { Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                        });
+                        const body = await response.json();
+                        if (response.status === 422) {
+                            this.errors = body.errors ?? {};
+                            return;
+                        }
+                        if (! response.ok) throw new Error(body.message);
+                        this.$el.reset();
+                        this.previews = [];
+                        $dispatch('close-modal', { name: 'report' });
+                        $dispatch('notify', { type: 'success', message: 'Gracias por tu reporte. Lo revisaremos a la brevedad.' });
+                    } catch (error) {
+                        $dispatch('notify', { type: 'error', message: 'No se pudo enviar el reporte. Inténtalo de nuevo.' });
+                    } finally {
+                        this.sending = false;
+                    }
+                },
+            }"
+            x-on:submit.prevent="submit"
+            class="flex flex-col gap-4"
+        >
+            <input type="hidden" name="order_id" x-bind:value="data.orderId">
+            <input type="hidden" name="product_id" x-bind:value="data.productId">
+
+            <p class="rounded-xl bg-canvas px-4 py-3 text-sm text-ink">Producto: <strong x-text="data.productName"></strong></p>
+
+            <div class="flex flex-col gap-1.5">
+                <x-ui.select name="reason" id="report_reason" label="Motivo" :options="$reportReasons" placeholder="Selecciona un motivo" required />
+                <template x-if="errors.reason"><p class="text-xs text-danger" x-text="errors.reason[0]"></p></template>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <x-ui.textarea name="description" id="report_description" label="Descripción" rows="4" placeholder="Describe el problema con detalle..." required />
+                <template x-if="errors.description"><p class="text-xs text-danger" x-text="errors.description[0]"></p></template>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label for="report_evidence" class="text-sm font-medium text-ink">Fotos (opcional, máximo 3)</label>
+                <input type="file" id="report_evidence" name="evidence[]" accept="image/*" multiple x-on:change="pick" class="text-sm text-muted file:mr-3 file:rounded-pill file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:font-medium file:text-brand">
+                <div class="flex gap-2" x-show="previews.length">
+                    <template x-for="src in previews"><img x-bind:src="src" alt="" class="size-16 rounded-lg object-cover"></template>
+                </div>
+                <template x-if="errors.evidence"><p class="text-xs text-danger" x-text="errors.evidence[0]"></p></template>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <x-ui.button variant="secondary" x-on:click="$dispatch('close-modal', { name: 'report' })">Cancelar</x-ui.button>
+                <x-ui.button type="submit" x-bind:disabled="sending"><span x-text="sending ? 'Enviando…' : 'Enviar reporte'">Enviar reporte</span></x-ui.button>
+            </div>
+        </form>
+    </x-ui.modal>
 @endsection
