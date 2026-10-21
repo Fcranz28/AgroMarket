@@ -39,6 +39,24 @@
 - **Pagos**: Stripe API
 - **Servidor**: Apache / Nginx
 
+## 🧩 Arquitectura: monolito modular
+
+El backend está organizado por dominio en `app/Modules/<Módulo>`. Cada módulo tiene sus modelos, controladores, requests, servicios, rutas y factories, y un `ServiceProvider` que extiende `App\Modules\ModuleServiceProvider` (registrado en `bootstrap/providers.php`).
+
+| Módulo | Responsabilidad |
+|---|---|
+| Identity | Usuarios, login (contraseña y Firebase), onboarding, perfil, direcciones y gestión de usuarios del admin |
+| Catalog | Productos, unidades, categorías, búsqueda, reseñas e inventario (`StockService`) |
+| Orders | Pedidos, precio del carrito y creación de pedidos |
+| Payments | Stripe: intención de pago, confirmación y webhook |
+| Invoicing | Comprobantes electrónicos |
+| Moderation | Reportes de productos |
+| Backoffice | Dashboards del admin y del agricultor |
+
+Las dependencias van en un solo sentido: `Identity ← Catalog ← Orders ← Payments | Invoicing | Moderation`, y nadie depende de `Backoffice`. Un módulo no modifica datos de otro directamente: usa sus acciones o servicios públicos, o reacciona a sus eventos. Estas reglas se verifican en `tests/Arch/ModulesTest.php`.
+
+Las vistas, los assets y las migraciones existentes siguen en `resources/` y `database/migrations`; las migraciones nuevas de un módulo van en `app/Modules/<Módulo>/Database/Migrations`.
+
 ## ⚙️ Instalación y Configuración
 
 Sigue estos pasos para levantar el proyecto en tu entorno local:
