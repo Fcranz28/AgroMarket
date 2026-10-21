@@ -1,12 +1,12 @@
-@import 'admin/users.css';
-@import 'admin/verify.css';
-@import 'admin/dashboard.css';
-@import 'dashboard/products/form.css';
-@import 'dashboard/products/index.css';
-@import 'farmer/orders.css';
-@import 'farmer/pending.css';
-@import 'dashboard/products/show.css';
-@import 'farmer/dashboard.css';
+@import './admin/users.css';
+@import './admin/verify.css';
+@import './admin/dashboard.css';
+@import './dashboard/products/form.css';
+@import './dashboard/products/index.css';
+@import './farmer/orders.css';
+@import './farmer/pending.css';
+@import './dashboard/products/show.css';
+@import './farmer/dashboard.css';
 
 /* ===== VARIABLES & THEME CONFIGURATION ===== */
 :root {
