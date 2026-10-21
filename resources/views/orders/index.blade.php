@@ -49,7 +49,7 @@
                     <button
                         type="button"
                         x-on:click="tab = @js($key)"
-                        x-bind:class="tab === @js($key) ? 'bg-brand text-white shadow-soft' : 'bg-surface text-ink hover:bg-brand-soft hover:text-brand'"
+                        x-bind:class="tab === @js($key) ? 'bg-night text-lime shadow-soft' : 'bg-surface text-ink hover:bg-brand-soft hover:text-brand'"
                         class="flex shrink-0 items-center gap-3 rounded-xl border border-line px-4 py-2.5 text-sm font-medium whitespace-nowrap transition"
                     >
                         <i class="fas {{ $tab['icon'] }} w-4"></i>
@@ -182,7 +182,7 @@
                     <div class="flex flex-col items-center">
                         <span
                             class="flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"
-                            x-bind:class="{ 'border-brand bg-brand text-white': state !== 'next', 'ring-4 ring-brand/25': state === 'current', 'border-line text-muted': state === 'next' }"
+                            x-bind:class="{ 'border-brand bg-night text-lime': state !== 'next', 'ring-4 ring-brand/25': state === 'current', 'border-line text-muted': state === 'next' }"
                         >
                             <template x-if="state === 'done'"><i class="fas fa-check"></i></template>
                             <template x-if="state !== 'done'"><span>{{ $index + 1 }}</span></template>

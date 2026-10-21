@@ -7,6 +7,9 @@
     <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @include('partials.theme-script')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -54,7 +57,7 @@
                     href="{{ route($item['route']) }}"
                     @class([
                         'flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition',
-                        'bg-brand text-white shadow-soft' => request()->routeIs($item['active']),
+                        'bg-night text-lime shadow-soft' => request()->routeIs($item['active']),
                         'text-ink hover:bg-brand-soft hover:text-brand' => ! request()->routeIs($item['active']),
                     ])
                 ><i class="fas {{ $item['icon'] }} w-4 text-center"></i> {{ $item['label'] }}</a>
@@ -65,7 +68,7 @@
     </aside>
 
     <div class="flex min-h-screen flex-col lg:pl-64">
-        <header class="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-navbar px-4 backdrop-blur-md sm:px-6">
+        <header class="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur-md sm:px-6">
             <button type="button" data-test="panel-menu" x-on:click="menuOpen = true" class="rounded-lg p-2 text-ink hover:bg-brand-soft lg:hidden" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
             <h1 class="truncate text-lg font-semibold text-ink">@yield('header', 'Panel')</h1>
 
@@ -73,7 +76,7 @@
                 @include('partials.theme-toggle')
 
                 <span class="hidden items-center gap-2 text-sm sm:flex">
-                    <span class="flex size-8 items-center justify-center rounded-full bg-brand font-semibold text-white">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+                    <span class="flex size-8 items-center justify-center rounded-full bg-night font-semibold text-lime">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
                     <span class="max-w-40 truncate text-ink">{{ $user->name }}</span>
                 </span>
 

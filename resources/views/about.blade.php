@@ -73,7 +73,7 @@
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($values as $value)
                     <div class="rounded-card border border-line bg-surface p-6 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-card" x-reveal>
-                        <span class="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-brand text-xl text-white"><i class="fas {{ $value['icon'] }}"></i></span>
+                        <span class="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-night text-xl text-lime"><i class="fas {{ $value['icon'] }}"></i></span>
                         <h3 class="font-semibold text-ink">{{ $value['title'] }}</h3>
                         <p class="mt-2 text-sm text-muted">{{ $value['text'] }}</p>
                     </div>
@@ -122,7 +122,7 @@
                         @if ($member['links'])
                             <div class="mt-4 flex justify-center gap-3">
                                 @foreach ($member['links'] as $link)
-                                    <a href="{{ $link['url'] }}" target="_blank" rel="noopener" aria-label="{{ $link['label'] }}" class="flex size-9 items-center justify-center rounded-full border border-line text-muted transition hover:border-brand hover:bg-brand hover:text-white"><i class="{{ $link['icon'] }}"></i></a>
+                                    <a href="{{ $link['url'] }}" target="_blank" rel="noopener" aria-label="{{ $link['label'] }}" class="flex size-9 items-center justify-center rounded-full border border-line text-muted transition hover:border-brand hover:bg-night hover:text-lime"><i class="{{ $link['icon'] }}"></i></a>
                                 @endforeach
                             </div>
                         @endif

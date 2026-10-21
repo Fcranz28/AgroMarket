@@ -89,7 +89,7 @@
                     <span class="text-sm font-medium text-ink">Unidad de medida</span>
                     <div class="flex flex-wrap gap-2">
                         @foreach ($units as $index => $unit)
-                            <button type="button" x-on:click="select({{ $index }})" x-bind:class="selected === {{ $index }} ? 'border-brand bg-brand text-white' : 'border-line bg-surface text-ink hover:border-brand'" class="rounded-pill border px-4 py-1.5 text-sm font-medium transition">{{ $unit['name'] }}</button>
+                            <button type="button" x-on:click="select({{ $index }})" x-bind:class="selected === {{ $index }} ? 'border-brand bg-night text-lime' : 'border-line bg-surface text-ink hover:border-brand'" class="rounded-pill border px-4 py-1.5 text-sm font-medium transition">{{ $unit['name'] }}</button>
                         @endforeach
                     </div>
                     <p class="text-sm text-muted">Stock disponible: <span class="font-semibold text-ink" x-text="unit.stock">{{ $units->first()['stock'] }}</span></p>
@@ -155,7 +155,7 @@
                 @forelse ($reviews as $review)
                     <article class="rounded-card border border-line bg-surface p-5">
                         <header class="flex items-center gap-3">
-                            <span class="flex size-10 items-center justify-center rounded-full bg-brand font-semibold text-white">{{ mb_strtoupper(mb_substr($review->user->name, 0, 1)) }}</span>
+                            <span class="flex size-10 items-center justify-center rounded-full bg-night font-semibold text-lime">{{ mb_strtoupper(mb_substr($review->user->name, 0, 1)) }}</span>
                             <div class="flex-1">
                                 <p class="font-medium text-ink">{{ $review->user->name }}</p>
                                 <p class="text-xs text-muted">{{ $review->created_at->format('d/m/Y') }}</p>

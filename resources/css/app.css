@@ -10,7 +10,7 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme inline {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
     --color-canvas: var(--am-canvas);
     --color-surface: var(--am-surface);
@@ -21,43 +21,61 @@
     --color-brand: var(--am-brand);
     --color-brand-strong: var(--am-brand-strong);
     --color-brand-soft: var(--am-brand-soft);
+    --color-night: var(--am-night);
+    --color-night-soft: var(--am-night-soft);
+    --color-lime: #a7db4c;
+    --color-lime-strong: #94c93a;
+    --color-on-night: #f3f7ec;
+    --color-on-night-muted: #b9cbaf;
     --color-danger: var(--am-danger);
     --color-success: var(--am-success);
 
-    --radius-card: 1rem;
+    --radius-card: 1.25rem;
+    --radius-control: 0.75rem;
     --radius-pill: 9999px;
 
-    --shadow-soft: 0 2px 4px rgb(122 165 55 / 0.08);
-    --shadow-card: 0 4px 12px rgb(122 165 55 / 0.12);
-    --shadow-lifted: 0 12px 24px rgb(122 165 55 / 0.18);
+    --shadow-soft: 0 1px 2px rgb(13 35 16 / 0.05);
+    --shadow-card: 0 6px 18px rgb(13 35 16 / 0.08);
+    --shadow-lifted: 0 20px 40px rgb(13 35 16 / 0.18);
+
+    --animate-marquee: marquee 38s linear infinite;
+
+    @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
 }
 
 /* Paleta de AgroMarket (verde de campo) para modo claro y oscuro */
 @layer base {
     :root {
-        --am-canvas: #f0f4e8;
+        --am-canvas: #f4f5f0;
         --am-surface: #ffffff;
-        --am-navbar: rgb(254 253 251 / 0.95);
-        --am-ink: #2a3e1f;
-        --am-muted: #5a6f4a;
-        --am-line: #d8e3c8;
-        --am-brand: #7aa537;
-        --am-brand-strong: #6a9527;
-        --am-brand-soft: #e8f1d9;
+        --am-navbar: #0d2310;
+        --am-ink: #12210f;
+        --am-muted: #59654f;
+        --am-line: #e2e6da;
+        --am-brand: #3b6a12;
+        --am-brand-strong: #2e5a0c;
+        --am-brand-soft: #eef3e3;
+        --am-night: #0d2310;
+        --am-night-soft: #13311a;
         --am-danger: #c53030;
         --am-success: #2f855a;
     }
 
     :root[data-theme='dark'] {
-        --am-canvas: #1a1e16;
-        --am-surface: #2e3228;
-        --am-navbar: rgb(36 40 31 / 0.95);
-        --am-ink: #f1edd4;
-        --am-muted: #c8c4ab;
-        --am-line: #4a4e42;
-        --am-brand: #76a233;
-        --am-brand-strong: #8ab854;
-        --am-brand-soft: #343b28;
+        --am-canvas: #0a170c;
+        --am-surface: #12231a;
+        --am-navbar: #07120a;
+        --am-ink: #eef4e6;
+        --am-muted: #a9bda0;
+        --am-line: #23392a;
+        --am-brand: #a7db4c;
+        --am-brand-strong: #bfe676;
+        --am-brand-soft: #1a3220;
+        --am-night: #07120a;
+        --am-night-soft: #102116;
         --am-danger: #fc8181;
         --am-success: #68d391;
     }

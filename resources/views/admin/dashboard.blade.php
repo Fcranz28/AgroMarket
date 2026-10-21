@@ -31,7 +31,7 @@
                 <p class="text-sm font-medium text-ink">Agricultores por verificar</p>
                 @forelse ($pendingFarmers as $farmer)
                     <a href="{{ route('admin.verify.view', $farmer) }}" class="flex items-center gap-3 rounded-xl p-2 transition hover:bg-brand-soft">
-                        <span class="flex size-9 items-center justify-center rounded-full bg-brand font-semibold text-white">{{ mb_strtoupper(mb_substr($farmer->name, 0, 1)) }}</span>
+                        <span class="flex size-9 items-center justify-center rounded-full bg-night font-semibold text-lime">{{ mb_strtoupper(mb_substr($farmer->name, 0, 1)) }}</span>
                         <span class="min-w-0 flex-1">
                             <span class="block truncate text-sm font-medium text-ink">{{ $farmer->name }}</span>
                             <span class="block truncate text-xs text-muted">{{ $farmer->created_at->diffForHumans() }}</span>

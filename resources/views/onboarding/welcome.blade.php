@@ -37,7 +37,7 @@
                         </span>
                         <span class="text-2xl font-semibold text-ink">{{ $role['title'] }}</span>
                         <span class="flex-1 text-muted">{{ $role['text'] }}</span>
-                        <span class="rounded-pill bg-canvas px-6 py-2 font-semibold text-ink transition group-hover:bg-brand group-hover:text-white">Seleccionar →</span>
+                        <span class="rounded-pill bg-canvas px-6 py-2 font-semibold text-ink transition group-hover:bg-night group-hover:text-lime">Seleccionar →</span>
                     </button>
                 </form>
             @endforeach

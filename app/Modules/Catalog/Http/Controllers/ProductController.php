@@ -19,7 +19,7 @@ class ProductController extends Controller
     {
         $product = Product::with(['units', 'images', 'category', 'user:id,name', 'reviews.user:id,name'])->where('slug', $slug)->firstOrFail();
 
-        $relatedProducts = Product::with('category')->where('category_id', $product->category_id)
+        $relatedProducts = Product::with(['category', 'units'])->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->take(4)
             ->get();

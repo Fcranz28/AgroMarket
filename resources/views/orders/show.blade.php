@@ -34,7 +34,7 @@
                                 <span @class(['h-0.5 flex-1', 'invisible' => $loop->first, 'bg-brand' => $index <= $currentStep, 'bg-line' => $index > $currentStep])></span>
                                 <span @class([
                                     'flex size-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold',
-                                    'border-brand bg-brand text-white' => $index <= $currentStep,
+                                    'border-brand bg-night text-lime' => $index <= $currentStep,
                                     'ring-4 ring-brand/25' => $index === $currentStep,
                                     'border-line text-muted' => $index > $currentStep,
                                 ])>

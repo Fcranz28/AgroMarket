@@ -92,7 +92,7 @@ class ProductCatalog extends Component
         $term = trim($this->q);
 
         return Product::query()
-            ->with('category')
+            ->with(['category', 'units'])
             ->when($term !== '', fn ($query) => $query->search($term))
             ->when($this->currentCategory, fn ($query, Category $category) => $query->where('category_id', $category->id))
             ->tap(fn ($query) => match ($this->sort) {

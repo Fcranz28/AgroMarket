@@ -7,6 +7,9 @@
     <link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @include('partials.theme-script')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -21,7 +24,10 @@
     @include('partials.header')
     @include('partials.mobile-nav')
 
-    <main class="mx-auto w-full max-w-[1400px] flex-1 px-4 pt-32 pb-28 sm:px-5 md:pt-36 md:pb-10 xl:pt-28">
+    {{-- Bloques a todo el ancho (p. ej. el hero del inicio) --}}
+    @yield('fullbleed')
+
+    <main class="mx-auto w-full max-w-7xl flex-1 px-4 pt-6 pb-28 sm:px-6 md:pb-12">
         @yield('content')
     </main>
 

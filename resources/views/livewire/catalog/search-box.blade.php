@@ -1,7 +1,7 @@
-<div class="relative min-w-0 flex-1 md:max-w-md xl:w-96 xl:flex-none" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
-    <form action="{{ route('search') }}" method="GET" role="search" class="flex items-center rounded-pill border border-line bg-canvas py-1 pr-1 pl-1 transition focus-within:border-brand">
+<div class="relative min-w-0 flex-1 md:max-w-md" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+    <form action="{{ route('search') }}" method="GET" role="search" class="flex items-center rounded-control border border-white/15 bg-night-soft py-1 pr-1 pl-1 text-on-night transition focus-within:border-lime">
         <label for="searchCategory" class="sr-only">Categoría</label>
-        <select name="category" id="searchCategory" wire:model="category" class="hidden max-w-24 cursor-pointer truncate border-r border-line bg-transparent px-2 py-1.5 text-xs text-ink outline-none min-[400px]:block sm:max-w-40 sm:text-sm">
+        <select name="category" id="searchCategory" wire:model="category" class="hidden max-w-24 cursor-pointer truncate border-r border-white/15 bg-transparent px-2 py-1.5 text-xs text-on-night outline-none min-[400px]:block sm:max-w-36 sm:text-sm [&>option]:text-ink">
             <option value="all">Todas las Categorías</option>
             @foreach ($this->categories as $categoryOption)
                 <option value="{{ $categoryOption->slug }}" @selected($categoryOption->slug === $category)>{{ $categoryOption->name }}</option>
@@ -19,10 +19,10 @@
             x-on:input="open = true"
             placeholder="Buscar productos..."
             autocomplete="off"
-            class="min-w-0 flex-1 bg-transparent px-3 py-1.5 text-base text-ink outline-none placeholder:text-muted sm:text-sm [&::-webkit-search-cancel-button]:hidden"
+            class="min-w-0 flex-1 bg-transparent px-3 py-1.5 text-base text-on-night outline-none placeholder:text-on-night-muted sm:text-sm [&::-webkit-search-cancel-button]:hidden"
         >
 
-        <button type="submit" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white transition hover:bg-brand-strong" aria-label="Buscar">
+        <button type="submit" class="flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-lime text-night transition hover:bg-lime-strong" aria-label="Buscar">
             <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         </button>
     </form>
