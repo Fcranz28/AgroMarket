@@ -99,10 +99,10 @@
                     <div class="flex items-center rounded-pill border border-line bg-surface">
                         <button type="button" x-on:click="quantity = Math.max(1, quantity - 1)" class="px-4 py-2 text-lg text-muted hover:text-brand" aria-label="Quitar uno">−</button>
                         <input type="number" x-model.number="quantity" min="1" x-bind:max="unit.stock" class="w-14 bg-transparent text-center font-semibold text-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" aria-label="Cantidad">
-                        <button type="button" x-on:click="quantity = Math.min(unit.stock, quantity + 1)" class="px-4 py-2 text-lg text-muted hover:text-brand" aria-label="Agregar uno">+</button>
+                        <button type="button" data-test="quantity-increase" x-on:click="quantity = Math.min(unit.stock, quantity + 1)" class="px-4 py-2 text-lg text-muted hover:text-brand" aria-label="Agregar uno">+</button>
                     </div>
 
-                    <x-ui.button size="lg" class="flex-1" x-on:click="add()" x-bind:disabled="unit.stock < 1">
+                    <x-ui.button size="lg" class="flex-1" data-test="product-add-to-cart" x-on:click="add()" x-bind:disabled="unit.stock < 1">
                         <span x-text="unit.stock < 1 ? 'Sin stock' : 'Agregar al carrito'">Agregar al carrito</span>
                     </x-ui.button>
                 </div>

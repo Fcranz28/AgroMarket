@@ -51,7 +51,7 @@
                 <input type="text" name="unit[]" x-model="row.unit" list="unit-suggestions" placeholder="Ej. kg, saco (50 kg)" required maxlength="50" aria-label="Unidad" class="col-span-2 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm text-ink focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none sm:col-span-1">
                 <input type="number" name="stock[]" x-model="row.stock" min="0" step="1" placeholder="Stock" required aria-label="Stock" class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm text-ink focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none">
                 <input type="number" name="price[]" x-model="row.price" min="0.1" step="0.01" placeholder="0.00" required aria-label="Precio" class="w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-sm text-ink focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none">
-                <button type="button" x-on:click="rows.splice(index, 1)" x-bind:disabled="rows.length === 1" class="col-span-2 rounded-lg p-2 text-muted transition hover:bg-danger/10 hover:text-danger disabled:opacity-30 sm:col-span-1" aria-label="Quitar unidad"><i class="fas fa-trash"></i></button>
+                <button type="button" x-bind:data-test="'remove-unit-' + index" x-on:click="rows.splice(index, 1)" x-bind:disabled="rows.length === 1" class="col-span-2 rounded-lg p-2 text-muted transition hover:bg-danger/10 hover:text-danger disabled:opacity-30 sm:col-span-1" aria-label="Quitar unidad"><i class="fas fa-trash"></i></button>
             </div>
         </template>
 

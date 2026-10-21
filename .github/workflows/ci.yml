@@ -20,7 +20,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, pdo_sqlite, gd, bcmath, intl
+          extensions: mbstring, pdo_sqlite, gd, bcmath, intl, sockets
           coverage: none
 
       - uses: actions/setup-node@v4
@@ -49,4 +49,21 @@ jobs:
         run: npm run build
 
       - name: Tests (Pest)
-        run: vendor/bin/pest
+        run: vendor/bin/pest --testsuite=Unit,Feature,Arch
+
+      # Playwright no está en package.json: se instala solo para los tests de navegador
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Tests de navegador (Pest + Playwright)
+        run: vendor/bin/pest --testsuite=Browser
+
+      - name: Capturas de los tests de navegador que fallaron
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: tests/Browser/Screenshots
+          if-no-files-found: ignore

@@ -13,7 +13,10 @@
 
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature', 'Browser');
+
+// Las páginas cargan SweetAlert y Font Awesome desde CDN: la primera visita puede tardar
+pest()->browser()->timeout(15_000);
 
 /*
 |--------------------------------------------------------------------------

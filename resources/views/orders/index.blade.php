@@ -178,7 +178,7 @@
         <p class="mb-6 text-sm text-muted">Pedido #<span x-text="data.orderId"></span></p>
         <ol class="flex flex-col gap-0" x-data="{ steps: @js(array_map(fn ($step) => $step->value, $steps)) }">
             @foreach ($steps as $index => $step)
-                <li class="flex gap-4" x-data="{ get position() { return steps.indexOf(data.status) }, get state() { return {{ $index }} < position ? 'done' : ({{ $index }} === position ? 'current' : 'next') } }">
+                <li class="flex gap-4" x-data="{ get position() { return steps.indexOf(data.status) }, get state() { return {{ $index }} < this.position ? 'done' : ({{ $index }} === this.position ? 'current' : 'next') } }">
                     <div class="flex flex-col items-center">
                         <span
                             class="flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"

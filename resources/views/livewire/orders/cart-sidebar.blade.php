@@ -13,6 +13,7 @@
         x-transition:enter-start="translate-x-full"
         x-transition:leave="transition duration-200 ease-in"
         x-transition:leave-end="translate-x-full"
+        data-test="cart-panel"
         class="fixed inset-y-0 right-0 z-[2100] flex w-full max-w-sm flex-col bg-surface text-ink shadow-2xl"
         role="dialog"
         aria-modal="true"
@@ -40,7 +41,7 @@
                             <div class="flex items-center rounded-pill border border-line">
                                 <button type="button" wire:click="decrement(@js($line['key']), {{ $line['quantity'] }})" class="px-2.5 py-1 text-muted transition hover:text-brand" aria-label="Quitar uno">−</button>
                                 <span class="min-w-6 text-center text-sm font-semibold">{{ $line['quantity'] }}</span>
-                                <button type="button" wire:click="increment(@js($line['key']), {{ $line['quantity'] }})" @disabled($line['quantity'] >= $line['stock']) class="px-2.5 py-1 text-muted transition hover:text-brand disabled:opacity-40" aria-label="Agregar uno">+</button>
+                                <button type="button" wire:click="increment(@js($line['key']), {{ $line['quantity'] }})" @disabled($line['quantity'] >= $line['stock']) class="px-2.5 py-1 text-muted transition hover:text-brand disabled:opacity-40" aria-label="Agregar uno" data-test="cart-increment">+</button>
                             </div>
                             <span class="text-sm font-semibold">{{ $line['subtotal']->format() }}</span>
                         </div>

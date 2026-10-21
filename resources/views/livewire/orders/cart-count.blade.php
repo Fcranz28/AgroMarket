@@ -6,4 +6,5 @@
         'hidden' => $count === 0,
     ])
     data-cart-count
+    data-test="cart-count-{{ $variant }}"
 >{{ $count }}</span>

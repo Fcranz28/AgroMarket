@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Capturas que guardan los tests de navegador al fallar
+/tests/Browser/Screenshots

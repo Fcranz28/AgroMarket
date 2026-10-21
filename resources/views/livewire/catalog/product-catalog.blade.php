@@ -13,7 +13,7 @@
                 </li>
                 @foreach ($this->categories as $categoryOption)
                     <li wire:key="category-{{ $categoryOption->id }}">
-                        <button type="button" wire:click="selectCategory(@js($categoryOption->slug))" @class([$categoryButtonClasses, 'bg-brand-soft font-semibold text-brand' => $this->currentCategory?->is($categoryOption), 'text-ink' => ! $this->currentCategory?->is($categoryOption)])>{{ $categoryOption->name }}</button>
+                        <button type="button" data-test="category-{{ $categoryOption->slug }}" wire:click="selectCategory(@js($categoryOption->slug))" @class([$categoryButtonClasses, 'bg-brand-soft font-semibold text-brand' => $this->currentCategory?->is($categoryOption), 'text-ink' => ! $this->currentCategory?->is($categoryOption)])>{{ $categoryOption->name }}</button>
                     </li>
                 @endforeach
             </ul>

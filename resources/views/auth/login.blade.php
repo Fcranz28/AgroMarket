@@ -26,7 +26,7 @@
                 <a href="{{ route('password.request') }}" class="font-medium text-brand hover:underline">¿Olvidaste tu contraseña?</a>
             </div>
 
-            <x-ui.button type="submit" size="lg" class="w-full">Iniciar sesión</x-ui.button>
+            <x-ui.button type="submit" size="lg" class="w-full" data-test="login-submit">Iniciar sesión</x-ui.button>
 
             @include('auth.partials.social-login', ['label' => 'O continúa con'])
         </form>

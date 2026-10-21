@@ -28,7 +28,7 @@
     </form>
 
     @if ($this->suggestions->isNotEmpty())
-        <ul x-cloak x-show="open" x-transition.opacity class="absolute inset-x-0 top-[calc(100%+6px)] z-[1000] max-h-96 overflow-y-auto rounded-xl border border-line bg-surface py-2 shadow-lifted">
+        <ul data-test="search-suggestions" x-cloak x-show="open" x-transition.opacity class="absolute inset-x-0 top-[calc(100%+6px)] z-[1000] max-h-96 overflow-y-auto rounded-xl border border-line bg-surface py-2 shadow-lifted">
             @foreach ($this->suggestions as $suggestion)
                 <li wire:key="suggestion-{{ $suggestion->id }}">
                     <a href="{{ route('products.show', $suggestion->slug) }}" class="flex items-center gap-3 px-4 py-2 transition hover:bg-brand-soft">
