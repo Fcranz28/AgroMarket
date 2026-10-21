@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Orders\Models;
 
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use App\Modules\Orders\Database\Factories\OrderItemFactory;
 use App\Modules\Catalog\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[UseFactory(OrderItemFactory::class)]
 class OrderItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderItemFactory> */
+    /** @use HasFactory<\App\Modules\Orders\Database\Factories\OrderItemFactory> */
     use HasFactory;
 
     protected $fillable = [

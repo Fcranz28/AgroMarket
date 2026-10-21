@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Order;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Identity\Models\User;
-use App\Services\CartPricingService;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Services\CartPricingService;
 use App\Services\InvoiceService;
 use App\Services\PaymentGateway;
 use Illuminate\Http\UploadedFile;

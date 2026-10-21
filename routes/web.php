@@ -2,12 +2,10 @@
 
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
@@ -23,8 +21,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
 
-// Checkout & Payment (Guest Access Allowed)
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+// Payment (Guest Access Allowed)
 Route::post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent')->middleware('throttle:20,1');
 Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process')->middleware('throttle:10,1');
 
@@ -35,9 +32,6 @@ Route::get('/factura/{invoice}/descargar-invitado', [InvoiceController::class, '
 
 // RUTAS PARA USUARIOS LOGUEADOS
 Route::middleware(['auth'])->group(function () {
-    Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/pedidos/{order}', [OrderController::class, 'show'])->name('orders.show');
-
     // Invoice Routes
     Route::get('/factura/{invoice}/descargar', [InvoiceController::class, 'download'])->name('invoice.download');
     Route::get('/factura/{invoice}', [InvoiceController::class, 'show'])->name('invoice.show');
@@ -48,11 +42,6 @@ Route::middleware(['auth'])->group(function () {
     // Rutas de Agricultor
     Route::middleware(['role:farmer'])->prefix('agricultor')->group(function () {
         Route::get('/dashboard', [FarmerController::class, 'index'])->name('farmer.dashboard');
-
-        // Farmer Orders (as seller)
-        Route::get('/pedidos', [OrderController::class, 'farmerOrders'])->name('farmer.orders');
-        Route::get('/pedidos/{order}/detalles', [OrderController::class, 'farmerShow'])->name('farmer.orders.show');
-        Route::patch('/pedidos/{order}/status', [OrderController::class, 'updateStatus'])->name('farmer.orders.status');
     });
 
     // Rutas de Administrador

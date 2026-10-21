@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Order;
 use App\Modules\Catalog\Models\Product;
-use App\Services\CartPricingService;
+use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Services\CartPricingService;
 use App\Services\PaymentGateway;
 use Illuminate\Support\Facades\Storage;
 use Stripe\PaymentIntent;

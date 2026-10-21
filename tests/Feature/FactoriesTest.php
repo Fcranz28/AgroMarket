@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Invoice;
-use App\Models\OrderItem;
 use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Identity\Models\User;
+use App\Modules\Orders\Models\OrderItem;
 
 it('creates users with role states', function () {
     expect(User::factory()->admin()->create()->isAdmin())->toBeTrue()

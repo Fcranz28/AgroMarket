@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Orders\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 class CheckoutController extends Controller
 {
     public function index()

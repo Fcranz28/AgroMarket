@@ -1,16 +1,24 @@
 <?php
 
-namespace Database\Factories;
+namespace App\Modules\Orders\Database\Factories;
 
+use App\Modules\Orders\Models\Order;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Orders\Models\Order>
  */
 class OrderFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<Order>
+     */
+    protected $model = Order::class;
+
     /**
      * Define the model's default state.
      *
