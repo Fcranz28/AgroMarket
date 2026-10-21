@@ -25,10 +25,9 @@
         @include('partials.user-menu-links')
     </x-ui.dropdown>
 
-    {{-- carrito.js usa .cart-button-mobile y .cart-count-mobile --}}
-    <button type="button" id="openCartMobile" class="cart-button-mobile relative {{ $itemClasses }} text-muted">
+    <button type="button" x-data x-on:click="$dispatch('open-cart')" class="relative {{ $itemClasses }} text-muted">
         <svg class="size-[22px] fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span>Carrito</span>
-        <span class="cart-count-mobile absolute top-2 left-1/2 ml-2 rounded-pill bg-brand px-1.5 py-px text-[0.65rem] text-white">0</span>
+        <livewire:orders.cart-count variant="mobile" />
     </button>
 </nav>

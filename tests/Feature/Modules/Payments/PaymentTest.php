@@ -82,9 +82,11 @@ it('creates the order when the payment matches the cart', function () {
     $gateway->shouldReceive('retrieveIntent')->andReturn(fakePaymentIntent($this->cart));
     $gateway->shouldReceive('currency')->andReturn('pen');
 
-    $this->postJson(route('payment.process'), checkoutPayload($this->cart))
+    $this->withSession(['cart' => ['x:' => ['product_id' => $this->product->id, 'unit_id' => null, 'quantity' => 2]]])
+        ->postJson(route('payment.process'), checkoutPayload($this->cart))
         ->assertSuccessful()
-        ->assertJson(['success' => true]);
+        ->assertJson(['success' => true])
+        ->assertSessionMissing('cart');
 
     $order = Order::sole();
 

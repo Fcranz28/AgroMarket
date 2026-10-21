@@ -7,6 +7,7 @@ use App\Modules\Catalog\Exceptions\InsufficientStockException;
 use App\Modules\Orders\Actions\PlaceOrderAction;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Services\CartPricingService;
+use App\Modules\Orders\Services\SessionCart;
 use App\Modules\Payments\Http\Requests\CreatePaymentIntentRequest;
 use App\Modules\Payments\Http\Requests\ProcessPaymentRequest;
 use App\Modules\Payments\Jobs\HandleStripeEvent;
@@ -35,6 +36,7 @@ class PaymentController extends Controller
         private PaymentGateway $gateway,
         private CartPricingService $pricing,
         private PlaceOrderAction $placeOrder,
+        private SessionCart $cart,
     ) {}
 
     /**
@@ -168,6 +170,8 @@ class PaymentController extends Controller
         } catch (UniqueConstraintViolationException) {
             return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
         }
+
+        $this->cart->clear();
 
         // The receipt is issued in the background (OrderPlaced → Invoicing); guests get a
         // signed link that waits until it is ready.

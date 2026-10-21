@@ -146,20 +146,31 @@
             <div class="checkout-order-summary">
                 <h2>Resumen del Pedido</h2>
                 
-                <div id="cart-items"></div>
+                <ul class="flex flex-col divide-y divide-line">
+                    @foreach ($lines as $line)
+                        <li class="flex items-center gap-3 py-3">
+                            <x-catalog.product-image :product="$line['product']" class="size-14 shrink-0 rounded-lg" />
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate font-medium text-ink">{{ $line['product']->name }}</p>
+                                <p class="text-sm text-muted">{{ $line['quantity'] }} × {{ $line['price']->format() }} / {{ $line['unit'] }}</p>
+                            </div>
+                            <span class="font-semibold text-ink">{{ $line['subtotal']->format() }}</span>
+                        </li>
+                    @endforeach
+                </ul>
 
                 <div class="checkout-summary-breakdown">
                     <div class="checkout-summary-row">
                         <span>Op. gravada</span>
-                        <span id="subtotal-amount">S/. 0.00</span>
+                        <span>{{ $total->withoutIgv()->format() }}</span>
                     </div>
                     <div class="checkout-summary-row">
                         <span>IGV (18%, incluido)</span>
-                        <span id="tax-amount">S/. 0.00</span>
+                        <span>{{ $total->igv()->format() }}</span>
                     </div>
                     <div class="checkout-summary-row checkout-total-row">
                         <span>Total</span>
-                        <span id="total-amount">S/. 0.00</span>
+                        <span>{{ $total->format() }}</span>
                     </div>
                 </div>
             </div>
@@ -169,6 +180,8 @@
 @push('scripts')
     <script>
         window.isUserLoggedIn = {{ auth()->check() ? 'true' : 'false' }};
+        // Solo ids, unidades y cantidades: el servidor vuelve a calcular el precio
+        window.checkoutCart = @json($paymentCart);
         window.initMap = function() {
             // Placeholder to prevent "initMap is not a function" error
             // The actual initMap in address-map.js will overwrite this or be called manually
