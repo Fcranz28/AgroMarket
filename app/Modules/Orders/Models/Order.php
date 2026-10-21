@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
  * The invoice relation is registered by the Invoicing module with
@@ -97,6 +99,20 @@ class Order extends Model
     public function isFinal(): bool
     {
         return $this->status->isFinal();
+    }
+
+    /**
+     * Notify the buyer: the account owner, or the e-mail given at checkout for guests.
+     */
+    public function notifyBuyer(Notification $notification): void
+    {
+        if ($this->user) {
+            $this->user->notify($notification);
+
+            return;
+        }
+
+        NotificationFacade::route('mail', $this->guest_email)->notify($notification);
     }
 
     /**
