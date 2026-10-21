@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\Product;
+use App\Modules\Catalog\Models\Product;
 use App\Modules\Identity\Models\User;
 
 class AdminController extends Controller

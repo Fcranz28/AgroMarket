@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Modules\Catalog\Http\Requests;
 
-use App\Http\Requests\Concerns\ValidatesProductUnits;
+use App\Modules\Catalog\Http\Requests\Concerns\ValidatesProductUnits;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AdminProductRequest extends FormRequest

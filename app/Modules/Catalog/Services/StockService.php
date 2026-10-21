@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Modules\Catalog\Services;
 
-use App\Exceptions\InsufficientStockException;
-use App\Models\Product;
-use App\Models\ProductUnit;
+use App\Modules\Catalog\Exceptions\InsufficientStockException;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductUnit;
 
 class StockService
 {

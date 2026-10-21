@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Modules\Catalog\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request; // <-- 1. Importa Request
 use OpenApi\Attributes as OA;

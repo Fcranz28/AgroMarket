@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\ProductApiController;
-use App\Http\Controllers\SearchController;
+use App\Modules\Catalog\Http\Controllers\Api\ProductApiController;
+use App\Modules\Catalog\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:60,1')->group(function () {

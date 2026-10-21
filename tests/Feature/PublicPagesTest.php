@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Product;
+use App\Modules\Catalog\Models\Product;
 
 beforeEach(function () {
     $this->withoutVite();

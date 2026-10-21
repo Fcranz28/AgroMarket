@@ -32,10 +32,7 @@
                 <form action="{{ route('search') }}" method="GET" id="searchForm">
                     <select class="category-select" name="category">
                         <option value="all">Todas las Categorías</option>
-                        @php
-                            $categories = \App\Models\Category::all();
-                        @endphp
-                        @foreach($categories as $category)
+                        @foreach($navCategories as $category)
                             <option value="{{ $category->slug }}">{{ $category->name }}</option>
                         @endforeach
                     </select>

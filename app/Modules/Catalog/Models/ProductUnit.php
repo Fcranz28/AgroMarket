@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Catalog\Models;
 
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use App\Modules\Catalog\Database\Factories\ProductUnitFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[UseFactory(ProductUnitFactory::class)]
 class ProductUnit extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductUnitFactory> */
+    /** @use HasFactory<\App\Modules\Catalog\Database\Factories\ProductUnitFactory> */
     use HasFactory;
 
     protected $fillable = [

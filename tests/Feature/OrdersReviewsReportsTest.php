@@ -2,9 +2,9 @@
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\ProductUnit;
-use App\Models\Review;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\ProductUnit;
+use App\Modules\Catalog\Models\Review;
 use App\Modules\Identity\Models\User;
 use App\Services\PaymentGateway;
 

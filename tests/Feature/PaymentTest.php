@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Order;
-use App\Models\Product;
+use App\Modules\Catalog\Models\Product;
 use App\Services\CartPricingService;
 use App\Services\PaymentGateway;
 use Illuminate\Support\Facades\Storage;

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Catalog\Http\Controllers;
 
-use App\Http\Requests\StoreReviewRequest;
-use App\Models\Product;
-use App\Models\Review;
+use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Http\Requests\StoreReviewRequest;
+use App\Modules\Catalog\Models\Product;
+use App\Modules\Catalog\Models\Review;
 use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller

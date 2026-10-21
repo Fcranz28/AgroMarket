@@ -2,7 +2,7 @@
 
 use App\Models\Invoice;
 use App\Models\OrderItem;
-use App\Models\ProductUnit;
+use App\Modules\Catalog\Models\ProductUnit;
 use App\Modules\Identity\Models\User;
 
 it('creates users with role states', function () {
