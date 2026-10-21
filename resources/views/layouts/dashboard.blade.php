@@ -41,6 +41,7 @@
         x-bind:class="menuOpen ? 'translate-x-0' : '-translate-x-full'"
         class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-line bg-surface transition-transform duration-200 lg:translate-x-0"
         aria-label="Menú del panel"
+        data-test="panel-sidebar"
     >
         <a href="{{ route('home') }}" class="flex h-16 items-center border-b border-line px-6">
             <img src="{{ asset('img/Logo_Claro.png') }}" alt="AgroMarket" class="h-9 w-auto dark:hidden">
@@ -65,7 +66,7 @@
 
     <div class="flex min-h-screen flex-col lg:pl-64">
         <header class="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-navbar px-4 backdrop-blur-md sm:px-6">
-            <button type="button" x-on:click="menuOpen = true" class="rounded-lg p-2 text-ink hover:bg-brand-soft lg:hidden" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+            <button type="button" data-test="panel-menu" x-on:click="menuOpen = true" class="rounded-lg p-2 text-ink hover:bg-brand-soft lg:hidden" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
             <h1 class="truncate text-lg font-semibold text-ink">@yield('header', 'Panel')</h1>
 
             <div class="ml-auto flex items-center gap-2 sm:gap-3">

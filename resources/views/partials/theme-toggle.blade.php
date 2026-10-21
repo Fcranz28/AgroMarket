@@ -1,6 +1,7 @@
 {{-- Cambia entre tema claro y oscuro y lo recuerda en localStorage --}}
 <button
     type="button"
+    data-test="theme-toggle"
     x-data="{ dark: document.documentElement.dataset.theme === 'dark' }"
     x-on:click="dark = ! dark; document.documentElement.dataset.theme = dark ? 'dark' : 'light'; localStorage.setItem('theme', dark ? 'dark' : 'light')"
     class="flex shrink-0 items-center rounded-full p-1.5 text-ink transition hover:text-brand"
