@@ -5,7 +5,9 @@ namespace App\Modules\Identity\Models;
 use App\Modules\Identity\Database\Factories\UserFactory;
 use App\Modules\Identity\Enums\UserRole;
 use App\Modules\Identity\Enums\VerificationStatus;
+use App\Modules\Identity\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +19,7 @@ use Illuminate\Notifications\Notifiable;
  * @property VerificationStatus $verification_status
  */
 #[UseFactory(UserFactory::class)]
+#[UsePolicy(UserPolicy::class)]
 class User extends Authenticatable
 {
     /** @use HasFactory<\App\Modules\Identity\Database\Factories\UserFactory> */

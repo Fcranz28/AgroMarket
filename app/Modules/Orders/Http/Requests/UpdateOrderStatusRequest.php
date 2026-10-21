@@ -14,10 +14,7 @@ class UpdateOrderStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /** @var Order $order */
-        $order = $this->route('order');
-
-        return $this->user()->isFarmer() && $order->isFullySoldBy($this->user());
+        return $this->user()->can('updateStatus', $this->route('order'));
     }
 
     /**

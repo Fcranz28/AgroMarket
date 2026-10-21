@@ -3,8 +3,10 @@
 namespace App\Modules\Catalog\Models;
 
 use App\Modules\Catalog\Database\Factories\ProductFactory;
+use App\Modules\Catalog\Policies\ProductPolicy;
 use App\Modules\Identity\Models\User;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[UseFactory(ProductFactory::class)]
+#[UsePolicy(ProductPolicy::class)]
 class Product extends Model
 {
     use HasFactory, SoftDeletes;

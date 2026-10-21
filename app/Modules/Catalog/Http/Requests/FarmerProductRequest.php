@@ -3,6 +3,7 @@
 namespace App\Modules\Catalog\Http\Requests;
 
 use App\Modules\Catalog\Http\Requests\Concerns\ValidatesProductUnits;
+use App\Modules\Catalog\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FarmerProductRequest extends FormRequest
@@ -14,9 +15,7 @@ class FarmerProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $user = $this->user();
-
-        return $user->isAdmin() || $user->isVerified();
+        return $this->user()->can('create', Product::class);
     }
 
     /**

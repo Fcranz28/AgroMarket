@@ -78,9 +78,7 @@ class AddressController extends Controller
     )]
     public function destroy(Address $address)
     {
-        if ($address->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('delete', $address);
 
         $address->delete();
 

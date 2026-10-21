@@ -37,7 +37,7 @@ class OrderController extends Controller
      */
     public function show(Order $order): View
     {
-        abort_if($order->user_id === null || $order->user_id !== Auth::id(), 403);
+        $this->authorize('view', $order);
 
         $order->load(['items.product', 'invoice']);
 
@@ -124,7 +124,7 @@ class OrderController extends Controller
      */
     public function farmerShow(Order $order): View
     {
-        abort_unless(Auth::user()->isFarmer() && $order->hasItemsSoldBy(Auth::user()), 403);
+        $this->authorize('viewAsSeller', $order);
 
         $order->load(['items.product', 'invoice']);
 
