@@ -4,6 +4,7 @@ namespace App\Modules\Moderation\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Moderation\Enums\ReportStatus;
+use App\Modules\Moderation\Http\Resources\ReportResource;
 use App\Modules\Moderation\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -47,7 +48,7 @@ class AdminReportController extends Controller
     {
         $report->load(['user', 'product.user', 'order']);
 
-        return response()->json($report);
+        return response()->json(new ReportResource($report));
     }
 
     #[OA\Patch(

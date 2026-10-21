@@ -3,6 +3,8 @@
 namespace App\Modules\Catalog\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Catalog\Http\Resources\ProductSuggestionResource;
+use App\Modules\Catalog\Http\Resources\SearchProductResource;
 use App\Modules\Catalog\Models\Category;
 use App\Modules\Catalog\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -65,19 +67,9 @@ class SearchController extends Controller
                 default => $query->latest(),
             })
             ->limit(self::RESULT_LIMIT)
-            ->get()
-            ->map(fn (Product $product) => [
-                'id' => $product->id,
-                'slug' => $product->slug,
-                'name' => $product->name,
-                'price' => $product->price,
-                'unit' => $product->unit ?? 'kg',
-                'image_path' => $product->image_path ? asset('storage/'.$product->image_path) : null,
-                'image_url' => $product->image_url,
-                'category_name' => $product->category?->name,
-            ]);
+            ->get();
 
-        return response()->json(['products' => $products, 'total' => $products->count()]);
+        return response()->json(['products' => SearchProductResource::collection($products), 'total' => $products->count()]);
     }
 
     #[OA\Get(
@@ -114,6 +106,6 @@ class SearchController extends Controller
             ->limit(5)
             ->get();
 
-        return response()->json(['suggestions' => $products]);
+        return response()->json(['suggestions' => ProductSuggestionResource::collection($products)]);
     }
 }

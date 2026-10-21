@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Identity\Http\Resources\AddressResource;
 use App\Modules\Identity\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class AddressController extends Controller
     {
         $user = Auth::user();
 
-        return response()->json($user->addresses);
+        return response()->json(AddressResource::collection($user->addresses));
     }
 
     #[OA\Post(
@@ -60,7 +61,7 @@ class AddressController extends Controller
 
         $address = $user->addresses()->create($validated);
 
-        return response()->json($address, 201);
+        return response()->json(new AddressResource($address), 201);
     }
 
     #[OA\Delete(

@@ -4,6 +4,7 @@ namespace App\Modules\Orders\Services;
 
 use App\Modules\Catalog\Models\Product;
 use App\Modules\Catalog\Models\ProductUnit;
+use App\Modules\Shared\Money;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -83,6 +84,6 @@ class CartPricingService
 
     private function toCents(string $price): int
     {
-        return (int) round(((float) $price) * 100);
+        return Money::fromDecimal($price)->cents();
     }
 }
