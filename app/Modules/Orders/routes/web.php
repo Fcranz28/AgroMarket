@@ -1,11 +1,7 @@
 <?php
 
-use App\Modules\Orders\Http\Controllers\CheckoutController;
 use App\Modules\Orders\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
-
-// Checkout (también para invitados)
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 
 Route::middleware('auth')->group(function () {
     // Pedidos del comprador
