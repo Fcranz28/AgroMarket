@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Modules\Payments\Services;
 
 use Stripe\PaymentIntent;
 use Stripe\Refund;

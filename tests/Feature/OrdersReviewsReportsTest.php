@@ -6,7 +6,7 @@ use App\Modules\Catalog\Models\Review;
 use App\Modules\Identity\Models\User;
 use App\Modules\Orders\Models\Order;
 use App\Modules\Orders\Models\OrderItem;
-use App\Services\PaymentGateway;
+use App\Modules\Payments\Services\PaymentGateway;
 
 use function Pest\Laravel\mock;
 

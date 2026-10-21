@@ -7,7 +7,6 @@ use App\Http\Controllers\FarmerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,10 +19,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/nosotros', [PageController::class, 'about'])->name('about');
 Route::get('/contacto', [ContactController::class, 'show'])->name('contact.show');
-
-// Payment (Guest Access Allowed)
-Route::post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent')->middleware('throttle:20,1');
-Route::post('/payment/process', [PaymentController::class, 'processPayment'])->name('payment.process')->middleware('throttle:10,1');
 
 // Descarga de comprobantes para compras como invitado (enlace firmado)
 Route::get('/factura/{invoice}/descargar-invitado', [InvoiceController::class, 'guestDownload'])
@@ -54,7 +49,3 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/reportes/{report}/status', [AdminReportController::class, 'updateStatus'])->name('reports.status');
     });
 });
-
-// Stripe Webhook (outside auth middleware)
-Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])
-    ->name('stripe.webhook');
