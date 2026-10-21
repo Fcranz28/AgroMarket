@@ -9,18 +9,10 @@
         :side-link="route('login')"
         side-link-label="Iniciar sesión"
     >
-        <form method="POST" action="{{ route('password.email') }}">
+        <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-4">
             @csrf
-
-            <div class="input-group">
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" />
-                <label for="email">Correo Electrónico</label>
-            </div>
-            @error('email')
-                <div class="input-error">{{ $message }}</div>
-            @enderror
-
-            <button type="submit" class="btn">Enviar enlace</button>
+            <x-ui.input name="email" type="email" label="Correo electrónico" required autofocus autocomplete="email" />
+            <x-ui.button type="submit" size="lg" class="w-full">Enviar enlace</x-ui.button>
         </form>
     </x-auth-card>
 @endsection

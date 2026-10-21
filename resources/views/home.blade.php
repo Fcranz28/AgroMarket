@@ -1,13 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="hero-banner" style="background-image: url('{{ asset('img/hero-market-hd.jpg') }}');">
-        <div class="hero-overlay">
-            <div class="hero-content">
-                <h1 class="hero-title">Productos Frescos Directamente del Campo</h1>
-                <p class="hero-subtitle">Conectamos agricultores locales con tu hogar</p>
-                <a href="{{ route('products.index') }}" class="hero-btn">Explorar Productos</a>
-            </div>
+    <section class="relative mt-4 flex min-h-[60vh] items-center justify-center overflow-hidden rounded-[2rem] bg-cover bg-center px-6 py-20 text-center text-white" style="background-image: url('{{ asset('img/hero-market-hd.jpg') }}');">
+        <div class="absolute inset-0 bg-linear-to-b from-black/55 via-black/40 to-black/60"></div>
+        <div class="relative flex max-w-3xl flex-col items-center gap-5">
+            <h1 class="text-4xl font-extrabold tracking-tight drop-shadow sm:text-6xl">Productos frescos directamente del campo</h1>
+            <p class="text-lg text-white/90 sm:text-xl">Conectamos agricultores locales con tu hogar</p>
+            <x-ui.button size="lg" :href="route('products.index')">Explorar productos</x-ui.button>
         </div>
     </section>
 

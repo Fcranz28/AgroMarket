@@ -9,12 +9,12 @@
     >
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-            <button type="submit" class="btn">Reenviar enlace</button>
+            <x-ui.button type="submit" size="lg" class="w-full">Reenviar enlace</x-ui.button>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" class="text-center">
             @csrf
-            <button type="submit" class="link-button">Cerrar sesión</button>
+            <button type="submit" class="text-sm font-medium text-muted hover:text-brand hover:underline">Cerrar sesión</button>
         </form>
     </x-auth-card>
 @endsection
