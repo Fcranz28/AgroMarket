@@ -82,7 +82,6 @@
 @import './pedidos.css' layer(legacy);
 @import './CRUD.css' layer(legacy);
 @import './onboarding/farmer.css' layer(legacy);
-@import './checkout/index.css' layer(legacy);
 @import './orders/index.css' layer(legacy);
 @import './orders/show.css' layer(legacy);
 @import './products/show.css' layer(legacy);

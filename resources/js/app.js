@@ -1,5 +1,9 @@
 import './bootstrap';
+import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
+import stripePayment from './checkout/stripe-payment';
 
-// El carrito, el buscador y el catálogo son componentes Livewire (Alpine viene incluido).
-// Los scripts de cada página se cargan con @vite en su vista:
-// firebase-auth.js (login/registro) y stripe-checkout.js (checkout)
+// Livewire (y Alpine) arrancan desde este bundle para registrar antes los componentes Alpine.
+// El carrito, el buscador, el catálogo y el checkout son componentes Livewire.
+Alpine.data('stripePayment', stripePayment);
+
+Livewire.start();

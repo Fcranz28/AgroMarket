@@ -3,39 +3,27 @@
 namespace App\Modules\Payments\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Catalog\Exceptions\InsufficientStockException;
-use App\Modules\Orders\Actions\PlaceOrderAction;
-use App\Modules\Orders\Models\Order;
-use App\Modules\Orders\Services\CartPricingService;
 use App\Modules\Orders\Services\SessionCart;
+use App\Modules\Payments\Actions\CompleteCheckout;
+use App\Modules\Payments\Actions\CreateCheckoutIntent;
+use App\Modules\Payments\Exceptions\CheckoutException;
 use App\Modules\Payments\Http\Requests\CreatePaymentIntentRequest;
 use App\Modules\Payments\Http\Requests\ProcessPaymentRequest;
 use App\Modules\Payments\Jobs\HandleStripeEvent;
-use App\Modules\Payments\Jobs\RefundPayment;
-use App\Modules\Payments\Services\PaymentGateway;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\URL;
 use OpenApi\Attributes as OA;
-use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
 use UnexpectedValueException;
 
 class PaymentController extends Controller
 {
-    /**
-     * Minimum card payment accepted by Stripe for PEN, in cents.
-     */
-    private const MINIMUM_AMOUNT_CENTS = 200;
-
     public function __construct(
-        private PaymentGateway $gateway,
-        private CartPricingService $pricing,
-        private PlaceOrderAction $placeOrder,
+        private CreateCheckoutIntent $createIntent,
+        private CompleteCheckout $completeCheckout,
         private SessionCart $cart,
     ) {}
 
@@ -64,23 +52,10 @@ class PaymentController extends Controller
     )]
     public function createPaymentIntent(CreatePaymentIntentRequest $request): JsonResponse
     {
-        $pricedCart = $this->pricing->price($request->validated('cart'));
-
-        if ($pricedCart['total_cents'] < self::MINIMUM_AMOUNT_CENTS) {
-            return response()->json([
-                'error' => 'El monto mínimo de compra para pagos con tarjeta es de S/. 2.00. Por favor, agregue más productos a su carrito.',
-            ], 400);
-        }
-
         try {
-            $paymentIntent = $this->gateway->createIntent($pricedCart['total_cents'], [
-                'user_id' => Auth::id(),
-                'cart_hash' => $pricedCart['hash'],
-            ]);
-        } catch (ApiErrorException $exception) {
-            Log::error('Stripe payment intent creation failed', ['error' => $exception->getMessage()]);
-
-            return response()->json(['error' => 'Error al iniciar el sistema de pagos. Por favor intente nuevamente.'], 502);
+            $paymentIntent = $this->createIntent->execute($request->validated('cart'), Auth::id());
+        } catch (CheckoutException $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->status);
         }
 
         return response()->json([
@@ -127,48 +102,15 @@ class PaymentController extends Controller
     )]
     public function processPayment(ProcessPaymentRequest $request): JsonResponse
     {
-        $paymentIntentId = $request->validated('payment_intent_id');
-
-        if (Order::where('stripe_payment_intent_id', $paymentIntentId)->exists()) {
-            return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
-        }
-
         try {
-            $paymentIntent = $this->gateway->retrieveIntent($paymentIntentId);
-        } catch (ApiErrorException $exception) {
-            Log::warning('Stripe payment intent lookup failed', ['payment_intent' => $paymentIntentId, 'error' => $exception->getMessage()]);
-
-            return response()->json(['error' => 'No se pudo verificar el pago.'], 422);
-        }
-
-        if ($paymentIntent->status !== 'succeeded') {
-            return response()->json(['error' => 'El pago no se ha completado'], 400);
-        }
-
-        $pricedCart = $this->pricing->price($request->validated('cart'));
-
-        if ($paymentIntent->amount !== $pricedCart['total_cents']
-            || $paymentIntent->currency !== $this->gateway->currency()
-            || ($paymentIntent->metadata['cart_hash'] ?? null) !== $pricedCart['hash']) {
-            Log::warning('Payment intent does not match cart', ['payment_intent' => $paymentIntentId]);
-
-            return response()->json(['error' => 'El pago no coincide con el contenido del carrito.'], 422);
-        }
-
-        try {
-            $order = $this->placeOrder->execute(
-                $pricedCart['lines'],
-                $pricedCart['total_cents'],
+            $order = $this->completeCheckout->execute(
+                $request->validated('payment_intent_id'),
+                $request->validated('cart'),
                 $request->safe()->only(['shipping_address', 'phone', 'guest_name', 'guest_lastname', 'guest_email', 'document_type', 'document_number']),
-                $paymentIntentId,
                 Auth::id(),
             );
-        } catch (InsufficientStockException $exception) {
-            RefundPayment::dispatch($paymentIntentId);
-
-            return response()->json(['error' => $exception->getMessage().' Reembolsaremos tu pago automáticamente.'], 409);
-        } catch (UniqueConstraintViolationException) {
-            return response()->json(['error' => 'Este pago ya fue registrado.'], 409);
+        } catch (CheckoutException $exception) {
+            return response()->json(['error' => $exception->getMessage()], $exception->status);
         }
 
         $this->cart->clear();
@@ -179,9 +121,7 @@ class PaymentController extends Controller
             'success' => true,
             'order_id' => $order->uuid,
             'redirect' => Auth::check() ? route('orders.show', $order) : route('home'),
-            'invoice_url' => Auth::check()
-                ? null
-                : URL::temporarySignedRoute('orders.guest-invoice', now()->addDays(7), ['order' => $order]),
+            'invoice_url' => Auth::check() ? null : CompleteCheckout::guestInvoiceUrl($order),
         ]);
     }
 
