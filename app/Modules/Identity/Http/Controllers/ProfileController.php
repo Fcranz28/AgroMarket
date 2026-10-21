@@ -5,11 +5,7 @@ namespace App\Modules\Identity\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Identity\Http\Requests\UpdateProfileRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
@@ -34,33 +30,5 @@ class ProfileController extends Controller
 
         return redirect()->route('orders.index')
             ->with('success', 'Perfil actualizado correctamente');
-    }
-
-    /**
-     * Update user password
-     */
-    public function updatePassword(Request $request)
-    {
-        $validated = $request->validate([
-            'current_password' => 'required',
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
-
-        $user = Auth::user();
-
-        // Verify current password
-        if (! Hash::check($validated['current_password'], $user->password)) {
-            return back()->withErrors([
-                'current_password' => 'La contraseña actual no es correcta',
-            ]);
-        }
-
-        // Update password
-        $user->update([
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        return redirect()->route('orders.index')
-            ->with('success', 'Contraseña actualizada correctamente');
     }
 }
