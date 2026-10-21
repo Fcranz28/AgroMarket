@@ -1,30 +1,54 @@
 @props(['product'])
 
+@php
+    use App\Modules\Shared\Money;
+
+    $units = $product->relationLoaded('units') ? $product->units->sortBy(fn ($unit) => (float) $unit->price)->values() : collect();
+
+    $tag = match (true) {
+        $product->stock > 0 && $product->stock <= 10 => ['Pocas unidades', 'bg-[#F2C14E] text-[#2A1E00]'],
+        $units->count() > 1 => ['Por mayor', 'bg-surface text-ink'],
+        default => null,
+    };
+@endphp
+
 {{-- El botón avisa al carrito con el evento "add-to-cart" de Livewire --}}
-<article {{ $attributes->class('group flex flex-col overflow-hidden rounded-card border border-line bg-surface shadow-soft transition hover:-translate-y-1 hover:shadow-lifted') }}>
-    <a href="{{ route('products.show', $product->slug) }}" class="block aspect-square overflow-hidden">
+<article {{ $attributes->class('group flex flex-col gap-3 rounded-card border border-line bg-surface p-3 shadow-soft transition hover:-translate-y-1 hover:shadow-card') }}>
+    <a href="{{ route('products.show', $product->slug) }}" class="relative block aspect-[4/3] overflow-hidden rounded-xl">
         <x-catalog.product-image :product="$product" class="size-full transition duration-300 group-hover:scale-105" />
+        @if ($tag)
+            <span class="absolute top-2.5 left-2.5 rounded-pill px-2.5 py-1 text-[11px] font-bold shadow-soft {{ $tag[1] }}">{{ $tag[0] }}</span>
+        @endif
     </a>
 
-    <div class="flex flex-1 flex-col gap-1 p-4">
+    <div class="flex flex-col gap-0.5 px-1.5">
         @if ($product->relationLoaded('category') && $product->category)
-            <span class="text-xs font-medium tracking-wide text-muted uppercase">{{ $product->category->name }}</span>
+            <span class="text-[11px] font-bold tracking-[0.08em] text-brand uppercase">{{ $product->category->name }}</span>
         @endif
+        <a href="{{ route('products.show', $product->slug) }}" class="line-clamp-2 text-lg font-extrabold tracking-tight text-ink hover:text-brand">{{ $product->name }}</a>
+    </div>
 
-        <a href="{{ route('products.show', $product->slug) }}" class="line-clamp-2 font-semibold text-ink hover:text-brand">{{ $product->name }}</a>
+    @if ($units->count() > 1)
+        <div class="flex flex-wrap gap-1.5 px-1.5">
+            @foreach ($units as $unit)
+                <span @class(['rounded-lg px-2 py-1 text-xs font-bold', 'bg-night text-lime' => $loop->first, 'bg-canvas text-muted' => ! $loop->first])>{{ $unit->unit }}</span>
+            @endforeach
+        </div>
+    @endif
 
-        <p class="mt-auto pt-2 text-lg font-bold text-brand">
-            {{ \App\Modules\Shared\Money::fromDecimal($product->price)->format() }}
-            <span class="text-sm font-normal text-muted">/ {{ $product->unit }}</span>
+    <div class="mt-auto flex items-center justify-between gap-2 px-1.5 pb-1">
+        <p class="min-w-0 text-ink">
+            <span class="block text-xl leading-tight font-extrabold tracking-tight whitespace-nowrap">{{ Money::fromDecimal($product->price)->format() }}</span>
+            <span class="block truncate text-sm text-muted">por {{ $product->unit }}</span>
         </p>
 
         @if ($product->stock > 0)
-            <x-ui.button size="sm" class="mt-2 w-full" data-test="add-to-cart-{{ $product->id }}" x-data x-on:click="Livewire.dispatch('add-to-cart', { productId: {{ $product->id }} })">
-                <svg class="size-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg>
-                Agregar al carrito
+            <x-ui.button variant="dark" size="sm" class="h-11 shrink-0" data-test="add-to-cart-{{ $product->id }}" aria-label="Agregar {{ $product->name }} al carrito" x-data x-on:click="Livewire.dispatch('add-to-cart', { productId: {{ $product->id }} })">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Agregar
             </x-ui.button>
         @else
-            <x-ui.button size="sm" variant="secondary" class="mt-2 w-full" disabled>Sin stock</x-ui.button>
+            <span class="rounded-lg bg-canvas px-3 py-2 text-sm font-semibold text-muted">Sin stock</span>
         @endif
     </div>
 </article>

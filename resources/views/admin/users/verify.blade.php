@@ -20,7 +20,7 @@
     <div class="grid gap-6 xl:grid-cols-2">
         <x-ui.card class="flex flex-col gap-5">
             <div class="flex items-center gap-4">
-                <span class="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-white">{{ mb_strtoupper(mb_substr($user->name, 0, 2)) }}</span>
+                <span class="flex size-14 items-center justify-center rounded-full bg-night text-lg font-semibold text-lime">{{ mb_strtoupper(mb_substr($user->name, 0, 2)) }}</span>
                 <div class="min-w-0">
                     <h2 class="truncate text-xl font-semibold text-ink">{{ $user->name }}</h2>
                     <p class="truncate text-sm text-muted">{{ $user->email }} · {{ $user->phone ?? 'Sin teléfono' }}</p>

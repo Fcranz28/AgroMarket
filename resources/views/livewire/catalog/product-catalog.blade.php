@@ -20,9 +20,9 @@
         </x-ui.card>
 
         <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:hidden">
-            <button type="button" wire:click="selectCategory('all')" @class(['shrink-0 rounded-pill border px-4 py-1.5 text-sm whitespace-nowrap transition', 'border-brand bg-brand text-white' => ! $this->currentCategory, 'border-line bg-surface text-ink' => (bool) $this->currentCategory])>Todos</button>
+            <button type="button" wire:click="selectCategory('all')" @class(['shrink-0 rounded-pill border px-4 py-1.5 text-sm whitespace-nowrap transition', 'border-brand bg-night text-lime' => ! $this->currentCategory, 'border-line bg-surface text-ink' => (bool) $this->currentCategory])>Todos</button>
             @foreach ($this->categories as $categoryOption)
-                <button type="button" wire:key="category-pill-{{ $categoryOption->id }}" wire:click="selectCategory(@js($categoryOption->slug))" @class(['shrink-0 rounded-pill border px-4 py-1.5 text-sm whitespace-nowrap transition', 'border-brand bg-brand text-white' => $this->currentCategory?->is($categoryOption), 'border-line bg-surface text-ink' => ! $this->currentCategory?->is($categoryOption)])>{{ $categoryOption->name }}</button>
+                <button type="button" wire:key="category-pill-{{ $categoryOption->id }}" wire:click="selectCategory(@js($categoryOption->slug))" @class(['shrink-0 rounded-pill border px-4 py-1.5 text-sm whitespace-nowrap transition', 'border-brand bg-night text-lime' => $this->currentCategory?->is($categoryOption), 'border-line bg-surface text-ink' => ! $this->currentCategory?->is($categoryOption)])>{{ $categoryOption->name }}</button>
             @endforeach
         </div>
     </aside>

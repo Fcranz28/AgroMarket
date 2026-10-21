@@ -1,50 +1,50 @@
 @php
     $navLinks = [
         ['label' => 'Inicio', 'route' => 'home', 'active' => 'home'],
-        ['label' => 'Categorías', 'route' => 'products.index', 'active' => 'products.*'],
-        ['label' => 'Contacto', 'route' => 'contact.show', 'active' => 'contact.*'],
+        ['label' => 'Catálogo', 'route' => 'products.index', 'active' => 'products.*'],
         ['label' => 'Nosotros', 'route' => 'about', 'active' => 'about'],
+        ['label' => 'Contacto', 'route' => 'contact.show', 'active' => 'contact.*'],
     ];
 @endphp
 
-<header class="pointer-events-none fixed inset-x-0 top-2.5 z-[1000] flex flex-col items-center md:top-5">
-    <nav class="pointer-events-auto flex w-[95%] max-w-[1600px] items-center justify-between gap-2 rounded-2xl border border-line bg-navbar px-2 py-2 shadow-card backdrop-blur-md sm:px-4 md:w-[90%] md:gap-4 md:rounded-pill md:px-8 md:py-3" aria-label="Principal">
-        <a href="{{ route('home') }}" class="shrink-0">
-            <img src="{{ asset('img/Logo_Claro.png') }}" alt="AgroMarket" class="h-7 w-auto md:h-10 dark:hidden">
-            <img src="{{ asset('img/Logo_Oscuro.png') }}" alt="AgroMarket" class="hidden h-7 w-auto md:h-10 dark:block">
+<header class="sticky top-0 z-[1000] bg-navbar text-on-night">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 lg:py-4">
+        <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2.5 hover:text-on-night" aria-label="AgroMarket, inicio">
+            <span class="flex size-9 items-center justify-center rounded-[10px] bg-lime">
+                <svg class="size-5 text-night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></svg>
+            </span>
+            <span class="text-xl font-extrabold tracking-tight">AgroMarket</span>
         </a>
 
-        <div class="hidden gap-8 xl:flex">
+        <nav class="order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 [scrollbar-width:none] xl:order-none xl:mx-0 xl:w-auto xl:shrink-0 xl:px-0" aria-label="Principal">
             @foreach ($navLinks as $link)
                 <a
                     href="{{ route($link['route']) }}"
+                    @if (request()->routeIs($link['active'])) aria-current="page" @endif
                     @class([
-                        'relative text-[0.95rem] font-medium transition hover:text-brand',
-                        'text-brand after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-brand' => request()->routeIs($link['active']),
-                        'text-ink' => ! request()->routeIs($link['active']),
+                        'shrink-0 rounded-pill px-4 py-2 text-sm font-semibold whitespace-nowrap transition',
+                        'bg-lime text-night' => request()->routeIs($link['active']),
+                        'text-on-night-muted hover:bg-white/10 hover:text-on-night' => ! request()->routeIs($link['active']),
                     ])
                 >{{ $link['label'] }}</a>
             @endforeach
-        </div>
+        </nav>
 
-        <div class="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-3 xl:flex-none">
+        <div class="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2 xl:ml-0">
             <livewire:catalog.search-box />
 
-            <button type="button" data-test="open-cart" x-data x-on:click="$dispatch('open-cart')" class="relative hidden p-1 text-ink transition hover:text-brand md:inline-flex" aria-label="Abrir carrito">
-                <svg class="size-6 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                <livewire:orders.cart-count />
-            </button>
-
             @guest
-                <div class="hidden shrink-0 gap-3 lg:flex">
-                    <x-ui.button variant="secondary" :href="route('login')" class="whitespace-nowrap">Iniciar sesión</x-ui.button>
-                    <x-ui.button variant="dark" :href="route('register')">Registrarse</x-ui.button>
-                </div>
+                <a href="{{ route('login') }}" class="hidden h-11 shrink-0 items-center gap-2 rounded-control border border-white/15 px-4 text-sm font-semibold transition hover:border-lime hover:text-lime lg:flex">
+                    <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg>
+                    Ingresar
+                </a>
+                <a href="{{ route('register') }}" class="hidden h-11 shrink-0 items-center rounded-control bg-white/10 px-4 text-sm font-semibold transition hover:bg-white/15 xl:flex">Registrarse</a>
             @else
                 <x-ui.dropdown class="hidden md:block">
                     <x-slot:trigger>
-                        <button type="button" class="flex items-center gap-2 rounded-pill border border-line bg-canvas px-3 py-2 text-sm whitespace-nowrap text-ink transition hover:border-brand">
-                            Hola, {{ Auth::user()->name }}
+                        <button type="button" class="flex h-11 items-center gap-2 rounded-control border border-white/15 px-3 text-sm font-semibold whitespace-nowrap transition hover:border-lime">
+                            <span class="flex size-7 items-center justify-center rounded-full bg-lime text-xs font-extrabold text-night">{{ mb_strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}</span>
+                            <span class="max-w-32 truncate">Hola, {{ Auth::user()->name }}</span>
                             <svg class="size-3 fill-current" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
                         </button>
                     </x-slot:trigger>
@@ -53,21 +53,12 @@
                 </x-ui.dropdown>
             @endguest
 
-            @include('partials.theme-toggle')
-        </div>
-    </nav>
+            <span class="hidden sm:block">@include('partials.theme-toggle')</span>
 
-    {{-- Pestañas que cuelgan del navbar cuando los enlaces no caben en él --}}
-    <nav class="pointer-events-auto -mt-px flex max-w-[95%] overflow-x-auto rounded-b-2xl border border-t-0 border-line bg-navbar px-1 shadow-soft backdrop-blur-md [scrollbar-width:none] xl:hidden" aria-label="Secciones">
-        @foreach ($navLinks as $link)
-            <a
-                href="{{ route($link['route']) }}"
-                @class([
-                    'my-1 shrink-0 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition hover:bg-brand/10 hover:text-brand',
-                    'bg-brand/10 font-semibold text-brand' => request()->routeIs($link['active']),
-                    'text-muted' => ! request()->routeIs($link['active']),
-                ])
-            >{{ $link['label'] }}</a>
-        @endforeach
-    </nav>
+            <button type="button" data-test="open-cart" x-data x-on:click="$dispatch('open-cart')" class="relative hidden size-11 shrink-0 items-center justify-center rounded-control bg-lime text-night transition hover:bg-lime-strong md:flex" aria-label="Abrir carrito">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>
+                <livewire:orders.cart-count />
+            </button>
+        </div>
+    </div>
 </header>

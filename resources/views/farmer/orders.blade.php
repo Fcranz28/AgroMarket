@@ -31,7 +31,7 @@
     <div class="flex flex-col gap-4" x-data="{ filter: 'all' }">
         <div class="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0" role="group" aria-label="Filtrar por estado">
             @foreach ($filters as $value => $label)
-                <button type="button" x-on:click="filter = @js($value)" x-bind:aria-pressed="filter === @js($value)" x-bind:class="filter === @js($value) ? 'border-brand bg-brand text-white' : 'border-line bg-surface text-ink hover:border-brand'" class="shrink-0 rounded-pill border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition">{{ $label }}</button>
+                <button type="button" x-on:click="filter = @js($value)" x-bind:aria-pressed="filter === @js($value)" x-bind:class="filter === @js($value) ? 'border-brand bg-night text-lime' : 'border-line bg-surface text-ink hover:border-brand'" class="shrink-0 rounded-pill border px-4 py-1.5 text-sm font-medium whitespace-nowrap transition">{{ $label }}</button>
             @endforeach
         </div>
 

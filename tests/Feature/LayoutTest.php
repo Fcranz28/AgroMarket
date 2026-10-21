@@ -66,7 +66,7 @@ it('hides the add product button from unverified farmers', function () {
 it('marks the current section as active', function () {
     $html = $this->get(route('about'))->getContent();
 
-    expect($html)->toMatch('/href="'.preg_quote(route('about'), '/').'"\s+class="[^"]*text-brand/');
+    expect($html)->toMatch('/href="'.preg_quote(route('about'), '/').'"\s+aria-current="page"/');
 });
 
 it('renders a button as a link when given an href', function () {
