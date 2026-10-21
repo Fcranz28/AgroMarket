@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Modules\Identity\Http\Controllers;
 
-use App\Exceptions\InvalidFirebaseTokenException;
-use App\Http\Requests\FirebaseAuthRequest;
-use App\Models\User;
-use App\Services\FirebaseTokenVerifier;
+use App\Http\Controllers\Controller;
+use App\Modules\Identity\Exceptions\InvalidFirebaseTokenException;
+use App\Modules\Identity\Http\Requests\FirebaseAuthRequest;
+use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Services\FirebaseTokenVerifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

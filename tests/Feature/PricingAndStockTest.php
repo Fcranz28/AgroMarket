@@ -4,7 +4,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductUnit;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use App\Services\CartPricingService;
 use App\Services\InvoiceService;
 use App\Services\PaymentGateway;

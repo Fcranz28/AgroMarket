@@ -13,13 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'onboarding.pending' => \App\Http\Middleware\EnsureOnboardingPending::class,
+            'role' => \App\Modules\Identity\Http\Middleware\CheckRole::class,
+            'onboarding.pending' => \App\Modules\Identity\Http\Middleware\EnsureOnboardingPending::class,
         ]);
 
         $middleware->web(append: [
-            \App\Http\Middleware\EnsureNotBanned::class,
-            \App\Http\Middleware\EnsureOnboarding::class,
+            \App\Modules\Identity\Http\Middleware\EnsureNotBanned::class,
+            \App\Modules\Identity\Http\Middleware\EnsureOnboarding::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 

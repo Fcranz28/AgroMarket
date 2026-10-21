@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Invoice;
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use Illuminate\Auth\Access\Response;
 
 class InvoicePolicy

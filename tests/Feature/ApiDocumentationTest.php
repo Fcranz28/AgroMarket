@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Modules\Identity\Models\User;
 use Illuminate\Support\Facades\Artisan;
 
 beforeEach(function () {

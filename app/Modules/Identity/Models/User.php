@@ -1,15 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\Identity\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Product;
+use App\Models\Report;
+use App\Modules\Identity\Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+#[UseFactory(UserFactory::class)]
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\App\Modules\Identity\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     const ROLE_USER = 'user';
