@@ -37,6 +37,22 @@ arch('orders does not depend on the modules built on top of it')
         'App\Modules\Backoffice',
     ]);
 
+arch('payments does not depend on its sibling modules')
+    ->expect('App\Modules\Payments')
+    ->not->toUse([
+        'App\Modules\Invoicing',
+        'App\Modules\Moderation',
+        'App\Modules\Backoffice',
+    ]);
+
+arch('invoicing does not depend on its sibling modules')
+    ->expect('App\Modules\Invoicing')
+    ->not->toUse([
+        'App\Modules\Payments',
+        'App\Modules\Moderation',
+        'App\Modules\Backoffice',
+    ]);
+
 arch('moderation does not depend on its sibling modules')
     ->expect('App\Modules\Moderation')
     ->not->toUse([
