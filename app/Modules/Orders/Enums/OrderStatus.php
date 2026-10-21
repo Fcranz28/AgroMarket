@@ -22,6 +22,30 @@ enum OrderStatus: string
     }
 
     /**
+     * Color of the status badge (x-ui.badge).
+     */
+    public function badgeColor(): string
+    {
+        return match ($this) {
+            self::Pending => 'warning',
+            self::Processing => 'info',
+            self::Shipped => 'brand',
+            self::Delivered => 'success',
+            self::Cancelled => 'danger',
+        };
+    }
+
+    /**
+     * Steps of the delivery timeline, in order. A cancelled order is not part of it.
+     *
+     * @return list<self>
+     */
+    public static function trackingSteps(): array
+    {
+        return [self::Pending, self::Processing, self::Shipped, self::Delivered];
+    }
+
+    /**
      * Delivered or cancelled orders can no longer change.
      */
     public function isFinal(): bool

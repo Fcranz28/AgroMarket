@@ -49,7 +49,7 @@ class AddressController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->addresses()->count() >= 3) {
+        if ($user->addresses()->count() >= Address::MAX_PER_USER) {
             return response()->json(['message' => 'Solo puedes tener un máximo de 3 direcciones.'], 422);
         }
 
