@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Identity\Enums\VerificationStatus;
 use App\Modules\Identity\Http\Requests\CheckDniRequest;
 use App\Modules\Identity\Models\User;
+use App\Modules\Identity\Notifications\FarmerVerificationReviewedNotification;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -134,6 +135,7 @@ class UserManagementController extends Controller
         }
 
         $user->update(['verification_status' => $status]);
+        $user->notify(new FarmerVerificationReviewedNotification($status));
 
         return redirect()->route('admin.users')->with('success', 'Estado del agricultor actualizado correctamente.');
     }

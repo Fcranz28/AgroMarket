@@ -9,6 +9,7 @@ use App\Modules\Orders\Enums\PaymentStatus;
 use App\Modules\Orders\Events\OrderCancelled;
 use App\Modules\Orders\Http\Requests\UpdateOrderStatusRequest;
 use App\Modules\Orders\Models\Order;
+use App\Modules\Orders\Notifications\OrderStatusChangedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +96,7 @@ class OrderController extends Controller
 
         if ($status !== OrderStatus::Cancelled) {
             $order->update(['status' => $status]);
+            $order->notifyBuyer(new OrderStatusChangedNotification($order, $status));
 
             return response()->json(['success' => true, 'message' => 'Estado actualizado correctamente']);
         }
@@ -112,6 +114,7 @@ class OrderController extends Controller
         $wasPaid = $order->payment_status === PaymentStatus::Paid;
 
         OrderCancelled::dispatch($order);
+        $order->notifyBuyer(new OrderStatusChangedNotification($order, OrderStatus::Cancelled));
 
         return response()->json([
             'success' => true,
